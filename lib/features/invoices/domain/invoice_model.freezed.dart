@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$InvoiceModel {
 
- int? get id; String? get rrn; String? get houseName; String? get houseCode; String? get estate; String? get property; String? get tenantName; String? get tenantPhone; String? get monthName; double get rentOwed; double get rentPaid; String? get category; String? get houseType; String? get dueDate; String? get paidOn; String? get voidedOn; String? get status; String? get overdueEstate;
+ int? get id; String? get rrn; String? get houseName; String? get houseCode; String? get estate; String? get property; String? get tenantName; String? get tenantPhone; String? get monthName; double get rentOwed; double get rentPaid; String? get category; String? get houseType; String? get dueDate; String? get paidOn; String? get voidedOn; int get status; bool get overdueEstate;
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $InvoiceModelCopyWith<$Res>  {
   factory $InvoiceModelCopyWith(InvoiceModel value, $Res Function(InvoiceModel) _then) = _$InvoiceModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String? rrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? category, String? houseType, String? dueDate, String? paidOn, String? voidedOn, String? status, String? overdueEstate
+ int? id, String? rrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? category, String? houseType, String? dueDate, String? paidOn, String? voidedOn, int status, bool overdueEstate
 });
 
 
@@ -65,7 +65,7 @@ class _$InvoiceModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? category = freezed,Object? houseType = freezed,Object? dueDate = freezed,Object? paidOn = freezed,Object? voidedOn = freezed,Object? status = freezed,Object? overdueEstate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? category = freezed,Object? houseType = freezed,Object? dueDate = freezed,Object? paidOn = freezed,Object? voidedOn = freezed,Object? status = null,Object? overdueEstate = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
@@ -83,9 +83,9 @@ as String?,houseType: freezed == houseType ? _self.houseType : houseType // igno
 as String?,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
 as String?,voidedOn: freezed == voidedOn ? _self.voidedOn : voidedOn // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,overdueEstate: freezed == overdueEstate ? _self.overdueEstate : overdueEstate // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as int,overdueEstate: null == overdueEstate ? _self.overdueEstate : overdueEstate // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -170,7 +170,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  String? status,  String? overdueEstate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  int status,  bool overdueEstate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _InvoiceModel() when $default != null:
 return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.category,_that.houseType,_that.dueDate,_that.paidOn,_that.voidedOn,_that.status,_that.overdueEstate);case _:
@@ -191,7 +191,7 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  String? status,  String? overdueEstate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  int status,  bool overdueEstate)  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceModel():
 return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.category,_that.houseType,_that.dueDate,_that.paidOn,_that.voidedOn,_that.status,_that.overdueEstate);case _:
@@ -211,7 +211,7 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  String? status,  String? overdueEstate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  int status,  bool overdueEstate)?  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceModel() when $default != null:
 return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.category,_that.houseType,_that.dueDate,_that.paidOn,_that.voidedOn,_that.status,_that.overdueEstate);case _:
@@ -226,7 +226,7 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,
 @JsonSerializable()
 
 class _InvoiceModel extends InvoiceModel {
-  const _InvoiceModel({this.id, this.rrn, this.houseName, this.houseCode, this.estate, this.property, this.tenantName, this.tenantPhone, this.monthName, this.rentOwed = 0, this.rentPaid = 0, this.category, this.houseType, this.dueDate, this.paidOn, this.voidedOn, this.status, this.overdueEstate}): super._();
+  const _InvoiceModel({this.id, this.rrn, this.houseName, this.houseCode, this.estate, this.property, this.tenantName, this.tenantPhone, this.monthName, this.rentOwed = 0, this.rentPaid = 0, this.category, this.houseType, this.dueDate, this.paidOn, this.voidedOn, this.status = 0, this.overdueEstate = false}): super._();
   factory _InvoiceModel.fromJson(Map<String, dynamic> json) => _$InvoiceModelFromJson(json);
 
 @override final  int? id;
@@ -245,8 +245,8 @@ class _InvoiceModel extends InvoiceModel {
 @override final  String? dueDate;
 @override final  String? paidOn;
 @override final  String? voidedOn;
-@override final  String? status;
-@override final  String? overdueEstate;
+@override@JsonKey() final  int status;
+@override@JsonKey() final  bool overdueEstate;
 
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
@@ -281,7 +281,7 @@ abstract mixin class _$InvoiceModelCopyWith<$Res> implements $InvoiceModelCopyWi
   factory _$InvoiceModelCopyWith(_InvoiceModel value, $Res Function(_InvoiceModel) _then) = __$InvoiceModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String? rrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? category, String? houseType, String? dueDate, String? paidOn, String? voidedOn, String? status, String? overdueEstate
+ int? id, String? rrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? category, String? houseType, String? dueDate, String? paidOn, String? voidedOn, int status, bool overdueEstate
 });
 
 
@@ -298,7 +298,7 @@ class __$InvoiceModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? category = freezed,Object? houseType = freezed,Object? dueDate = freezed,Object? paidOn = freezed,Object? voidedOn = freezed,Object? status = freezed,Object? overdueEstate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? category = freezed,Object? houseType = freezed,Object? dueDate = freezed,Object? paidOn = freezed,Object? voidedOn = freezed,Object? status = null,Object? overdueEstate = null,}) {
   return _then(_InvoiceModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
@@ -316,9 +316,9 @@ as String?,houseType: freezed == houseType ? _self.houseType : houseType // igno
 as String?,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
 as String?,voidedOn: freezed == voidedOn ? _self.voidedOn : voidedOn // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,overdueEstate: freezed == overdueEstate ? _self.overdueEstate : overdueEstate // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as int,overdueEstate: null == overdueEstate ? _self.overdueEstate : overdueEstate // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

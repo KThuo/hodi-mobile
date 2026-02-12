@@ -21,6 +21,8 @@ class PaymentRepository {
     int pageSize = 20,
     String? searchTerm,
     bool isTenant = false,
+    String? startDate,
+    String? endDate,
   }) async {
     final endpoint = isTenant ? ApiConstants.payments : ApiConstants.estatePayments;
     return _apiClient.get<PagedResponse<PaymentModel>>(
@@ -30,6 +32,8 @@ class PaymentRepository {
         'pageSize': pageSize,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
         if (isTenant) 'self': 'true',
+        'startDate': ?startDate,
+        'endDate': ?endDate,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

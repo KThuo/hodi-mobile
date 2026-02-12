@@ -25,9 +25,19 @@ class AuthRepository {
     if (response.isSuccess && response.data != null) {
       final user = UserModel.fromLoginResponse(response.data!);
       final tokenData = response.data!['tokenDetails'] as Map<String, dynamic>? ?? {};
+      final expiryValue = tokenData['expiry'];
+      final int expiryMs;
+      if (expiryValue is num) {
+        expiryMs = expiryValue.toInt();
+      } else if (expiryValue is String) {
+        expiryMs = DateTime.parse(expiryValue).millisecondsSinceEpoch;
+      } else {
+        expiryMs = 0;
+      }
+
       final token = TokenModel(
         accessToken: tokenData['accessToken']?.toString() ?? '',
-        expiry: (tokenData['expiry'] as num?)?.toInt() ?? 0,
+        expiry: expiryMs,
       );
 
       await _storage.saveToken(token);

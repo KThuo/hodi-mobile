@@ -24,8 +24,8 @@ _InvoiceModel _$InvoiceModelFromJson(Map<String, dynamic> json) =>
       dueDate: json['dueDate'] as String?,
       paidOn: json['paidOn'] as String?,
       voidedOn: json['voidedOn'] as String?,
-      status: json['status'] as String?,
-      overdueEstate: json['overdueEstate'] as String?,
+      status: (json['status'] as num?)?.toInt() ?? 0,
+      overdueEstate: json['overdueEstate'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$InvoiceModelToJson(_InvoiceModel instance) =>

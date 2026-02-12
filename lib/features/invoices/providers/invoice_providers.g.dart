@@ -58,7 +58,7 @@ final class InvoiceListProvider
   }
 }
 
-String _$invoiceListHash() => r'dc535edb70f2c9b6d86ff8516a05169b2c5735fb';
+String _$invoiceListHash() => r'0ed5cdc882e3c3a2ed20e7d1b8f7fa8f187f234e';
 
 final class InvoiceListFamily extends $Family
     with

@@ -22,7 +22,7 @@ _PaymentModel _$PaymentModelFromJson(Map<String, dynamic> json) =>
       rentPaid: (json['rentPaid'] as num?)?.toDouble() ?? 0,
       paidBy: json['paidBy'] as String?,
       paidOn: json['paidOn'] as String?,
-      status: json['status'] as String?,
+      status: (json['status'] as num?)?.toInt() ?? 0,
       paymentRef: json['paymentRef'] as String?,
       phoneNo: json['phoneNo'] as String?,
       category: json['category'] as String?,

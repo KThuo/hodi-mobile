@@ -1,5 +1,5 @@
 abstract class ApiConstants {
-  static const String baseUrl = 'https://app.hodi.co.ke';
+  static const String baseUrl = 'https://hodi-test.qnex.io';
   static const String apiPrefix = '/api';
 
   // Timeouts

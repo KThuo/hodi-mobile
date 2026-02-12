@@ -21,7 +21,7 @@ abstract class PaymentModel with _$PaymentModel {
     @Default(0) double rentPaid,
     String? paidBy,
     String? paidOn,
-    String? status,
+    @Default(0) int status,
     String? paymentRef,
     String? phoneNo,
     String? category,

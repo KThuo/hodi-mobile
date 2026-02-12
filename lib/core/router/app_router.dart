@@ -12,6 +12,8 @@ import '../../features/invoices/presentation/invoices_screen.dart';
 import '../../features/invoices/presentation/invoice_detail_screen.dart';
 import '../../features/payments/presentation/payments_screen.dart';
 import '../../features/payments/presentation/payment_detail_screen.dart';
+import '../../features/properties/presentation/properties_screen.dart';
+import '../../features/more/presentation/more_screen.dart';
 
 // Placeholder screens - will be replaced in later phases
 class _PlaceholderScreen extends StatelessWidget {
@@ -25,13 +27,13 @@ class _PlaceholderScreen extends StatelessWidget {
   }
 }
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/home',
     debugLogDiagnostics: true,
     redirect: (context, state) {
@@ -115,13 +117,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // Properties (placeholder - Phase 3)
+          // Properties
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/properties',
                 name: RouteNames.properties,
-                builder: (context, state) => const _PlaceholderScreen(title: 'Properties'),
+                builder: (context, state) => const PropertiesScreen(),
                 routes: [
                   GoRoute(
                     path: ':id/houses',
@@ -181,7 +183,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/more',
                 name: RouteNames.more,
-                builder: (context, state) => const _PlaceholderScreen(title: 'More'),
+                builder: (context, state) => const MoreScreen(),
                 routes: [
                   GoRoute(
                     path: 'metres',

@@ -11,15 +11,16 @@ class _NavTab {
   final IconData icon;
   final IconData activeIcon;
   final String path;
+  final int branchIndex;
 
   const _NavTab({
     required this.label,
     required this.icon,
     required this.activeIcon,
     required this.path,
+    required this.branchIndex,
   });
 }
-
 class AppShell extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
 
@@ -42,6 +43,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       icon: Icons.dashboard_outlined,
       activeIcon: Icons.dashboard,
       path: '/home',
+      branchIndex: 0,
     ));
 
     bool hasPermission(String p) => authorities.contains(p);
@@ -54,6 +56,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         icon: Icons.home_work_outlined,
         activeIcon: Icons.home_work,
         path: '/houses',
+        branchIndex: 1,
       ));
     }
 
@@ -64,6 +67,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         icon: Icons.apartment_outlined,
         activeIcon: Icons.apartment,
         path: '/properties',
+        branchIndex: 2,
       ));
     }
 
@@ -74,6 +78,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long,
         path: '/invoices',
+        branchIndex: 3,
       ));
     }
 
@@ -84,16 +89,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         icon: Icons.payments_outlined,
         activeIcon: Icons.payments,
         path: '/payments',
-      ));
-    }
-
-    // Tenants
-    if (hasPermission(AppPermissions.tenantsView)) {
-      tabs.add(const _NavTab(
-        label: 'Tenants',
-        icon: Icons.people_outline,
-        activeIcon: Icons.people,
-        path: '/tenants',
+        branchIndex: 4,
       ));
     }
 
@@ -112,6 +108,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       icon: Icons.menu_outlined,
       activeIcon: Icons.menu,
       path: '/more',
+      branchIndex: 5,
     ));
 
     return visibleTabs;
@@ -137,13 +134,13 @@ class _AppShellState extends ConsumerState<AppShell> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(tabs.length, (index) {
                 final tab = tabs[index];
-                final isSelected = widget.navigationShell.currentIndex == index;
+                final isSelected = widget.navigationShell.currentIndex == tab.branchIndex;
 
                 return Expanded(
                   child: InkWell(
                     onTap: () => widget.navigationShell.goBranch(
-                      index,
-                      initialLocation: index == widget.navigationShell.currentIndex,
+                      tab.branchIndex,
+                      initialLocation: tab.branchIndex == widget.navigationShell.currentIndex,
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

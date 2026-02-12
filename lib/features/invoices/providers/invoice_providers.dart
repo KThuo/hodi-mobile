@@ -55,15 +55,11 @@ class InvoiceListState {
 class InvoiceList extends _$InvoiceList {
   @override
   InvoiceListState build(String status) {
-    _loadInitial();
+    Future.microtask(() => _fetchPage(0));
     return const InvoiceListState(isLoading: true);
   }
 
   InvoiceRepository get _repository => ref.read(invoiceRepositoryProvider);
-
-  Future<void> _loadInitial() async {
-    await _fetchPage(0);
-  }
 
   Future<void> _fetchPage(int page) async {
     final response = await _repository.getInvoices(
@@ -110,5 +106,11 @@ final invoiceDetailProvider =
     FutureProvider.autoDispose.family<InvoiceDetailModel?, String>((ref, rrn) async {
   final repo = ref.watch(invoiceRepositoryProvider);
   final response = await repo.getInvoiceDetail(rrn);
-  return response.isSuccess ? response.data : null;
+  if (response.isEstateOverdue) {
+    return null; // Dialog handled globally via ErrorInterceptor
+  }
+  if (!response.isSuccess) {
+    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load invoice');
+  }
+  return response.data;
 });

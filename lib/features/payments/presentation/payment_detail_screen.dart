@@ -27,7 +27,10 @@ class PaymentDetailScreen extends ConsumerWidget {
       body: detailAsync.when(
         data: (detail) {
           if (detail == null) {
-            return const HodiErrorState(message: 'Payment not found');
+            return HodiErrorState(
+              message: 'Payment not found',
+              onRetry: () => ref.invalidate(paymentDetailProvider(rrn)),
+            );
           }
 
           return SingleChildScrollView(
@@ -134,7 +137,7 @@ class PaymentDetailScreen extends ConsumerWidget {
         },
         loading: () => const HodiLoadingShimmer(itemCount: 2, itemHeight: 120),
         error: (e, _) => HodiErrorState(
-          message: 'Failed to load payment',
+          message: e is Exception ? e.toString().replaceFirst('Exception: ', '') : 'Failed to load payment',
           onRetry: () => ref.invalidate(paymentDetailProvider(rrn)),
         ),
       ),

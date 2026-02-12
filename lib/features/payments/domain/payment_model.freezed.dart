@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PaymentModel {
 
- int? get id; String? get paymentRrn; String? get invoiceRrn; String? get houseName; String? get houseCode; String? get estate; String? get property; String? get tenantName; String? get tenantPhone; String? get monthName; double get rentOwed; double get rentPaid; String? get paidBy; String? get paidOn; String? get status; String? get paymentRef; String? get phoneNo; String? get category; String? get houseType;
+ int? get id; String? get paymentRrn; String? get invoiceRrn; String? get houseName; String? get houseCode; String? get estate; String? get property; String? get tenantName; String? get tenantPhone; String? get monthName; double get rentOwed; double get rentPaid; String? get paidBy; String? get paidOn; int get status; String? get paymentRef; String? get phoneNo; String? get category; String? get houseType;
 /// Create a copy of PaymentModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $PaymentModelCopyWith<$Res>  {
   factory $PaymentModelCopyWith(PaymentModel value, $Res Function(PaymentModel) _then) = _$PaymentModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String? paymentRrn, String? invoiceRrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? paidBy, String? paidOn, String? status, String? paymentRef, String? phoneNo, String? category, String? houseType
+ int? id, String? paymentRrn, String? invoiceRrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? paidBy, String? paidOn, int status, String? paymentRef, String? phoneNo, String? category, String? houseType
 });
 
 
@@ -65,7 +65,7 @@ class _$PaymentModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? paymentRrn = freezed,Object? invoiceRrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? paidBy = freezed,Object? paidOn = freezed,Object? status = freezed,Object? paymentRef = freezed,Object? phoneNo = freezed,Object? category = freezed,Object? houseType = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? paymentRrn = freezed,Object? invoiceRrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? paidBy = freezed,Object? paidOn = freezed,Object? status = null,Object? paymentRef = freezed,Object? phoneNo = freezed,Object? category = freezed,Object? houseType = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,paymentRrn: freezed == paymentRrn ? _self.paymentRrn : paymentRrn // ignore: cast_nullable_to_non_nullable
@@ -81,8 +81,8 @@ as String?,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cas
 as double,rentPaid: null == rentPaid ? _self.rentPaid : rentPaid // ignore: cast_nullable_to_non_nullable
 as double,paidBy: freezed == paidBy ? _self.paidBy : paidBy // ignore: cast_nullable_to_non_nullable
 as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,paymentRef: freezed == paymentRef ? _self.paymentRef : paymentRef // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as int,paymentRef: freezed == paymentRef ? _self.paymentRef : paymentRef // ignore: cast_nullable_to_non_nullable
 as String?,phoneNo: freezed == phoneNo ? _self.phoneNo : phoneNo // ignore: cast_nullable_to_non_nullable
 as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable
@@ -171,7 +171,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? paymentRrn,  String? invoiceRrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? paidBy,  String? paidOn,  String? status,  String? paymentRef,  String? phoneNo,  String? category,  String? houseType)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? paymentRrn,  String? invoiceRrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? paidBy,  String? paidOn,  int status,  String? paymentRef,  String? phoneNo,  String? category,  String? houseType)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PaymentModel() when $default != null:
 return $default(_that.id,_that.paymentRrn,_that.invoiceRrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.paidBy,_that.paidOn,_that.status,_that.paymentRef,_that.phoneNo,_that.category,_that.houseType);case _:
@@ -192,7 +192,7 @@ return $default(_that.id,_that.paymentRrn,_that.invoiceRrn,_that.houseName,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? paymentRrn,  String? invoiceRrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? paidBy,  String? paidOn,  String? status,  String? paymentRef,  String? phoneNo,  String? category,  String? houseType)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? paymentRrn,  String? invoiceRrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? paidBy,  String? paidOn,  int status,  String? paymentRef,  String? phoneNo,  String? category,  String? houseType)  $default,) {final _that = this;
 switch (_that) {
 case _PaymentModel():
 return $default(_that.id,_that.paymentRrn,_that.invoiceRrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.paidBy,_that.paidOn,_that.status,_that.paymentRef,_that.phoneNo,_that.category,_that.houseType);case _:
@@ -212,7 +212,7 @@ return $default(_that.id,_that.paymentRrn,_that.invoiceRrn,_that.houseName,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? paymentRrn,  String? invoiceRrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? paidBy,  String? paidOn,  String? status,  String? paymentRef,  String? phoneNo,  String? category,  String? houseType)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? paymentRrn,  String? invoiceRrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? paidBy,  String? paidOn,  int status,  String? paymentRef,  String? phoneNo,  String? category,  String? houseType)?  $default,) {final _that = this;
 switch (_that) {
 case _PaymentModel() when $default != null:
 return $default(_that.id,_that.paymentRrn,_that.invoiceRrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.paidBy,_that.paidOn,_that.status,_that.paymentRef,_that.phoneNo,_that.category,_that.houseType);case _:
@@ -227,7 +227,7 @@ return $default(_that.id,_that.paymentRrn,_that.invoiceRrn,_that.houseName,_that
 @JsonSerializable()
 
 class _PaymentModel extends PaymentModel {
-  const _PaymentModel({this.id, this.paymentRrn, this.invoiceRrn, this.houseName, this.houseCode, this.estate, this.property, this.tenantName, this.tenantPhone, this.monthName, this.rentOwed = 0, this.rentPaid = 0, this.paidBy, this.paidOn, this.status, this.paymentRef, this.phoneNo, this.category, this.houseType}): super._();
+  const _PaymentModel({this.id, this.paymentRrn, this.invoiceRrn, this.houseName, this.houseCode, this.estate, this.property, this.tenantName, this.tenantPhone, this.monthName, this.rentOwed = 0, this.rentPaid = 0, this.paidBy, this.paidOn, this.status = 0, this.paymentRef, this.phoneNo, this.category, this.houseType}): super._();
   factory _PaymentModel.fromJson(Map<String, dynamic> json) => _$PaymentModelFromJson(json);
 
 @override final  int? id;
@@ -244,7 +244,7 @@ class _PaymentModel extends PaymentModel {
 @override@JsonKey() final  double rentPaid;
 @override final  String? paidBy;
 @override final  String? paidOn;
-@override final  String? status;
+@override@JsonKey() final  int status;
 @override final  String? paymentRef;
 @override final  String? phoneNo;
 @override final  String? category;
@@ -283,7 +283,7 @@ abstract mixin class _$PaymentModelCopyWith<$Res> implements $PaymentModelCopyWi
   factory _$PaymentModelCopyWith(_PaymentModel value, $Res Function(_PaymentModel) _then) = __$PaymentModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String? paymentRrn, String? invoiceRrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? paidBy, String? paidOn, String? status, String? paymentRef, String? phoneNo, String? category, String? houseType
+ int? id, String? paymentRrn, String? invoiceRrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? paidBy, String? paidOn, int status, String? paymentRef, String? phoneNo, String? category, String? houseType
 });
 
 
@@ -300,7 +300,7 @@ class __$PaymentModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? paymentRrn = freezed,Object? invoiceRrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? paidBy = freezed,Object? paidOn = freezed,Object? status = freezed,Object? paymentRef = freezed,Object? phoneNo = freezed,Object? category = freezed,Object? houseType = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? paymentRrn = freezed,Object? invoiceRrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? paidBy = freezed,Object? paidOn = freezed,Object? status = null,Object? paymentRef = freezed,Object? phoneNo = freezed,Object? category = freezed,Object? houseType = freezed,}) {
   return _then(_PaymentModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,paymentRrn: freezed == paymentRrn ? _self.paymentRrn : paymentRrn // ignore: cast_nullable_to_non_nullable
@@ -316,8 +316,8 @@ as String?,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cas
 as double,rentPaid: null == rentPaid ? _self.rentPaid : rentPaid // ignore: cast_nullable_to_non_nullable
 as double,paidBy: freezed == paidBy ? _self.paidBy : paidBy // ignore: cast_nullable_to_non_nullable
 as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,paymentRef: freezed == paymentRef ? _self.paymentRef : paymentRef // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as int,paymentRef: freezed == paymentRef ? _self.paymentRef : paymentRef // ignore: cast_nullable_to_non_nullable
 as String?,phoneNo: freezed == phoneNo ? _self.phoneNo : phoneNo // ignore: cast_nullable_to_non_nullable
 as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable

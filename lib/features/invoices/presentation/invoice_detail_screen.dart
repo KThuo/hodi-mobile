@@ -27,7 +27,10 @@ class InvoiceDetailScreen extends ConsumerWidget {
       body: detailAsync.when(
         data: (detail) {
           if (detail == null) {
-            return const HodiErrorState(message: 'Invoice not found');
+            return HodiErrorState(
+              message: 'Invoice not found',
+              onRetry: () => ref.invalidate(invoiceDetailProvider(rrn)),
+            );
           }
 
           return SingleChildScrollView(
@@ -125,7 +128,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
         },
         loading: () => const HodiLoadingShimmer(itemCount: 2, itemHeight: 120),
         error: (e, _) => HodiErrorState(
-          message: 'Failed to load invoice',
+          message: e is Exception ? e.toString().replaceFirst('Exception: ', '') : 'Failed to load invoice',
           onRetry: () => ref.invalidate(invoiceDetailProvider(rrn)),
         ),
       ),

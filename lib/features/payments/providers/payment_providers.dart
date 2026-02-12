@@ -53,7 +53,7 @@ class PaymentListState {
 class PaymentListNotifier extends Notifier<PaymentListState> {
   @override
   PaymentListState build() {
-    _loadInitial();
+    Future.microtask(() => _fetchPage(0));
     return const PaymentListState(isLoading: true);
   }
 
@@ -64,10 +64,6 @@ class PaymentListNotifier extends Notifier<PaymentListState> {
     final authorities = authState.user?.authorities ?? [];
     return authorities.contains(AppPermissions.tenantAccessView) &&
         !authorities.contains(AppPermissions.paymentsView);
-  }
-
-  Future<void> _loadInitial() async {
-    await _fetchPage(0);
   }
 
   Future<void> _fetchPage(int page) async {
@@ -119,5 +115,11 @@ final paymentDetailProvider =
     FutureProvider.autoDispose.family<PaymentDetailModel?, String>((ref, rrn) async {
   final repo = ref.watch(paymentRepositoryProvider);
   final response = await repo.getPaymentDetail(rrn);
-  return response.isSuccess ? response.data : null;
+  if (response.isEstateOverdue) {
+    return null; // Dialog handled globally via ErrorInterceptor
+  }
+  if (!response.isSuccess) {
+    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load payment');
+  }
+  return response.data;
 });

@@ -1,8 +1,9 @@
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_constants.dart';
 import '../../../core/api/api_response.dart';
+import '../../../core/api/paged_response.dart';
+import '../../payments/domain/payment_model.dart';
 import '../domain/dashboard_summary.dart';
-import '../domain/calendar_data.dart';
 
 class DashboardRepository {
   final ApiClient _apiClient;
@@ -43,20 +44,26 @@ class DashboardRepository {
     );
   }
 
-  Future<ApiResponse<CalendarData>> getCalendarData({
-    String? estateId,
-    String? propertyId,
-    String? year,
+  Future<ApiResponse<PagedResponse<PaymentModel>>> getCollections({
+    required String startDate,
+    required String endDate,
+    String? searchTerm,
+    bool isTenant = false,
   }) async {
-    return _apiClient.get<CalendarData>(
-      ApiConstants.dashboardTableData,
+    return _apiClient.get<PagedResponse<PaymentModel>>(
+      ApiConstants.payments,
       queryParameters: {
-        'status': '3',
-        'estateId': ?estateId,
-        'propertyId': ?propertyId,
-        'year': ?year,
+        'page': 0,
+        'pageSize': 100,
+        'startDate': startDate,
+        'endDate': endDate,
+        if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
+        if (isTenant) 'self': 'true',
       },
-      fromJsonT: (data) => CalendarData.fromJson(data as Map<String, dynamic>),
+      fromJsonT: (data) => PagedResponse.fromJson(
+        data as Map<String, dynamic>,
+        (item) => PaymentModel.fromJson(item),
+      ),
     );
   }
 }

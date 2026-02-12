@@ -23,14 +23,14 @@ abstract class InvoiceModel with _$InvoiceModel {
     String? dueDate,
     String? paidOn,
     String? voidedOn,
-    String? status,
-    String? overdueEstate,
+    @Default(0) int status,
+    @Default(false) bool overdueEstate,
   }) = _InvoiceModel;
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) =>
       _$InvoiceModelFromJson(json);
 
   double get balance => rentOwed - rentPaid;
-  bool get isPaid => status == '2' || (rentOwed > 0 && rentPaid >= rentOwed);
-  bool get isVoided => status == '4';
+  bool get isPaid => status == 2 || (rentOwed > 0 && rentPaid >= rentOwed);
+  bool get isVoided => status == 4;
 }

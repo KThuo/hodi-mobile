@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_constants.dart';
 import 'api_response.dart';
@@ -26,11 +29,14 @@ class ApiClient {
     _dio.interceptors.addAll([
       AuthInterceptor(storage),
       _errorInterceptor,
-      LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        logPrint: (obj) {}, // Suppress in production; enable for debug
-      ),
+      if (kDebugMode)
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+          requestHeader: true,
+          responseHeader: false,
+          logPrint: (obj) => developer.log(obj.toString(), name: 'API'),
+        ),
     ]);
   }
 
@@ -46,9 +52,16 @@ class ApiClient {
       final response = await _dio.get(path, queryParameters: queryParameters);
       return ApiResponse.fromJson(response.data, fromJsonT);
     } on DioException catch (e) {
+      developer.log('GET $path DioException: $e', name: 'API', level: 1000);
       return ApiResponse<T>(
         status: '01',
         message: _getErrorMessage(e),
+      );
+    } catch (e, stack) {
+      developer.log('GET $path parse error: $e', name: 'API', level: 1000, stackTrace: stack);
+      return ApiResponse<T>(
+        status: '01',
+        message: 'Failed to parse response',
       );
     }
   }
@@ -63,9 +76,16 @@ class ApiClient {
       final response = await _dio.post(path, data: data, queryParameters: queryParameters);
       return ApiResponse.fromJson(response.data, fromJsonT);
     } on DioException catch (e) {
+      developer.log('POST $path DioException: $e', name: 'API', level: 1000);
       return ApiResponse<T>(
         status: '01',
         message: _getErrorMessage(e),
+      );
+    } catch (e, stack) {
+      developer.log('POST $path parse error: $e', name: 'API', level: 1000, stackTrace: stack);
+      return ApiResponse<T>(
+        status: '01',
+        message: 'Failed to parse response',
       );
     }
   }

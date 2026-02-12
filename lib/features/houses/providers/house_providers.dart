@@ -54,16 +54,11 @@ class HouseListState {
 class HouseListNotifier extends Notifier<HouseListState> {
   @override
   HouseListState build() {
-    _loadInitial();
+    Future.microtask(() => _fetchPage(0));
     return const HouseListState(isLoading: true);
   }
 
   HouseRepository get _repository => ref.read(houseRepositoryProvider);
-
-  Future<void> _loadInitial() async {
-    state = const HouseListState(isLoading: true);
-    await _fetchPage(0);
-  }
 
   Future<void> _fetchPage(int page) async {
     final response = await _repository.getHouses(
@@ -118,12 +113,18 @@ final houseListProvider = NotifierProvider<HouseListNotifier, HouseListState>(
 final houseDetailProvider = FutureProvider.autoDispose.family<HouseDetailModel?, int>((ref, id) async {
   final repo = ref.watch(houseRepositoryProvider);
   final response = await repo.getHouseDetail(id);
-  return response.isSuccess ? response.data : null;
+  if (!response.isSuccess) {
+    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load house');
+  }
+  return response.data;
 });
 
 // House features
 final houseFeaturesProvider = FutureProvider.autoDispose.family<List<HouseFeatureModel>, int>((ref, houseId) async {
   final repo = ref.watch(houseRepositoryProvider);
   final response = await repo.getHouseFeatures(houseId);
-  return response.isSuccess ? (response.data ?? []) : [];
+  if (!response.isSuccess) {
+    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load features');
+  }
+  return response.data ?? [];
 });
