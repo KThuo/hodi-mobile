@@ -19,12 +19,15 @@ abstract class ApiConstants {
 
   // Dashboard
   static const String dashboard = '$apiPrefix/dashboard';
+  static const String dashboardTableData = '$apiPrefix/dashboard/table-data';
 
   // Properties
   static const String properties = '$apiPrefix/properties';
 
   // Houses
   static const String houses = '$apiPrefix/houses';
+  static const String houseDetail = '$apiPrefix/houses'; // append /{id}
+  static const String houseFeatures = '$apiPrefix/houses/house-features'; // append /{id}
   static const String myHouses = '$apiPrefix/my-houses';
 
   // Tenants
@@ -32,10 +35,15 @@ abstract class ApiConstants {
 
   // Invoices
   static const String invoices = '$apiPrefix/invoices';
+  static const String invoiceDetail = '$apiPrefix/invoices/detail'; // append /{rrn}
+  static const String invoicePrint = '$apiPrefix/invoices/detail/print'; // append /{rrn}
   static const String generateInvoice = '$apiPrefix/invoices/generate';
 
   // Payments
   static const String payments = '$apiPrefix/payments';
+  static const String estatePayments = '$apiPrefix/estate-payments';
+  static const String paymentDetail = '$apiPrefix/estate-payments/detail'; // append /{rrn}
+  static const String paymentPrint = '$apiPrefix/estate-payments/detail/print'; // append /{rrn}
   static const String recordPayment = '$apiPrefix/payments/receive-payment';
 
   // Metres

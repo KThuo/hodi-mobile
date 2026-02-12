@@ -5,8 +5,15 @@ import '../auth/providers/auth_provider.dart';
 import 'app_shell.dart';
 import 'route_names.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/dashboard/presentation/dashboard_screen.dart';
+import '../../features/houses/presentation/houses_screen.dart';
+import '../../features/houses/presentation/house_detail_screen.dart';
+import '../../features/invoices/presentation/invoices_screen.dart';
+import '../../features/invoices/presentation/invoice_detail_screen.dart';
+import '../../features/payments/presentation/payments_screen.dart';
+import '../../features/payments/presentation/payment_detail_screen.dart';
 
-// Placeholder screens for Phase 1 - will be replaced in later phases
+// Placeholder screens - will be replaced in later phases
 class _PlaceholderScreen extends StatelessWidget {
   final String title;
   const _PlaceholderScreen({required this.title});
@@ -82,7 +89,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/home',
                 name: RouteNames.home,
-                builder: (context, state) => const _PlaceholderScreen(title: 'Dashboard'),
+                builder: (context, state) => const DashboardScreen(),
               ),
             ],
           ),
@@ -93,19 +100,22 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/houses',
                 name: RouteNames.houses,
-                builder: (context, state) => const _PlaceholderScreen(title: 'Houses'),
+                builder: (context, state) => const HousesScreen(),
                 routes: [
                   GoRoute(
                     path: ':id',
                     name: RouteNames.houseDetail,
-                    builder: (context, state) => const _PlaceholderScreen(title: 'House Detail'),
+                    builder: (context, state) {
+                      final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                      return HouseDetailScreen(houseId: id);
+                    },
                   ),
                 ],
               ),
             ],
           ),
 
-          // Properties
+          // Properties (placeholder - Phase 3)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -129,12 +139,36 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/invoices',
                 name: RouteNames.invoices,
-                builder: (context, state) => const _PlaceholderScreen(title: 'Invoices'),
+                builder: (context, state) => const InvoicesScreen(),
                 routes: [
                   GoRoute(
                     path: ':rrn',
                     name: RouteNames.invoiceDetail,
-                    builder: (context, state) => const _PlaceholderScreen(title: 'Invoice Detail'),
+                    builder: (context, state) {
+                      final rrn = state.pathParameters['rrn'] ?? '';
+                      return InvoiceDetailScreen(rrn: rrn);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Payments
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/payments',
+                name: RouteNames.payments,
+                builder: (context, state) => const PaymentsScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':rrn',
+                    name: RouteNames.paymentDetail,
+                    builder: (context, state) {
+                      final rrn = state.pathParameters['rrn'] ?? '';
+                      return PaymentDetailScreen(rrn: rrn);
+                    },
                   ),
                 ],
               ),
