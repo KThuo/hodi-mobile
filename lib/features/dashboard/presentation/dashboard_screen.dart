@@ -17,8 +17,6 @@ import '../providers/dashboard_provider.dart';
 import 'widgets/summary_card.dart';
 import 'widgets/property_performance.dart';
 import 'widgets/cash_flow_analytics.dart';
-import 'widgets/collections_table.dart';
-import 'widgets/payment_breakdown_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -30,7 +28,6 @@ class DashboardScreen extends ConsumerWidget {
         ref.watch(hasPermissionProvider(AppPermissions.dashboardView));
     final overallAsync = ref.watch(overallSummaryProvider);
     final monthlyAsync = ref.watch(monthlySummaryProvider);
-    final collectionsAsync = ref.watch(collectionsProvider);
     final selectedMonth = ref.watch(selectedMonthProvider);
     final selectedYear = ref.watch(selectedYearProvider);
 
@@ -44,7 +41,6 @@ class DashboardScreen extends ConsumerWidget {
         onRefresh: () async {
           ref.invalidate(overallSummaryProvider);
           ref.invalidate(monthlySummaryProvider);
-          ref.invalidate(collectionsProvider);
         },
         child: CustomScrollView(
           slivers: [
@@ -145,7 +141,7 @@ class DashboardScreen extends ConsumerWidget {
                   );
                 }
 
-                // Tenant: Invoice, Payment, Arrears + PaymentBreakdownCard
+                // Tenant: Invoice, Payment, Arrears
                 return SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   sliver: SliverGrid.count(
@@ -172,7 +168,6 @@ class DashboardScreen extends ConsumerWidget {
                         icon: Icons.warning_amber,
                         gradient: HodiGradients.error,
                       ),
-                      PaymentBreakdownCard(summary: summary),
                     ],
                   ),
                 );
@@ -250,32 +245,6 @@ class DashboardScreen extends ConsumerWidget {
                           error: (_, _) => const SizedBox.shrink(),
                         ),
 
-                      // Both roles: Collections table
-                      collectionsAsync.when(
-                        data: (payments) => CollectionsTable(
-                          payments: payments,
-                          isAdmin: isAdmin,
-                        ),
-                        loading: () => const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: HodiColors.primaryStart,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                        ),
-                        error: (e, _) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Center(
-                            child: Text(
-                              'Failed to load collections',
-                              style: HodiTextStyles.bodyMedium
-                                  .copyWith(color: HodiColors.errorStart),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
