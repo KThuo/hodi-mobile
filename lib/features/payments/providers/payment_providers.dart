@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/auth/providers/auth_provider.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/pdf_downloader.dart';
@@ -81,6 +82,7 @@ class PaymentListNotifier extends Notifier<PaymentListState> {
   }
 
   Future<void> _fetchPage(int page) async {
+    final filters = ref.read(filterProvider);
     final response = await _repository.getPayments(
       page: page,
       searchTerm: state.searchTerm,
@@ -88,6 +90,8 @@ class PaymentListNotifier extends Notifier<PaymentListState> {
       startDate: DateFormatter.formatForApi(state.startDate),
       endDate: DateFormatter.formatForApi(state.endDate),
       status: state.statusFilter,
+      estateId: filters.selectedEstateId,
+      propertyId: filters.selectedPropertyId,
     );
 
     if (response.isSuccess && response.data != null) {

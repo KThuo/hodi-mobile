@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/filters/filter_button.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/utils/date_formatter.dart';
@@ -65,6 +67,12 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(filterProvider, (previous, next) {
+      if (previous?.selectedEstateId != next.selectedEstateId ||
+          previous?.selectedPropertyId != next.selectedPropertyId) {
+        ref.read(paymentListProvider.notifier).refresh();
+      }
+    });
     final state = ref.watch(paymentListProvider);
 
     return Scaffold(
@@ -74,6 +82,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: const [FilterButton()],
       ),
       body: RefreshIndicator(
         color: HodiColors.primaryStart,

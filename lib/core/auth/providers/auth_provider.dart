@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../api/api_client.dart';
+import '../../filters/filter_provider.dart';
 import '../data/auth_repository.dart';
 import '../domain/user_model.dart';
 
@@ -48,6 +49,9 @@ class AuthNotifier extends Notifier<AuthState> {
     if (isLoggedIn) {
       final user = await _repository.getSavedUser();
       state = AuthState(user: user, isAuthenticated: user != null);
+      if (user != null) {
+        ref.read(filterProvider.notifier).loadFilters();
+      }
     } else {
       state = const AuthState();
     }
@@ -63,6 +67,7 @@ class AuthNotifier extends Notifier<AuthState> {
         user: response.data,
         isAuthenticated: true,
       );
+      ref.read(filterProvider.notifier).loadFilters();
       return true;
     }
 
@@ -75,6 +80,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> logout() async {
     await _repository.logout();
+    ref.read(filterProvider.notifier).reset();
     state = const AuthState();
   }
 

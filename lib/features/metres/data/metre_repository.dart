@@ -15,6 +15,8 @@ class MetreRepository {
     int pageSize = 20,
     bool? currentReading,
     String? searchTerm,
+    String? estateId,
+    String? propertyId,
   }) async {
     return _apiClient.get<PagedResponse<MetreModel>>(
       ApiConstants.metres,
@@ -23,6 +25,8 @@ class MetreRepository {
         'pageSize': pageSize,
         if (currentReading != null) 'currentReading': currentReading,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
+        'estateId': ?estateId,
+        'propertyId': ?propertyId,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

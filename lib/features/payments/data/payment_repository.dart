@@ -24,6 +24,8 @@ class PaymentRepository {
     String? startDate,
     String? endDate,
     required String status,
+    String? estateId,
+    String? propertyId,
   }) async {
     return _apiClient.get<PagedResponse<PaymentModel>>(
       ApiConstants.payments,
@@ -35,6 +37,8 @@ class PaymentRepository {
         'startDate': ?startDate,
         'endDate': ?endDate,
         'status': status,
+        'estateId': ?estateId,
+        'propertyId': ?propertyId,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

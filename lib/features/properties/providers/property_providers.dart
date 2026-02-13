@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../data/property_repository.dart';
 import '../domain/property_model.dart';
 import '../domain/property_detail_model.dart';
@@ -55,9 +56,12 @@ class PropertyListNotifier extends Notifier<PropertyListState> {
   PropertyRepository get _repository => ref.read(propertyRepositoryProvider);
 
   Future<void> _fetchPage(int page) async {
+    final filters = ref.read(filterProvider);
     final response = await _repository.getProperties(
       page: page,
       searchTerm: state.searchTerm,
+      estateId: filters.selectedEstateId,
+      propertyId: filters.selectedPropertyId,
     );
 
     if (response.isSuccess && response.data != null) {

@@ -18,6 +18,7 @@ class HouseRepository {
     String? occupied,
     String? searchTerm,
     String? categoryId,
+    String? estateId,
   }) async {
     return _apiClient.get<PagedResponse<HouseModel>>(
       ApiConstants.houses,
@@ -28,6 +29,7 @@ class HouseRepository {
         'occupied': ?occupied,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
         'categoryId': ?categoryId,
+        'estateId': ?estateId,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

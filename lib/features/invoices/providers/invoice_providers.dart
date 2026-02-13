@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../../../core/utils/pdf_downloader.dart';
 import '../data/invoice_repository.dart';
 import '../domain/invoice_model.dart';
@@ -62,10 +63,13 @@ class InvoiceList extends _$InvoiceList {
   InvoiceRepository get _repository => ref.read(invoiceRepositoryProvider);
 
   Future<void> _fetchPage(int page) async {
+    final filters = ref.read(filterProvider);
     final response = await _repository.getInvoices(
       status: status,
       page: page,
       searchTerm: state.searchTerm,
+      estateId: filters.selectedEstateId,
+      propertyId: filters.selectedPropertyId,
     );
 
     if (response.isSuccess && response.data != null) {

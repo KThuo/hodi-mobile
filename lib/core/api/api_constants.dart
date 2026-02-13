@@ -21,8 +21,12 @@ abstract class ApiConstants {
   static const String dashboard = '$apiPrefix/dashboard';
   static const String dashboardTableData = '$apiPrefix/dashboard/table-data';
 
+  // Estates
+  static const String estatesAll = '$apiPrefix/real-estates/all';
+
   // Properties
   static const String properties = '$apiPrefix/properties';
+  static const String propertiesAll = '$apiPrefix/properties/all'; // append /{estateId}
 
   // Houses
   static const String houses = '$apiPrefix/houses';

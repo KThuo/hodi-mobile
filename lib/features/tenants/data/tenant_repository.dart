@@ -17,6 +17,8 @@ class TenantRepository {
     int pageSize = 20,
     String? searchTerm,
     String? userId,
+    String? estateId,
+    String? propertyId,
   }) async {
     return _apiClient.get<PagedResponse<TenantModel>>(
       ApiConstants.tenants,
@@ -25,6 +27,8 @@ class TenantRepository {
         'pageSize': pageSize,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
         'userId': ?userId,
+        'estateId': ?estateId,
+        'propertyId': ?propertyId,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

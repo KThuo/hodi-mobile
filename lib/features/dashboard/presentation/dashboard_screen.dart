@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/auth/providers/auth_provider.dart';
+import '../../../core/filters/filter_button.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
 import '../../../core/permissions/permission_provider.dart';
 import '../../../core/theme/hodi_colors.dart';
@@ -62,13 +64,21 @@ class DashboardScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Hello, $userName',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: HodiColors.white,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Hello, $userName',
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: HodiColors.white,
+                            ),
+                          ),
+                        ),
+                        const _DashboardFilterButton(),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -384,6 +394,41 @@ class _QuickAccessItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DashboardFilterButton extends ConsumerWidget {
+  const _DashboardFilterButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filterNotifier = ref.read(filterProvider.notifier);
+    if (filterNotifier.isTenant) return const SizedBox.shrink();
+
+    final filterState = ref.watch(filterProvider);
+
+    return Stack(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.filter_list, color: HodiColors.white),
+          onPressed: () => showFilterBottomSheet(context),
+          tooltip: 'Filter',
+        ),
+        if (filterState.hasActiveFilter)
+          Positioned(
+            right: 8,
+            top: 8,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: HodiColors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

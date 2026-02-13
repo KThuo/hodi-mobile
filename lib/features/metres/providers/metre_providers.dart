@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../data/metre_repository.dart';
 import '../domain/metre_model.dart';
 import '../domain/metre_history_model.dart';
@@ -63,10 +64,13 @@ class MetreListNotifier extends Notifier<MetreListState> {
   MetreRepository get _repository => ref.read(metreRepositoryProvider);
 
   Future<void> _fetchPage(int page) async {
+    final filters = ref.read(filterProvider);
     final response = await _repository.getMetres(
       page: page,
       currentReading: state.currentReadingFilter,
       searchTerm: state.searchTerm,
+      estateId: filters.selectedEstateId,
+      propertyId: filters.selectedPropertyId,
     );
 
     if (response.isSuccess && response.data != null) {

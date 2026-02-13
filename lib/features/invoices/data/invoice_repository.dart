@@ -24,6 +24,8 @@ class InvoiceRepository {
     String? searchTerm,
     String? startDate,
     String? endDate,
+    String? estateId,
+    String? propertyId,
   }) async {
     return _apiClient.get<PagedResponse<InvoiceModel>>(
       '${ApiConstants.invoices}/$status',
@@ -33,6 +35,8 @@ class InvoiceRepository {
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
         'startDate': ?startDate,
         'endDate': ?endDate,
+        'estateId': ?estateId,
+        'propertyId': ?propertyId,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

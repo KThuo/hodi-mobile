@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/auth/providers/auth_provider.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
 import '../../payments/domain/payment_model.dart';
 import '../data/dashboard_repository.dart';
@@ -32,7 +33,11 @@ final selectedYearProvider =
 final overallSummaryProvider =
     FutureProvider.autoDispose<DashboardSummary?>((ref) async {
   final repo = ref.watch(dashboardRepositoryProvider);
-  final response = await repo.getOverallSummary();
+  final filters = ref.watch(filterProvider);
+  final response = await repo.getOverallSummary(
+    estateId: filters.selectedEstateId,
+    propertyId: filters.selectedPropertyId,
+  );
   if (response.isEstateOverdue) return null;
   return response.isSuccess ? response.data : null;
 });
@@ -40,9 +45,12 @@ final overallSummaryProvider =
 final monthlySummaryProvider =
     FutureProvider.autoDispose<DashboardSummary?>((ref) async {
   final repo = ref.watch(dashboardRepositoryProvider);
+  final filters = ref.watch(filterProvider);
   final month = ref.watch(selectedMonthProvider);
   final year = ref.watch(selectedYearProvider);
   final response = await repo.getMonthlySummary(
+    estateId: filters.selectedEstateId,
+    propertyId: filters.selectedPropertyId,
     month: month.toString(),
     year: year.toString(),
   );

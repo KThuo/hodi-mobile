@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/filters/filter_button.dart';
+import '../../../core/filters/filter_provider.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/widgets/hodi_search_bar.dart';
@@ -42,6 +44,12 @@ class _PropertiesScreenState extends ConsumerState<PropertiesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(filterProvider, (previous, next) {
+      if (previous?.selectedEstateId != next.selectedEstateId ||
+          previous?.selectedPropertyId != next.selectedPropertyId) {
+        ref.read(propertyListProvider.notifier).refresh();
+      }
+    });
     final state = ref.watch(propertyListProvider);
 
     return Scaffold(
@@ -51,6 +59,7 @@ class _PropertiesScreenState extends ConsumerState<PropertiesScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: const [FilterButton()],
       ),
       body: RefreshIndicator(
         color: HodiColors.primaryStart,
