@@ -14,6 +14,8 @@ import '../../features/payments/presentation/payments_screen.dart';
 import '../../features/payments/presentation/payment_detail_screen.dart';
 import '../../features/properties/presentation/properties_screen.dart';
 import '../../features/more/presentation/more_screen.dart';
+import '../../features/tenants/presentation/tenants_screen.dart';
+import '../../features/tenants/presentation/tenant_detail_screen.dart';
 
 // Placeholder screens - will be replaced in later phases
 class _PlaceholderScreen extends StatelessWidget {
@@ -185,6 +187,21 @@ final routerProvider = Provider<GoRouter>((ref) {
                 name: RouteNames.more,
                 builder: (context, state) => const MoreScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'tenants',
+                    name: RouteNames.tenants,
+                    builder: (context, state) => const TenantsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':userId/details',
+                        name: RouteNames.tenantDetail,
+                        builder: (context, state) {
+                          final userId = state.pathParameters['userId'] ?? '';
+                          return TenantDetailScreen(userId: userId);
+                        },
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: 'metres',
                     name: RouteNames.metres,

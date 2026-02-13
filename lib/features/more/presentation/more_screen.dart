@@ -44,7 +44,7 @@ const _moduleItems = <_MenuItem>[
     label: 'Tenants',
     icon: Icons.people,
     permissions: [AppPermissions.tenantsView],
-    route: '/tenants',
+    route: '/more/tenants',
   ),
   _MenuItem(
     label: 'Invoices',
