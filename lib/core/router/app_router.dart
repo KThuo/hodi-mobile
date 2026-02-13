@@ -20,6 +20,10 @@ import '../../features/tenants/presentation/tenant_detail_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/metres/presentation/metres_screen.dart';
 import '../../features/metres/presentation/metre_history_screen.dart';
+import '../../features/vacant_houses/presentation/vacant_houses_screen.dart';
+import '../../features/vacant_houses/presentation/vacant_house_detail_screen.dart';
+import '../../features/vacate_notices/presentation/vacate_notices_screen.dart';
+import '../../features/vacate_notices/presentation/vacate_notice_detail_screen.dart';
 
 // Placeholder screens - will be replaced in later phases
 class _PlaceholderScreen extends StatelessWidget {
@@ -75,12 +79,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/vacant-houses',
         name: RouteNames.vacantHouses,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Vacant Houses'),
+        builder: (context, state) => const VacantHousesScreen(),
         routes: [
           GoRoute(
             path: ':id',
             name: RouteNames.vacantHouseDetail,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Vacant House Detail'),
+            builder: (context, state) {
+              final id = state.pathParameters['id'] ?? '';
+              return VacantHouseDetailScreen(houseId: id);
+            },
           ),
         ],
       ),
@@ -227,7 +234,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'vacate-notices',
                     name: RouteNames.vacateNotices,
-                    builder: (context, state) => const _PlaceholderScreen(title: 'Vacate Notices'),
+                    builder: (context, state) => const VacateNoticesScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        name: RouteNames.vacateNoticeDetail,
+                        builder: (context, state) {
+                          final id = state.pathParameters['id'] ?? '';
+                          return VacateNoticeDetailScreen(noticeId: id);
+                        },
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'profile',

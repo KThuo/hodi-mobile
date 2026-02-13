@@ -1,0 +1,123 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'vacate_notice_detail_model.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_VacateNoticeDetailModel _$VacateNoticeDetailModelFromJson(
+  Map<String, dynamic> json,
+) => _VacateNoticeDetailModel(
+  id: json['id'] as String?,
+  rrn: json['rrn'] as String?,
+  houseName: json['houseName'] as String?,
+  houseCode: json['houseCode'] as String?,
+  houseNumber: json['houseNumber'] as String?,
+  houseId: parseIntNullable(json['houseId']),
+  tenantName: json['tenantName'] as String?,
+  tenantPhone: json['tenantPhone'] as String?,
+  tenantEmail: json['tenantEmail'] as String?,
+  tenantId: parseIntNullable(json['tenantId']),
+  propertyName: json['propertyName'] as String?,
+  propertyId: parseIntNullable(json['propertyId']),
+  estateName: json['estateName'] as String?,
+  estateId: parseIntNullable(json['estateId']),
+  vacateDate: json['vacateDate'] as String?,
+  reason: json['reason'] as String?,
+  flag: json['flag'] as String?,
+  status: parseIntNullable(json['status']),
+  initiatedBy: json['initiatedBy'] as String?,
+  initiatedByName: json['initiatedByName'] as String?,
+  initiatedById: parseIntNullable(json['initiatedById']),
+  approvedByName: json['approvedByName'] as String?,
+  approvalDate: json['approvalDate'] as String?,
+  approvalComments: json['approvalComments'] as String?,
+  isProcessed: json['isProcessed'] as bool? ?? false,
+  processedDate: json['processedDate'] as String?,
+  processedBy: json['processedBy'] as String?,
+  settlementType: json['settlementType'] as String?,
+  rentOwed: json['rentOwed'] == null ? 0 : parseDouble(json['rentOwed']),
+  refundableDeposit: json['refundableDeposit'] == null
+      ? 0
+      : parseDouble(json['refundableDeposit']),
+  totalExpenses: json['totalExpenses'] == null
+      ? 0
+      : parseDouble(json['totalExpenses']),
+  netAmount: json['netAmount'] == null ? 0 : parseDouble(json['netAmount']),
+  settlementDetails: json['settlementDetails'] as String?,
+  paymentStatus: parseIntNullable(json['paymentStatus']),
+  paymentFlag: json['paymentFlag'] as String?,
+  totalPaid: json['totalPaid'] == null ? 0 : parseDouble(json['totalPaid']),
+  balanceRemaining: json['balanceRemaining'] == null
+      ? 0
+      : parseDouble(json['balanceRemaining']),
+  paymentRrn: json['paymentRrn'] as String?,
+  paymentHistory: json['paymentHistory'] as String?,
+  invoiceRrn: json['invoiceRrn'] as String?,
+  invoiceGeneratedDate: json['invoiceGeneratedDate'] as String?,
+  unpaidBalanceHandling: json['unpaidBalanceHandling'] as String?,
+  unpaidHandlingNotes: json['unpaidHandlingNotes'] as String?,
+  unpaidAmount: json['unpaidAmount'] == null
+      ? 0
+      : parseDouble(json['unpaidAmount']),
+  refundConfirmed: json['refundConfirmed'] as bool? ?? false,
+  createdOn: json['createdOn'] as String?,
+  createdBy: json['createdBy'] as String?,
+  modifiedOn: json['modifiedOn'] as String?,
+  modifiedBy: json['modifiedBy'] as String?,
+);
+
+Map<String, dynamic> _$VacateNoticeDetailModelToJson(
+  _VacateNoticeDetailModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'rrn': instance.rrn,
+  'houseName': instance.houseName,
+  'houseCode': instance.houseCode,
+  'houseNumber': instance.houseNumber,
+  'houseId': instance.houseId,
+  'tenantName': instance.tenantName,
+  'tenantPhone': instance.tenantPhone,
+  'tenantEmail': instance.tenantEmail,
+  'tenantId': instance.tenantId,
+  'propertyName': instance.propertyName,
+  'propertyId': instance.propertyId,
+  'estateName': instance.estateName,
+  'estateId': instance.estateId,
+  'vacateDate': instance.vacateDate,
+  'reason': instance.reason,
+  'flag': instance.flag,
+  'status': instance.status,
+  'initiatedBy': instance.initiatedBy,
+  'initiatedByName': instance.initiatedByName,
+  'initiatedById': instance.initiatedById,
+  'approvedByName': instance.approvedByName,
+  'approvalDate': instance.approvalDate,
+  'approvalComments': instance.approvalComments,
+  'isProcessed': instance.isProcessed,
+  'processedDate': instance.processedDate,
+  'processedBy': instance.processedBy,
+  'settlementType': instance.settlementType,
+  'rentOwed': instance.rentOwed,
+  'refundableDeposit': instance.refundableDeposit,
+  'totalExpenses': instance.totalExpenses,
+  'netAmount': instance.netAmount,
+  'settlementDetails': instance.settlementDetails,
+  'paymentStatus': instance.paymentStatus,
+  'paymentFlag': instance.paymentFlag,
+  'totalPaid': instance.totalPaid,
+  'balanceRemaining': instance.balanceRemaining,
+  'paymentRrn': instance.paymentRrn,
+  'paymentHistory': instance.paymentHistory,
+  'invoiceRrn': instance.invoiceRrn,
+  'invoiceGeneratedDate': instance.invoiceGeneratedDate,
+  'unpaidBalanceHandling': instance.unpaidBalanceHandling,
+  'unpaidHandlingNotes': instance.unpaidHandlingNotes,
+  'unpaidAmount': instance.unpaidAmount,
+  'refundConfirmed': instance.refundConfirmed,
+  'createdOn': instance.createdOn,
+  'createdBy': instance.createdBy,
+  'modifiedOn': instance.modifiedOn,
+  'modifiedBy': instance.modifiedBy,
+};

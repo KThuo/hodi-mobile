@@ -99,6 +99,30 @@ class ApiClient {
     }
   }
 
+  Future<ApiResponse<T>> put<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    T Function(dynamic)? fromJsonT,
+  }) async {
+    try {
+      final response = await _dio.put(path, data: data, queryParameters: queryParameters);
+      return ApiResponse.fromJson(response.data, fromJsonT);
+    } on DioException catch (e) {
+      developer.log('PUT $path DioException: $e', name: 'API', level: 1000);
+      return ApiResponse<T>(
+        status: '01',
+        message: _getErrorMessage(e),
+      );
+    } catch (e, stack) {
+      developer.log('PUT $path parse error: $e', name: 'API', level: 1000, stackTrace: stack);
+      return ApiResponse<T>(
+        status: '01',
+        message: 'Failed to parse response',
+      );
+    }
+  }
+
   Future<Response> downloadFile(String path, String savePath) async {
     return _dio.download(path, savePath);
   }
