@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/auth/providers/auth_provider.dart';
@@ -83,6 +84,16 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+            // Quick Access
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverToBoxAdapter(
+                child: _QuickAccessSection(isAdmin: isAdmin),
               ),
             ),
 
@@ -290,6 +301,121 @@ class DashboardScreen extends ConsumerWidget {
     }
     ref.read(selectedMonthProvider.notifier).set(newMonth);
     ref.read(selectedYearProvider.notifier).set(newYear);
+  }
+}
+
+class _QuickAccessSection extends StatelessWidget {
+  final bool isAdmin;
+
+  const _QuickAccessSection({required this.isAdmin});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = isAdmin
+        ? const [
+            _QuickAccessItem(
+              icon: Icons.people_outline,
+              label: 'Tenants',
+              path: '/more/tenants',
+              gradient: HodiGradients.primary,
+            ),
+            _QuickAccessItem(
+              icon: Icons.receipt_long_outlined,
+              label: 'Invoices',
+              path: '/invoices',
+              gradient: HodiGradients.warning,
+            ),
+            _QuickAccessItem(
+              icon: Icons.speed_outlined,
+              label: 'Metres',
+              path: '/more/metres',
+              gradient: HodiGradients.success,
+            ),
+          ]
+        : const [
+            _QuickAccessItem(
+              icon: Icons.home_work_outlined,
+              label: 'My Houses',
+              path: '/houses',
+              gradient: HodiGradients.primary,
+            ),
+            _QuickAccessItem(
+              icon: Icons.receipt_long_outlined,
+              label: 'My Invoices',
+              path: '/invoices',
+              gradient: HodiGradients.warning,
+            ),
+            _QuickAccessItem(
+              icon: Icons.payments_outlined,
+              label: 'My Payments',
+              path: '/payments',
+              gradient: HodiGradients.success,
+            ),
+          ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Quick Access', style: HodiTextStyles.heading3),
+        const SizedBox(height: 12),
+        Row(
+          children: items
+              .map((item) => Expanded(child: item))
+              .toList()
+            ..insert(1, const Expanded(flex: 0, child: SizedBox(width: 12)))
+            ..insert(3, const Expanded(flex: 0, child: SizedBox(width: 12))),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickAccessItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String path;
+  final LinearGradient gradient;
+
+  const _QuickAccessItem({
+    required this.icon,
+    required this.label,
+    required this.path,
+    required this.gradient,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.go(path),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: HodiColors.cardBackground,
+          borderRadius: HodiBorderRadius.card,
+          boxShadow: HodiShadows.cardLight,
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: gradient,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: HodiColors.white, size: 22),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: HodiTextStyles.labelBold.copyWith(
+                color: HodiColors.textDark,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
