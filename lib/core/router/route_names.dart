@@ -10,7 +10,7 @@ abstract class RouteNames {
   // Main
   static const home = 'home';
   static const properties = 'properties';
-  static const propertyHouses = 'property-houses';
+  static const propertyDetail = 'property-detail';
   static const houses = 'houses';
   static const houseDetail = 'house-detail';
   static const tenants = 'tenants';

@@ -3,6 +3,7 @@ import '../../../core/api/api_constants.dart';
 import '../../../core/api/api_response.dart';
 import '../../../core/api/paged_response.dart';
 import '../domain/property_model.dart';
+import '../domain/property_detail_model.dart';
 
 class PropertyRepository {
   final ApiClient _apiClient;
@@ -25,6 +26,20 @@ class PropertyRepository {
         data as Map<String, dynamic>,
         (item) => PropertyModel.fromJson(item),
       ),
+    );
+  }
+
+  Future<ApiResponse<PropertyDetailModel>> getPropertyDetail(
+    int id, {
+    String? period,
+  }) async {
+    return _apiClient.get<PropertyDetailModel>(
+      '${ApiConstants.properties}/$id',
+      queryParameters: {
+        'period': ?period,
+      },
+      fromJsonT: (data) =>
+          PropertyDetailModel.fromJson(data as Map<String, dynamic>),
     );
   }
 }

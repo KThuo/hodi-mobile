@@ -13,6 +13,7 @@ import '../../features/invoices/presentation/invoice_detail_screen.dart';
 import '../../features/payments/presentation/payments_screen.dart';
 import '../../features/payments/presentation/payment_detail_screen.dart';
 import '../../features/properties/presentation/properties_screen.dart';
+import '../../features/properties/presentation/property_detail_screen.dart';
 import '../../features/more/presentation/more_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
 import '../../features/tenants/presentation/tenant_detail_screen.dart';
@@ -129,9 +130,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const PropertiesScreen(),
                 routes: [
                   GoRoute(
-                    path: ':id/houses',
-                    name: RouteNames.propertyHouses,
-                    builder: (context, state) => const _PlaceholderScreen(title: 'Property Houses'),
+                    path: ':id',
+                    name: RouteNames.propertyDetail,
+                    builder: (context, state) {
+                      final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                      return PropertyDetailScreen(propertyId: id);
+                    },
                   ),
                 ],
               ),

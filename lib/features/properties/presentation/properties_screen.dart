@@ -116,7 +116,7 @@ class _PropertiesScreenState extends ConsumerState<PropertiesScreen> {
         final property = state.properties[index];
         return PropertyListItem(
           property: property,
-          onTap: () => context.push('/properties/${property.id}/houses'),
+          onTap: () => context.push('/properties/${property.id}'),
         );
       },
     );

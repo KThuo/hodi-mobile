@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../data/property_repository.dart';
 import '../domain/property_model.dart';
+import '../domain/property_detail_model.dart';
 
 final propertyRepositoryProvider = Provider<PropertyRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -95,3 +96,29 @@ class PropertyListNotifier extends Notifier<PropertyListState> {
 final propertyListProvider = NotifierProvider<PropertyListNotifier, PropertyListState>(
   PropertyListNotifier.new,
 );
+
+// Property detail period toggling
+class _PropertyDetailPeriodNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void set(String? value) => state = value;
+}
+
+final propertyDetailPeriodProvider =
+    NotifierProvider<_PropertyDetailPeriodNotifier, String?>(
+  _PropertyDetailPeriodNotifier.new,
+);
+
+// Property detail
+final propertyDetailProvider = FutureProvider.autoDispose
+    .family<PropertyDetailModel?, int>((ref, id) async {
+  final period = ref.watch(propertyDetailPeriodProvider);
+  final repo = ref.watch(propertyRepositoryProvider);
+  final response = await repo.getPropertyDetail(id, period: period);
+  if (!response.isSuccess) {
+    throw Exception(
+      response.message.isNotEmpty ? response.message : 'Failed to load property',
+    );
+  }
+  return response.data;
+});
