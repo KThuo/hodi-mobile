@@ -88,6 +88,43 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: HodiColors.white,
+        headerBackgroundColor: HodiColors.primaryStart,
+        headerForegroundColor: HodiColors.white,
+        rangeSelectionBackgroundColor: HodiColors.primaryStart.withValues(alpha: 0.12),
+        rangePickerHeaderBackgroundColor: HodiColors.primaryStart,
+        rangePickerHeaderForegroundColor: HodiColors.white,
+        dayOverlayColor: WidgetStatePropertyAll(
+          HodiColors.primaryStart.withValues(alpha: 0.08),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: HodiBorderRadius.card,
+        ),
+        rangePickerShape: RoundedRectangleBorder(
+          borderRadius: HodiBorderRadius.card,
+        ),
+        headerHelpStyle: GoogleFonts.poppins(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: HodiColors.white.withValues(alpha: 0.8),
+        ),
+        headerHeadlineStyle: GoogleFonts.poppins(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: HodiColors.white,
+        ),
+        weekdayStyle: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: HodiColors.textMedium,
+        ),
+        dayStyle: GoogleFonts.poppins(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: HodiColors.textDark,
+        ),
+      ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: HodiColors.white,
         selectedItemColor: HodiColors.primaryStart,

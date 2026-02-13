@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
+import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/pdf_downloader.dart';
 import '../data/payment_repository.dart';
 import '../domain/payment_model.dart';
@@ -21,15 +22,22 @@ class PaymentListState {
   final int currentPage;
   final String? error;
   final String? searchTerm;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String statusFilter;
 
-  const PaymentListState({
+  PaymentListState({
     this.payments = const [],
     this.isLoading = false,
     this.hasMore = true,
     this.currentPage = 0,
     this.error,
     this.searchTerm,
-  });
+    DateTime? startDate,
+    DateTime? endDate,
+    this.statusFilter = '0',
+  })  : startDate = startDate ?? DateTime.now().subtract(const Duration(days: 90)),
+        endDate = endDate ?? DateTime.now();
 
   PaymentListState copyWith({
     List<PaymentModel>? payments,
@@ -38,6 +46,9 @@ class PaymentListState {
     int? currentPage,
     String? error,
     String? searchTerm,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? statusFilter,
   }) {
     return PaymentListState(
       payments: payments ?? this.payments,
@@ -46,6 +57,9 @@ class PaymentListState {
       currentPage: currentPage ?? this.currentPage,
       error: error,
       searchTerm: searchTerm ?? this.searchTerm,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      statusFilter: statusFilter ?? this.statusFilter,
     );
   }
 }
@@ -54,7 +68,7 @@ class PaymentListNotifier extends Notifier<PaymentListState> {
   @override
   PaymentListState build() {
     Future.microtask(() => _fetchPage(0));
-    return const PaymentListState(isLoading: true);
+    return PaymentListState(isLoading: true);
   }
 
   PaymentRepository get _repository => ref.read(paymentRepositoryProvider);
@@ -71,6 +85,9 @@ class PaymentListNotifier extends Notifier<PaymentListState> {
       page: page,
       searchTerm: state.searchTerm,
       isTenant: _isTenant,
+      startDate: DateFormatter.formatForApi(state.startDate),
+      endDate: DateFormatter.formatForApi(state.endDate),
+      status: state.statusFilter,
     );
 
     if (response.isSuccess && response.data != null) {
@@ -101,7 +118,34 @@ class PaymentListNotifier extends Notifier<PaymentListState> {
   }
 
   Future<void> search(String term) async {
-    state = PaymentListState(isLoading: true, searchTerm: term);
+    state = PaymentListState(
+      isLoading: true,
+      searchTerm: term,
+      startDate: state.startDate,
+      endDate: state.endDate,
+      statusFilter: state.statusFilter,
+    );
+    await _fetchPage(0);
+  }
+
+  Future<void> filterByStatus(String status) async {
+    state = PaymentListState(
+      isLoading: true,
+      searchTerm: state.searchTerm,
+      startDate: state.startDate,
+      endDate: state.endDate,
+      statusFilter: status,
+    );
+    await _fetchPage(0);
+  }
+
+  Future<void> setDateRange(DateTime start, DateTime end) async {
+    state = state.copyWith(
+      isLoading: true,
+      startDate: start,
+      endDate: end,
+      error: null,
+    );
     await _fetchPage(0);
   }
 }

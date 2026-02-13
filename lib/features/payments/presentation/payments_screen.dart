@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_text_styles.dart';
+import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/hodi_search_bar.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_empty_state.dart';
@@ -40,6 +41,28 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
     }
   }
 
+  Future<void> _pickDateRange() async {
+    final state = ref.read(paymentListProvider);
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: DateTimeRange(
+        start: state.startDate,
+        end: state.endDate,
+      ),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      ref.read(paymentListProvider.notifier).setDateRange(picked.start, picked.end);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(paymentListProvider);
@@ -70,6 +93,40 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                 },
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  _DateRangeChip(
+                    startDate: state.startDate,
+                    endDate: state.endDate,
+                    onTap: _pickDateRange,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 36,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  _FilterChip(
+                    label: 'Processed',
+                    isSelected: state.statusFilter == '0',
+                    onTap: () => ref.read(paymentListProvider.notifier).filterByStatus('0'),
+                  ),
+                  const SizedBox(width: 8),
+                  _FilterChip(
+                    label: 'Voided',
+                    isSelected: state.statusFilter == '2',
+                    onTap: () => ref.read(paymentListProvider.notifier).filterByStatus('2'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
             Expanded(child: _buildList(state)),
           ],
         ),
@@ -93,7 +150,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
       return const HodiEmptyState(
         icon: Icons.payments_outlined,
         title: 'No Payments Found',
-        subtitle: 'Try adjusting your search',
+        subtitle: 'Try adjusting your search or date range',
       );
     }
 
@@ -118,6 +175,87 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
           },
         );
       },
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterChip({required this.label, required this.isSelected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? HodiColors.primaryStart : HodiColors.surfaceLight,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? HodiColors.white : HodiColors.textMedium,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DateRangeChip extends StatelessWidget {
+  final DateTime startDate;
+  final DateTime endDate;
+  final VoidCallback onTap;
+
+  const _DateRangeChip({
+    required this.startDate,
+    required this.endDate,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: HodiColors.surfaceLight,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.calendar_today_outlined,
+              size: 16,
+              color: HodiColors.primaryStart,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${DateFormatter.formatDate(startDate)} – ${DateFormatter.formatDate(endDate)}',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: HodiColors.textMedium,
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 18,
+              color: HodiColors.textLight,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
