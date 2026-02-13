@@ -50,6 +50,8 @@ abstract class ApiConstants {
 
   // Metres
   static const String metres = '$apiPrefix/metres';
+  static const String metreHistory = '$apiPrefix/metres/history';
+  static const String metreUpdateReading = '$apiPrefix/metres/update-reading';
 
   // Vacate Notices
   static const String vacateNotices = '$apiPrefix/vacate-notices';

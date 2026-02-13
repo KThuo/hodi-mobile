@@ -18,6 +18,8 @@ import '../../features/more/presentation/more_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
 import '../../features/tenants/presentation/tenant_detail_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/metres/presentation/metres_screen.dart';
+import '../../features/metres/presentation/metre_history_screen.dart';
 
 // Placeholder screens - will be replaced in later phases
 class _PlaceholderScreen extends StatelessWidget {
@@ -210,7 +212,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'metres',
                     name: RouteNames.metres,
-                    builder: (context, state) => const _PlaceholderScreen(title: 'Metres'),
+                    builder: (context, state) => const MetresScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id/history',
+                        name: RouteNames.metreHistory,
+                        builder: (context, state) {
+                          final id = state.pathParameters['id'] ?? '';
+                          return MetreHistoryScreen(metreId: id);
+                        },
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'vacate-notices',

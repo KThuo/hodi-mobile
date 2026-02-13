@@ -40,8 +40,9 @@ dependencies:
   # Formatting
   intl: ^0.20.2
 
-  # Camera
+  # Camera & OCR
   image_picker: ^1.2.1
+  google_mlkit_text_recognition: ^0.14.0
 
   # Models
   freezed_annotation: ^3.1.0
