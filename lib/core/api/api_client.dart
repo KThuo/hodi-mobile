@@ -50,6 +50,15 @@ class ApiClient {
   }) async {
     try {
       final response = await _dio.get(path, queryParameters: queryParameters);
+      // Some endpoints return a raw list (e.g. house-features) instead of
+      // the standard {status, message, data} envelope.
+      if (response.data is List) {
+        return ApiResponse<T>(
+          status: '00',
+          message: '',
+          data: fromJsonT != null ? fromJsonT(response.data) : response.data as T?,
+        );
+      }
       return ApiResponse.fromJson(response.data, fromJsonT);
     } on DioException catch (e) {
       developer.log('GET $path DioException: $e', name: 'API', level: 1000);

@@ -9,9 +9,9 @@ abstract class HouseDetailModel with _$HouseDetailModel {
   const factory HouseDetailModel({
     String? houseName,
     String? houseCode,
-    @Default(0) int floor,
+    String? floor,
     @Default(0) int status,
-    @JsonKey(name: 'occupied') @Default(false) bool isOccupied,
+    @Default(false) bool isOccupied,
     @Default(0) double rent,
     String? location,
     double? squareFt,

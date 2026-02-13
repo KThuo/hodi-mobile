@@ -55,6 +55,9 @@ abstract class ApiConstants {
   // Vacant Houses
   static const String vacantHouses = '$apiPrefix/vacant-houses';
 
+  // Profile
+  static const String profile = '$apiPrefix/profile/user-details';
+
   // Reports
   static const String reports = '$apiPrefix/reports';
 }

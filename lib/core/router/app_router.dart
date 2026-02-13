@@ -16,6 +16,7 @@ import '../../features/properties/presentation/properties_screen.dart';
 import '../../features/more/presentation/more_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
 import '../../features/tenants/presentation/tenant_detail_screen.dart';
+import '../../features/profile/presentation/profile_screen.dart';
 
 // Placeholder screens - will be replaced in later phases
 class _PlaceholderScreen extends StatelessWidget {
@@ -215,7 +216,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'profile',
                     name: RouteNames.profile,
-                    builder: (context, state) => const _PlaceholderScreen(title: 'Profile'),
+                    builder: (context, state) => const ProfileScreen(),
                   ),
                 ],
               ),

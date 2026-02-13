@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HouseDetailModel {
 
- String? get houseName; String? get houseCode; int get floor; int get status;@JsonKey(name: 'occupied') bool get isOccupied; double get rent; String? get location; double? get squareFt; String? get property; String? get category; String? get houseType; String? get estate; HouseTenant? get tenant;
+ String? get houseName; String? get houseCode; String? get floor; int get status; bool get isOccupied; double get rent; String? get location; double? get squareFt; String? get property; String? get category; String? get houseType; String? get estate; HouseTenant? get tenant;
 /// Create a copy of HouseDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $HouseDetailModelCopyWith<$Res>  {
   factory $HouseDetailModelCopyWith(HouseDetailModel value, $Res Function(HouseDetailModel) _then) = _$HouseDetailModelCopyWithImpl;
 @useResult
 $Res call({
- String? houseName, String? houseCode, int floor, int status,@JsonKey(name: 'occupied') bool isOccupied, double rent, String? location, double? squareFt, String? property, String? category, String? houseType, String? estate, HouseTenant? tenant
+ String? houseName, String? houseCode, String? floor, int status, bool isOccupied, double rent, String? location, double? squareFt, String? property, String? category, String? houseType, String? estate, HouseTenant? tenant
 });
 
 
@@ -65,12 +65,12 @@ class _$HouseDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of HouseDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? houseName = freezed,Object? houseCode = freezed,Object? floor = null,Object? status = null,Object? isOccupied = null,Object? rent = null,Object? location = freezed,Object? squareFt = freezed,Object? property = freezed,Object? category = freezed,Object? houseType = freezed,Object? estate = freezed,Object? tenant = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? houseName = freezed,Object? houseCode = freezed,Object? floor = freezed,Object? status = null,Object? isOccupied = null,Object? rent = null,Object? location = freezed,Object? squareFt = freezed,Object? property = freezed,Object? category = freezed,Object? houseType = freezed,Object? estate = freezed,Object? tenant = freezed,}) {
   return _then(_self.copyWith(
 houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
 as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,floor: null == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,floor: freezed == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as int,isOccupied: null == isOccupied ? _self.isOccupied : isOccupied // ignore: cast_nullable_to_non_nullable
 as bool,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
 as double,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
@@ -177,7 +177,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? houseName,  String? houseCode,  int floor,  int status, @JsonKey(name: 'occupied')  bool isOccupied,  double rent,  String? location,  double? squareFt,  String? property,  String? category,  String? houseType,  String? estate,  HouseTenant? tenant)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? houseName,  String? houseCode,  String? floor,  int status,  bool isOccupied,  double rent,  String? location,  double? squareFt,  String? property,  String? category,  String? houseType,  String? estate,  HouseTenant? tenant)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HouseDetailModel() when $default != null:
 return $default(_that.houseName,_that.houseCode,_that.floor,_that.status,_that.isOccupied,_that.rent,_that.location,_that.squareFt,_that.property,_that.category,_that.houseType,_that.estate,_that.tenant);case _:
@@ -198,7 +198,7 @@ return $default(_that.houseName,_that.houseCode,_that.floor,_that.status,_that.i
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? houseName,  String? houseCode,  int floor,  int status, @JsonKey(name: 'occupied')  bool isOccupied,  double rent,  String? location,  double? squareFt,  String? property,  String? category,  String? houseType,  String? estate,  HouseTenant? tenant)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? houseName,  String? houseCode,  String? floor,  int status,  bool isOccupied,  double rent,  String? location,  double? squareFt,  String? property,  String? category,  String? houseType,  String? estate,  HouseTenant? tenant)  $default,) {final _that = this;
 switch (_that) {
 case _HouseDetailModel():
 return $default(_that.houseName,_that.houseCode,_that.floor,_that.status,_that.isOccupied,_that.rent,_that.location,_that.squareFt,_that.property,_that.category,_that.houseType,_that.estate,_that.tenant);case _:
@@ -218,7 +218,7 @@ return $default(_that.houseName,_that.houseCode,_that.floor,_that.status,_that.i
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? houseName,  String? houseCode,  int floor,  int status, @JsonKey(name: 'occupied')  bool isOccupied,  double rent,  String? location,  double? squareFt,  String? property,  String? category,  String? houseType,  String? estate,  HouseTenant? tenant)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? houseName,  String? houseCode,  String? floor,  int status,  bool isOccupied,  double rent,  String? location,  double? squareFt,  String? property,  String? category,  String? houseType,  String? estate,  HouseTenant? tenant)?  $default,) {final _that = this;
 switch (_that) {
 case _HouseDetailModel() when $default != null:
 return $default(_that.houseName,_that.houseCode,_that.floor,_that.status,_that.isOccupied,_that.rent,_that.location,_that.squareFt,_that.property,_that.category,_that.houseType,_that.estate,_that.tenant);case _:
@@ -233,14 +233,14 @@ return $default(_that.houseName,_that.houseCode,_that.floor,_that.status,_that.i
 @JsonSerializable()
 
 class _HouseDetailModel extends HouseDetailModel {
-  const _HouseDetailModel({this.houseName, this.houseCode, this.floor = 0, this.status = 0, @JsonKey(name: 'occupied') this.isOccupied = false, this.rent = 0, this.location, this.squareFt, this.property, this.category, this.houseType, this.estate, this.tenant}): super._();
+  const _HouseDetailModel({this.houseName, this.houseCode, this.floor, this.status = 0, this.isOccupied = false, this.rent = 0, this.location, this.squareFt, this.property, this.category, this.houseType, this.estate, this.tenant}): super._();
   factory _HouseDetailModel.fromJson(Map<String, dynamic> json) => _$HouseDetailModelFromJson(json);
 
 @override final  String? houseName;
 @override final  String? houseCode;
-@override@JsonKey() final  int floor;
+@override final  String? floor;
 @override@JsonKey() final  int status;
-@override@JsonKey(name: 'occupied') final  bool isOccupied;
+@override@JsonKey() final  bool isOccupied;
 @override@JsonKey() final  double rent;
 @override final  String? location;
 @override final  double? squareFt;
@@ -283,7 +283,7 @@ abstract mixin class _$HouseDetailModelCopyWith<$Res> implements $HouseDetailMod
   factory _$HouseDetailModelCopyWith(_HouseDetailModel value, $Res Function(_HouseDetailModel) _then) = __$HouseDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? houseName, String? houseCode, int floor, int status,@JsonKey(name: 'occupied') bool isOccupied, double rent, String? location, double? squareFt, String? property, String? category, String? houseType, String? estate, HouseTenant? tenant
+ String? houseName, String? houseCode, String? floor, int status, bool isOccupied, double rent, String? location, double? squareFt, String? property, String? category, String? houseType, String? estate, HouseTenant? tenant
 });
 
 
@@ -300,12 +300,12 @@ class __$HouseDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of HouseDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? houseName = freezed,Object? houseCode = freezed,Object? floor = null,Object? status = null,Object? isOccupied = null,Object? rent = null,Object? location = freezed,Object? squareFt = freezed,Object? property = freezed,Object? category = freezed,Object? houseType = freezed,Object? estate = freezed,Object? tenant = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? houseName = freezed,Object? houseCode = freezed,Object? floor = freezed,Object? status = null,Object? isOccupied = null,Object? rent = null,Object? location = freezed,Object? squareFt = freezed,Object? property = freezed,Object? category = freezed,Object? houseType = freezed,Object? estate = freezed,Object? tenant = freezed,}) {
   return _then(_HouseDetailModel(
 houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
 as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,floor: null == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,floor: freezed == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as int,isOccupied: null == isOccupied ? _self.isOccupied : isOccupied // ignore: cast_nullable_to_non_nullable
 as bool,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
 as double,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable

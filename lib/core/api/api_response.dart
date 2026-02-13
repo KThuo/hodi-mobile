@@ -42,6 +42,17 @@ class ApiResponse<T> {
       );
     }
 
+    // Raw object response (e.g. house detail) — the response body is the
+    // domain object itself without the standard {status, message, data}
+    // envelope. The standard envelope always has both 'message' and 'data'.
+    if (!json.containsKey('message') && !json.containsKey('data')) {
+      return ApiResponse<T>(
+        status: '00',
+        message: '',
+        data: fromJsonT != null ? fromJsonT(json) : null,
+      );
+    }
+
     return ApiResponse<T>(
       status: json['status']?.toString() ?? '01',
       message: json['message']?.toString() ?? '',

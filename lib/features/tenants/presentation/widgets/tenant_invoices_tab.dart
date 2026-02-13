@@ -5,7 +5,6 @@ import '../../../../core/theme/hodi_colors.dart';
 import '../../../../core/theme/hodi_text_styles.dart';
 import '../../../../core/widgets/hodi_card.dart';
 import '../../../../core/widgets/hodi_amount_text.dart';
-import '../../../../core/widgets/hodi_status_badge.dart';
 import '../../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../../core/widgets/hodi_empty_state.dart';
 import '../../../../core/widgets/hodi_error_state.dart';
@@ -179,19 +178,6 @@ class _InvoiceItem extends StatelessWidget {
 
   const _InvoiceItem({required this.invoice, this.onTap});
 
-  BadgeType get _badgeType {
-    if (invoice.isVoided) return BadgeType.error;
-    if (invoice.isPaid) return BadgeType.success;
-    return BadgeType.warning;
-  }
-
-  String get _badgeText {
-    if (invoice.isVoided) return 'Voided';
-    if (invoice.isPaid) return 'Paid';
-    if (invoice.status == 1) return 'Partial';
-    return 'Unpaid';
-  }
-
   @override
   Widget build(BuildContext context) {
     return HodiCard(
@@ -199,18 +185,11 @@ class _InvoiceItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  invoice.rrn ?? '-',
-                  style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              HodiStatusBadge(text: _badgeText, type: _badgeType),
-            ],
+          Text(
+            invoice.rrn ?? '-',
+            style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
           Row(
@@ -227,22 +206,22 @@ class _InvoiceItem extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              HodiAmountText(
-                amount: invoice.rentOwed,
-                style: HodiTextStyles.currency.copyWith(fontSize: 15),
+          if (invoice.isPaid)
+            HodiAmountText(
+              amount: invoice.rentPaid,
+              style: HodiTextStyles.currency.copyWith(
+                fontSize: 15,
+                color: HodiColors.successStart,
               ),
-              HodiAmountText(
-                amount: invoice.rentPaid,
-                prefix: 'Paid: KES ',
-                style: HodiTextStyles.currencySmall.copyWith(
-                  color: HodiColors.successStart,
-                ),
+            )
+          else if (!invoice.isVoided)
+            Text(
+              'Bal: ${invoice.balance >= 0 ? "" : "-"}KES ${invoice.balance.abs().toStringAsFixed(0)}',
+              style: HodiTextStyles.bodySmall.copyWith(
+                color: HodiColors.errorStart,
+                fontWeight: FontWeight.w500,
               ),
-            ],
-          ),
+            ),
         ],
       ),
     );

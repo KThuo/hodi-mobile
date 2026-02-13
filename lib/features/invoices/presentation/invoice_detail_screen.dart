@@ -7,6 +7,7 @@ import '../../../core/theme/hodi_shadows.dart';
 import '../../../core/theme/hodi_gradients.dart';
 import '../../../core/widgets/hodi_app_bar.dart';
 import '../../../core/widgets/hodi_amount_text.dart';
+import '../../../core/widgets/hodi_status_badge.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -58,6 +59,8 @@ class InvoiceDetailScreen extends ConsumerWidget {
                         detail.rrn ?? rrn,
                         style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
                       ),
+                      const SizedBox(height: 8),
+                      _InvoiceStatusBadge(flag: detail.flag),
                       const SizedBox(height: 8),
                       HodiAmountText(
                         amount: detail.invoiceAmount,
@@ -144,5 +147,42 @@ class InvoiceDetailScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _InvoiceStatusBadge extends StatelessWidget {
+  final int flag;
+
+  const _InvoiceStatusBadge({required this.flag});
+
+  String get _label {
+    switch (flag) {
+      case 2:
+        return 'Paid';
+      case 1:
+        return 'Partially Paid';
+      case 4:
+        return 'Voided';
+      case 3:
+        return 'Brought Forward';
+      default:
+        return 'Unpaid';
+    }
+  }
+
+  BadgeType get _type {
+    switch (flag) {
+      case 2:
+        return BadgeType.success;
+      case 1:
+        return BadgeType.warning;
+      default:
+        return BadgeType.error;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HodiStatusBadge(text: _label, type: _type);
   }
 }
