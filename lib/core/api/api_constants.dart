@@ -45,6 +45,8 @@ abstract class ApiConstants {
   static const String paymentDetail = '$apiPrefix/payments/detail'; // append /{rrn}
   static const String paymentPrint = '$apiPrefix/payments/detail/print'; // append /{rrn}
   static const String recordPayment = '$apiPrefix/payments/receive-payment';
+  static const String receivePayments = '$apiPrefix/payments/receive-payments';
+  static const String paymentTypes = '$apiPrefix/estate/payment-types'; // append /property/{self}/{propertyId}
 
   // Metres
   static const String metres = '$apiPrefix/metres';

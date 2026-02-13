@@ -11,7 +11,10 @@ import '../../../core/widgets/hodi_status_badge.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/widgets/hodi_gradient_button.dart';
+import '../domain/invoice_detail_model.dart';
 import '../providers/invoice_providers.dart';
+import 'widgets/make_payment_sheet.dart';
 
 class InvoiceDetailScreen extends ConsumerWidget {
   final String rrn;
@@ -116,7 +119,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
                               ),
                               const Spacer(),
                               HodiAmountText(
-                                amount: detail.invoiceAmount,
+                                amount: detail.rentOwed,
                                 style: HodiTextStyles.currency.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ],
@@ -135,16 +138,90 @@ class InvoiceDetailScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(invoiceDetailProvider(rrn)),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ref.read(invoiceRepositoryProvider).downloadInvoicePdf(rrn);
+      bottomNavigationBar: detailAsync.when(
+        data: (detail) {
+          if (detail == null) return const SizedBox.shrink();
+          return _BottomActions(
+            detail: detail,
+            rrn: rrn,
+          );
         },
-        backgroundColor: HodiColors.primaryStart,
-        icon: const Icon(Icons.download, color: HodiColors.white),
-        label: Text(
-          'Download PDF',
-          style: HodiTextStyles.button.copyWith(fontSize: 14),
-        ),
+        loading: () => const SizedBox.shrink(),
+        error: (_, _) => const SizedBox.shrink(),
+      ),
+    );
+  }
+}
+
+class _BottomActions extends ConsumerWidget {
+  final InvoiceDetailModel detail;
+  final String rrn;
+
+  const _BottomActions({required this.detail, required this.rrn});
+
+  bool get _canPay => detail.flag < 2 && detail.rentOwed > 0;
+
+  void _openPaymentSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => MakePaymentSheet(invoice: detail),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 12,
+        bottom: MediaQuery.of(context).padding.bottom + 12,
+      ),
+      decoration: const BoxDecoration(
+        color: HodiColors.cardBackground,
+        border: Border(top: BorderSide(color: HodiColors.divider)),
+      ),
+      child: Row(
+        children: [
+          // Download PDF button
+          Expanded(
+            flex: _canPay ? 1 : 2,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                ref.read(invoiceRepositoryProvider).downloadInvoicePdf(rrn);
+              },
+              icon: const Icon(Icons.download, size: 18),
+              label: Text(
+                'Download',
+                style: HodiTextStyles.bodyMedium.copyWith(
+                  color: HodiColors.primaryStart,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: HodiColors.primaryStart,
+                side: const BorderSide(color: HodiColors.primaryStart),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          if (_canPay) ...[
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: HodiGradientButton(
+                text: 'Make Payment',
+                icon: Icons.payment,
+                onPressed: () => _openPaymentSheet(context),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

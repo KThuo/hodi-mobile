@@ -5,6 +5,7 @@ import '../../../core/api/paged_response.dart';
 import '../../../core/utils/pdf_downloader.dart';
 import '../domain/invoice_model.dart';
 import '../domain/invoice_detail_model.dart';
+import '../domain/payment_type_model.dart';
 
 class InvoiceRepository {
   final ApiClient _apiClient;
@@ -51,6 +52,28 @@ class InvoiceRepository {
     await _pdfDownloader.downloadAndOpen(
       '${ApiConstants.invoicePrint}/$rrn',
       'invoice_$rrn.pdf',
+    );
+  }
+
+  Future<ApiResponse<List<PaymentTypeModel>>> getPaymentTypes({
+    required int propertyId,
+    required bool isSelf,
+  }) async {
+    final selfParam = isSelf ? 1 : 0;
+    return _apiClient.get<List<PaymentTypeModel>>(
+      '${ApiConstants.paymentTypes}/property/$selfParam/$propertyId',
+      fromJsonT: (data) => (data as List)
+          .map((item) => PaymentTypeModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Future<ApiResponse<void>> receivePayment({
+    required Map<String, dynamic> payload,
+  }) async {
+    return _apiClient.post<void>(
+      ApiConstants.receivePayments,
+      data: payload,
     );
   }
 }
