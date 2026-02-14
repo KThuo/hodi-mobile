@@ -82,7 +82,7 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isAdmin ? 'Property Overview' : 'Your Dashboard',
+                      authState.user?.estate ?? (isAdmin ? 'Property Overview' : 'Your Dashboard'),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: HodiColors.white.withValues(alpha: 0.8),
