@@ -65,9 +65,27 @@ dev_dependencies:
   json_serializable: ^6.9.5
   riverpod_lint: ^3.1.3
   mockito: ^5.4.6
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app-icon.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#667EEA"
+  adaptive_icon_foreground: "assets/images/app-icon.png"
+
+flutter_native_splash:
+  color: "#667EEA"
+  image: "assets/images/splash-logo.png"
+  android_12:
+    color: "#667EEA"
+    image: "assets/images/splash-logo.png"
+    icon_background_color: "#667EEA"
