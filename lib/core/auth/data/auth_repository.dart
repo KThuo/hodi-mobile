@@ -75,4 +75,9 @@ class AuthRepository {
   Future<bool> isLoggedIn() => _storage.isTokenValid();
 
   Future<void> logout() => _storage.clearAll();
+
+  /// Clears session (token/user) but preserves biometric credentials.
+  Future<void> clearSession() => _storage.clearSession();
+
+  Future<bool> isBiometricEnabled() => _storage.isBiometricEnabled();
 }

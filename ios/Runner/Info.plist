@@ -49,6 +49,8 @@
 		</dict>
 		<key>NSCameraUsageDescription</key>
 		<string>Camera access is needed to capture metre reading photos</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Enable Face ID to quickly and securely sign in to HODI</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UILaunchStoryboardName</key>

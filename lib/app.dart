@@ -16,13 +16,15 @@ class HodiApp extends ConsumerStatefulWidget {
   ConsumerState<HodiApp> createState() => _HodiAppState();
 }
 
-class _HodiAppState extends ConsumerState<HodiApp> {
+class _HodiAppState extends ConsumerState<HodiApp> with WidgetsBindingObserver {
   StreamSubscription? _errorSubscription;
   bool _isDialogShowing = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     Future.microtask(() {
       ref.read(authProvider.notifier).checkAuth();
     });
@@ -31,7 +33,7 @@ class _HodiAppState extends ConsumerState<HodiApp> {
       final apiClient = ref.read(apiClientProvider);
       _errorSubscription = apiClient.errorStream.listen((error) {
         if (error.status == '003') {
-          ref.read(authProvider.notifier).logout();
+          ref.read(authProvider.notifier).sessionExpired();
         } else if (error.status == '002') {
           _showErrorDialog(error.message);
         }
@@ -40,7 +42,26 @@ class _HodiAppState extends ConsumerState<HodiApp> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkTokenOnResume();
+    }
+  }
+
+  Future<void> _checkTokenOnResume() async {
+    final authState = ref.read(authProvider);
+    if (!authState.isAuthenticated) return;
+
+    final storage = ref.read(authLocalStorageProvider);
+    final isValid = await storage.isTokenValid();
+    if (!isValid) {
+      ref.read(authProvider.notifier).sessionExpired();
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _errorSubscription?.cancel();
     super.dispose();
   }

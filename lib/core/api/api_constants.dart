@@ -18,6 +18,7 @@ abstract class ApiConstants {
   // Auth endpoints
   static const String login = '$apiPrefix/login';
   static const String deleteAccount = '$apiPrefix/delete-account';
+  static const String refreshToken = '$apiPrefix/refresh-token';
   static const String forgotPassword = '$apiPrefix/forgot-password';
 
   // Dashboard

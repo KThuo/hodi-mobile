@@ -24,6 +24,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _biometricTriggered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _tryBiometricAuth();
+    });
+  }
 
   @override
   void dispose() {
@@ -32,17 +41,107 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
+  void _tryBiometricAuth() {
+    if (_biometricTriggered) return;
+    final authState = ref.read(authProvider);
+    if (authState.pendingBiometricVerification) {
+      _biometricTriggered = true;
+      _handleBiometricLogin();
+    }
+  }
 
-    final success = await ref.read(authProvider.notifier).login(
-          _usernameController.text.trim(),
-          _passwordController.text,
-        );
-
+  Future<void> _handleBiometricLogin() async {
+    final success =
+        await ref.read(authProvider.notifier).authenticateWithBiometrics();
     if (success && mounted) {
       context.go('/home');
     }
+  }
+
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
+    final success = await ref.read(authProvider.notifier).login(
+          username,
+          password,
+        );
+
+    if (success && mounted) {
+      final authState = ref.read(authProvider);
+      if (authState.biometricAvailable && !authState.biometricEnabled) {
+        final shouldEnable = await _showBiometricEnrollmentDialog();
+        if (shouldEnable && mounted) {
+          await ref.read(authProvider.notifier).enableBiometric(
+                username,
+                password,
+              );
+        }
+      }
+      if (mounted) {
+        context.go('/home');
+      }
+    }
+  }
+
+  Future<bool> _showBiometricEnrollmentDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: HodiBorderRadius.card),
+            title: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: HodiColors.primaryStart.withValues(alpha: 0.1),
+                    borderRadius: HodiBorderRadius.small,
+                  ),
+                  child: const Icon(
+                    Icons.fingerprint,
+                    color: HodiColors.primaryStart,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text('Enable Biometric Login',
+                      style: HodiTextStyles.heading3),
+                ),
+              ],
+            ),
+            content: Text(
+              'Would you like to use biometrics to sign in next time? '
+              'Your credentials will be stored securely on this device.',
+              style: HodiTextStyles.bodyMedium,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'Not Now',
+                  style: HodiTextStyles.bodyMedium
+                      .copyWith(color: HodiColors.textMedium),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  'Enable',
+                  style: HodiTextStyles.bodyMedium.copyWith(
+                    color: HodiColors.primaryStart,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   @override
@@ -95,7 +194,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 16),
                     Text(
                       'HODI',
-                      style: HodiTextStyles.heading1.copyWith(color: HodiColors.white),
+                      style: HodiTextStyles.heading1
+                          .copyWith(color: HodiColors.white),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -132,10 +232,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: HodiColors.errorStart.withValues(alpha: 0.1),
+                                  color: HodiColors.errorStart
+                                      .withValues(alpha: 0.1),
                                   borderRadius: HodiBorderRadius.small,
                                   border: Border.all(
-                                    color: HodiColors.errorStart.withValues(alpha: 0.3),
+                                    color: HodiColors.errorStart
+                                        .withValues(alpha: 0.3),
                                   ),
                                 ),
                                 child: Row(
@@ -149,7 +251,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     Expanded(
                                       child: Text(
                                         authState.error!,
-                                        style: HodiTextStyles.bodySmall.copyWith(
+                                        style:
+                                            HodiTextStyles.bodySmall.copyWith(
                                           color: HodiColors.errorStart,
                                         ),
                                       ),
@@ -167,7 +270,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               prefixIcon: Icons.person_outline,
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
-                              validator: (v) => Validators.required(v, 'Username'),
+                              validator: (v) =>
+                                  Validators.required(v, 'Username'),
                             ),
                             const SizedBox(height: 16),
 
@@ -179,7 +283,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               obscureText: _obscurePassword,
                               textInputAction: TextInputAction.done,
                               onSubmitted: (_) => _handleLogin(),
-                              validator: (v) => Validators.required(v, 'Password'),
+                              validator: (v) =>
+                                  Validators.required(v, 'Password'),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword
@@ -189,7 +294,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   size: 20,
                                 ),
                                 onPressed: () {
-                                  setState(() => _obscurePassword = !_obscurePassword);
+                                  setState(
+                                      () => _obscurePassword = !_obscurePassword);
                                 },
                               ),
                             ),
@@ -201,12 +307,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               onPressed: _handleLogin,
                               isLoading: authState.isLoading,
                             ),
+
+                            // Biometric button
+                            if (authState.biometricEnabled) ...[
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 48,
+                                child: OutlinedButton.icon(
+                                  onPressed: authState.isLoading
+                                      ? null
+                                      : _handleBiometricLogin,
+                                  icon: const Icon(Icons.fingerprint, size: 22),
+                                  label: Text(
+                                    'Sign in with Biometrics',
+                                    style: HodiTextStyles.bodyMedium.copyWith(
+                                      color: HodiColors.primaryStart,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: HodiColors.primaryStart,
+                                    side: const BorderSide(
+                                      color: HodiColors.primaryStart,
+                                      width: 1.5,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 16),
 
                             // Forgot password
                             Center(
                               child: TextButton(
-                                onPressed: () => context.pushNamed('forgot-password'),
+                                onPressed: () =>
+                                    context.pushNamed('forgot-password'),
                                 child: Text(
                                   'Forgot Password?',
                                   style: HodiTextStyles.bodyMedium.copyWith(
