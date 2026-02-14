@@ -5,6 +5,7 @@ import '../auth/providers/auth_provider.dart';
 import 'app_shell.dart';
 import 'route_names.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/houses/presentation/houses_screen.dart';
 import '../../features/houses/presentation/house_detail_screen.dart';
@@ -24,18 +25,6 @@ import '../../features/vacant_houses/presentation/vacant_houses_screen.dart';
 import '../../features/vacant_houses/presentation/vacant_house_detail_screen.dart';
 import '../../features/vacate_notices/presentation/vacate_notices_screen.dart';
 import '../../features/vacate_notices/presentation/vacate_notice_detail_screen.dart';
-
-// Placeholder screens - will be replaced in later phases
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const _PlaceholderScreen({required this.title});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text(title, style: const TextStyle(fontSize: 18))),
-    );
-  }
-}
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -72,7 +61,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/forgot-password',
         name: RouteNames.forgotPassword,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Forgot Password'),
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
 
       // Public routes (no shell)
