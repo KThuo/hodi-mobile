@@ -13,7 +13,7 @@ _VacantHouseDetailModel _$VacantHouseDetailModelFromJson(
   houseName: json['houseName'] as String?,
   houseNumber: json['houseNumber'] as String?,
   houseCode: json['houseCode'] as String?,
-  floor: (json['floor'] as num?)?.toInt() ?? 0,
+  floor: parseIntNullable(json['floor']),
   description: json['description'] as String?,
   category: json['category'] as String?,
   houseType: json['houseType'] as String?,
@@ -22,9 +22,9 @@ _VacantHouseDetailModel _$VacantHouseDetailModelFromJson(
   longitude: (json['longitude'] as num?)?.toDouble(),
   property: json['property'] as String?,
   estate: json['estate'] as String?,
-  rent: (json['rent'] as num?)?.toDouble() ?? 0,
+  rent: json['rent'] == null ? 0 : parseDouble(json['rent']),
   squareFt: (json['squareFt'] as num?)?.toDouble(),
-  featureCount: (json['featureCount'] as num?)?.toInt() ?? 0,
+  featureCount: parseIntNullable(json['featureCount']),
   lastOccupied: json['lastOccupied'] as String?,
   imageUrl: json['imageUrl'] as String?,
   utilityBills:
@@ -37,9 +37,15 @@ _VacantHouseDetailModel _$VacantHouseDetailModelFromJson(
           ?.map((e) => VacantHouseBill.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
-  totalMonthlyBills: (json['totalMonthlyBills'] as num?)?.toDouble() ?? 0,
-  totalOnboardFees: (json['totalOnboardFees'] as num?)?.toDouble() ?? 0,
-  maxRefundableAmount: (json['maxRefundableAmount'] as num?)?.toDouble() ?? 0,
+  totalMonthlyBills: json['totalMonthlyBills'] == null
+      ? 0
+      : parseDouble(json['totalMonthlyBills']),
+  totalOnboardFees: json['totalOnboardFees'] == null
+      ? 0
+      : parseDouble(json['totalOnboardFees']),
+  maxRefundableAmount: json['maxRefundableAmount'] == null
+      ? 0
+      : parseDouble(json['maxRefundableAmount']),
   houseFeatures:
       (json['houseFeatures'] as List<dynamic>?)
           ?.map((e) => VacantHouseFeature.fromJson(e as Map<String, dynamic>))
@@ -84,9 +90,9 @@ Map<String, dynamic> _$VacantHouseDetailModelToJson(
 
 _VacantHouseBill _$VacantHouseBillFromJson(Map<String, dynamic> json) =>
     _VacantHouseBill(
-      id: (json['id'] as num?)?.toInt(),
+      id: parseIntNullable(json['id']),
       name: json['name'] as String?,
-      amount: (json['amount'] as num?)?.toDouble() ?? 0,
+      amount: json['amount'] == null ? 0 : parseDouble(json['amount']),
       isOnboard: json['isOnboard'] as bool? ?? false,
     );
 
@@ -100,7 +106,7 @@ Map<String, dynamic> _$VacantHouseBillToJson(_VacantHouseBill instance) =>
 
 _VacantHouseFeature _$VacantHouseFeatureFromJson(Map<String, dynamic> json) =>
     _VacantHouseFeature(
-      id: (json['id'] as num?)?.toInt(),
+      id: parseIntNullable(json['id']),
       name: json['name'] as String?,
     );
 
@@ -109,7 +115,7 @@ Map<String, dynamic> _$VacantHouseFeatureToJson(_VacantHouseFeature instance) =>
 
 _VacantHouseImage _$VacantHouseImageFromJson(Map<String, dynamic> json) =>
     _VacantHouseImage(
-      id: (json['id'] as num?)?.toInt(),
+      id: parseIntNullable(json['id']),
       filename: json['filename'] as String?,
       originalName: json['originalName'] as String?,
       imageUrl: json['imageUrl'] as String?,

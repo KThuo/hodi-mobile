@@ -291,8 +291,8 @@ class _HouseInfoCard extends StatelessWidget {
             _DetailRow(icon: Icons.category_outlined, label: 'Type', value: detail.houseType!),
           if (detail.category != null)
             _DetailRow(icon: Icons.meeting_room_outlined, label: 'Category', value: detail.category!),
-          if (detail.floor > 0)
-            _DetailRow(icon: Icons.layers_outlined, label: 'Floor', value: _floorLabel(detail.floor)),
+          if (detail.floor != null && detail.floor! > 0)
+            _DetailRow(icon: Icons.layers_outlined, label: 'Floor', value: _floorLabel(detail.floor!)),
           if (detail.squareFt != null)
             _DetailRow(icon: Icons.square_foot_outlined, label: 'Size', value: '${detail.squareFt!.toStringAsFixed(0)} sq ft'),
           if (detail.location != null)

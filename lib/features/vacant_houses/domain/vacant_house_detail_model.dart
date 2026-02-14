@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../../core/utils/json_parsers.dart';
 
 part 'vacant_house_detail_model.freezed.dart';
 part 'vacant_house_detail_model.g.dart';
@@ -11,7 +12,7 @@ abstract class VacantHouseDetailModel with _$VacantHouseDetailModel {
     String? houseName,
     String? houseNumber,
     String? houseCode,
-    @Default(0) int floor,
+    @JsonKey(fromJson: parseIntNullable) int? floor,
     String? description,
     String? category,
     String? houseType,
@@ -20,16 +21,16 @@ abstract class VacantHouseDetailModel with _$VacantHouseDetailModel {
     double? longitude,
     String? property,
     String? estate,
-    @Default(0) double rent,
+    @JsonKey(fromJson: parseDouble) @Default(0) double rent,
     double? squareFt,
-    @Default(0) int featureCount,
+    @JsonKey(fromJson: parseIntNullable) int? featureCount,
     String? lastOccupied,
     String? imageUrl,
     @Default([]) List<VacantHouseBill> utilityBills,
     @Default([]) List<VacantHouseBill> onboardFees,
-    @Default(0) double totalMonthlyBills,
-    @Default(0) double totalOnboardFees,
-    @Default(0) double maxRefundableAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double totalMonthlyBills,
+    @JsonKey(fromJson: parseDouble) @Default(0) double totalOnboardFees,
+    @JsonKey(fromJson: parseDouble) @Default(0) double maxRefundableAmount,
     @Default([]) List<VacantHouseFeature> houseFeatures,
     @Default([]) List<VacantHouseImage> categoryImages,
   }) = _VacantHouseDetailModel;
@@ -37,15 +38,15 @@ abstract class VacantHouseDetailModel with _$VacantHouseDetailModel {
   factory VacantHouseDetailModel.fromJson(Map<String, dynamic> json) =>
       _$VacantHouseDetailModelFromJson(json);
 
-  double get totalMoveInCost => rent + totalMonthlyBills + totalOnboardFees;
+  double get totalMoveInCost => (rent) + totalMonthlyBills + totalOnboardFees;
 }
 
 @freezed
 abstract class VacantHouseBill with _$VacantHouseBill {
   const factory VacantHouseBill({
-    int? id,
+    @JsonKey(fromJson: parseIntNullable) int? id,
     String? name,
-    @Default(0) double amount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double amount,
     @Default(false) bool isOnboard,
   }) = _VacantHouseBill;
 
@@ -56,7 +57,7 @@ abstract class VacantHouseBill with _$VacantHouseBill {
 @freezed
 abstract class VacantHouseFeature with _$VacantHouseFeature {
   const factory VacantHouseFeature({
-    int? id,
+    @JsonKey(fromJson: parseIntNullable) int? id,
     String? name,
   }) = _VacantHouseFeature;
 
@@ -67,7 +68,7 @@ abstract class VacantHouseFeature with _$VacantHouseFeature {
 @freezed
 abstract class VacantHouseImage with _$VacantHouseImage {
   const factory VacantHouseImage({
-    int? id,
+    @JsonKey(fromJson: parseIntNullable) int? id,
     String? filename,
     String? originalName,
     String? imageUrl,
