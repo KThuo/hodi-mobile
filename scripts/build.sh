@@ -17,10 +17,18 @@ fi
 echo "Building $ENV $FORMAT..."
 
 if [[ "$FORMAT" == "apk" ]]; then
-  flutter build apk --split-per-abi --dart-define=ENV="$ENV"
+  flutter build apk --split-per-abi \
+    --obfuscate \
+    --split-debug-info=build/debug-info \
+    --dart-define=ENV="$ENV"
 else
-  flutter build appbundle --dart-define=ENV="$ENV"
+  flutter build appbundle \
+    --obfuscate \
+    --split-debug-info=build/debug-info \
+    --dart-define=ENV="$ENV"
 fi
 
 echo ""
 echo "Build complete ($ENV $FORMAT)"
+echo ""
+echo "NOTE: Archive build/debug-info/ after each release — those symbols are needed to decode obfuscated stack traces from crash reports."
