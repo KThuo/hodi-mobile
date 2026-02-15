@@ -162,7 +162,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Image.asset(
               'assets/images/login-bg.png',
               fit: BoxFit.cover,
-              opacity: const AlwaysStoppedAnimation(0.15),
+              opacity: const AlwaysStoppedAnimation(0.35),
             ),
           ),
 
