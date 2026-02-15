@@ -340,6 +340,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
 
     if (response.isSuccess) {
       Navigator.of(context).pop();
+      await widget.ref.read(authProvider.notifier).disableBiometric();
       widget.ref.read(authProvider.notifier).logout();
     } else {
       setState(() {

@@ -199,9 +199,23 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<void> logout() async {
-    await _repository.logout();
+    final biometricAvailable = state.biometricAvailable;
+    final biometricEnabled = state.biometricEnabled;
+
+    await _repository.clearSession();
     ref.read(filterProvider.notifier).reset();
-    state = const AuthState();
+
+    if (biometricEnabled) {
+      state = AuthState(
+        biometricAvailable: biometricAvailable,
+        biometricEnabled: true,
+        pendingBiometricVerification: true,
+      );
+    } else {
+      state = AuthState(
+        biometricAvailable: biometricAvailable,
+      );
+    }
   }
 
   /// Handles session expiry (error 003) — preserves biometric credentials.
