@@ -32,10 +32,8 @@ class BiometricService {
     try {
       return await _localAuth.authenticate(
         localizedReason: 'Sign in to HODI',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-        ),
+        persistAcrossBackgrounding: true,
+        biometricOnly: true,
       );
     } catch (_) {
       return false;

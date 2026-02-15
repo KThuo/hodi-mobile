@@ -24,7 +24,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0
 
   # Biometric Authentication
-  local_auth: ^2.3.0
+  local_auth: ^3.0.0
 
   # UI
   google_fonts: ^8.0.1
@@ -45,7 +45,7 @@ dependencies:
 
   # Camera & OCR
   image_picker: ^1.2.1
-  google_mlkit_text_recognition: ^0.14.0
+  google_mlkit_text_recognition: ^0.15.1
 
   # Models
   freezed_annotation: ^3.1.0
