@@ -737,8 +737,37 @@ class _PaymentInstructionsCard extends StatelessWidget {
 
   const _PaymentInstructionsCard({required this.instructions});
 
+  static final _boldPattern = RegExp(r'bold-([^-]+)-bold');
+
+  List<TextSpan> _parseInstructions(String text, TextStyle baseStyle) {
+    final spans = <TextSpan>[];
+    var lastEnd = 0;
+
+    for (final match in _boldPattern.allMatches(text)) {
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
+      }
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: baseStyle.copyWith(fontWeight: FontWeight.w700),
+      ));
+      lastEnd = match.end;
+    }
+
+    if (lastEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastEnd)));
+    }
+
+    return spans;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final baseStyle = HodiTextStyles.bodyMedium.copyWith(
+      color: HodiColors.textDark,
+      height: 1.5,
+    );
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -770,11 +799,14 @@ class _PaymentInstructionsCard extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(height: 1, color: HodiColors.divider),
           const SizedBox(height: 16),
-          Text(
-            instructions,
-            style: HodiTextStyles.bodyMedium.copyWith(
-              color: HodiColors.textDark,
-              height: 1.5,
+          SizedBox(
+            width: double.infinity,
+            child: Text.rich(
+              TextSpan(
+                style: baseStyle,
+                children: _parseInstructions(instructions, baseStyle),
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
         ],
