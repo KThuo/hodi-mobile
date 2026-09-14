@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 import 'hodi_colors.dart';
 
 abstract class HodiGradients {
+  /// What a filled button is painted with — `--grad-button` on the web.
+  ///
+  /// **Not the full brand gradient**, and the difference is the point. `--grad-brand` runs blue all
+  /// the way to magenta and is reserved for one thing: the gradient-clipped heading. A button is a
+  /// surface, and a surface in full brand-into-accent shouts. The web mixes only 30% of the accent
+  /// into the brand for the far stop — `color-mix(in srgb, accent 30%, brand)`, which resolves to
+  /// #5E71D4 — so the button reads as blue with a warm edge rather than as a stripe of two colours.
+  static const LinearGradient button = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF2190F2), Color(0xFF5E71D4)],
+  );
+
   /// The app's one gradient: the dashboard header.
   ///
   /// Built from the ink, deepening toward the brand — a navy header rather than a slab of

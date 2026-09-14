@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,7 +8,6 @@ import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_gradients.dart';
 import '../../../core/theme/hodi_text_styles.dart';
-import '../../../core/theme/hodi_shadows.dart';
 import '../../../core/theme/hodi_border_radius.dart';
 import '../../../core/widgets/hodi_gradient_button.dart';
 import '../../../core/widgets/hodi_text_field.dart';
@@ -51,8 +52,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleBiometricLogin() async {
-    final success =
-        await ref.read(authProvider.notifier).authenticateWithBiometrics();
+    final success = await ref
+        .read(authProvider.notifier)
+        .authenticateWithBiometrics();
     if (success && mounted) {
       context.go('/home');
     }
@@ -64,20 +66,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
-    final success = await ref.read(authProvider.notifier).login(
-          username,
-          password,
-        );
+    final success = await ref
+        .read(authProvider.notifier)
+        .login(username, password);
 
     if (success && mounted) {
       final authState = ref.read(authProvider);
       if (authState.biometricAvailable && !authState.biometricEnabled) {
         final shouldEnable = await _showBiometricEnrollmentDialog();
         if (shouldEnable && mounted) {
-          await ref.read(authProvider.notifier).enableBiometric(
-                username,
-                password,
-              );
+          await ref
+              .read(authProvider.notifier)
+              .enableBiometric(username, password);
         }
       }
       if (mounted) {
@@ -90,8 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: HodiBorderRadius.card),
+            shape: RoundedRectangleBorder(borderRadius: HodiBorderRadius.card),
             title: Row(
               children: [
                 Container(
@@ -109,8 +108,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text('Enable Biometric Login',
-                      style: HodiTextStyles.heading3),
+                  child: Text(
+                    'Enable Biometric Login',
+                    style: HodiTextStyles.heading3,
+                  ),
                 ),
               ],
             ),
@@ -124,8 +125,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 onPressed: () => Navigator.of(context).pop(false),
                 child: Text(
                   'Not Now',
-                  style: HodiTextStyles.bodyMedium
-                      .copyWith(color: HodiColors.textMedium),
+                  style: HodiTextStyles.bodyMedium.copyWith(
+                    color: HodiColors.textMedium,
+                  ),
                 ),
               ),
               TextButton(
@@ -152,17 +154,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background gradient
-          Container(
-            decoration: const BoxDecoration(gradient: HodiGradients.primary),
+          /*
+           * The photograph, clean.
+           *
+           * It used to sit at 35% over a full-screen brand gradient, so the first thing anybody saw
+           * on opening the app was a blue-into-magenta wash with a washed-out room behind it. The
+           * web shows the same `login-bg.png` at full strength with no tint at all, and its own note
+           * says why it settled there: "a full-frame scrim washed it out and a colour tint hazed it
+           * pink — the old page showed the photograph clean and that was the better call."
+           */
+          Positioned.fill(
+            child: Image.asset('assets/images/login-bg.png', fit: BoxFit.cover),
           ),
 
-          // Background image
+          // Darkened at the foot only, and only as far as the link down there needs to be legible.
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/login-bg.png',
-              fit: BoxFit.cover,
-              opacity: const AlwaysStoppedAnimation(0.35),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.transparent,
+                    HodiColors.inkDeep.withValues(alpha: 0.55),
+                  ],
+                  stops: const [0.0, 0.55, 1.0],
+                ),
+              ),
             ),
           ),
 
@@ -174,188 +193,220 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo
-                    Container(
-                      width: 72,
-                      height: 72,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: HodiColors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: SvgPicture.asset(
-                        'assets/images/logo.svg',
-                        colorFilter: const ColorFilter.mode(
-                          HodiColors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'HODI',
-                      style: HodiTextStyles.heading1
-                          .copyWith(color: HodiColors.white),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Property Management',
-                      style: HodiTextStyles.bodyMedium.copyWith(
-                        color: HodiColors.white.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-
-                    // Login card
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: HodiColors.white.withValues(alpha: 0.95),
-                        borderRadius: HodiBorderRadius.card,
-                        boxShadow: HodiShadows.card,
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Sign In', style: HodiTextStyles.heading2),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Enter your credentials to continue',
-                              style: HodiTextStyles.bodyMedium,
+                    // The card: glass over the photograph, as the web's AuthShell is.
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                        child: Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            // --glass and --glass-edge. Not flat white: the blur behind it is what
+                            // makes a card on a photograph read as glass rather than as a sticker.
+                            color: HodiColors.white.withValues(alpha: 0.95),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: HodiColors.white.withValues(alpha: 0.4),
                             ),
-                            const SizedBox(height: 24),
-
-                            // Error message
-                            if (authState.error != null) ...[
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: HodiColors.errorStart
-                                      .withValues(alpha: 0.1),
-                                  borderRadius: HodiBorderRadius.small,
-                                  border: Border.all(
-                                    color: HodiColors.errorStart
-                                        .withValues(alpha: 0.3),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x38071726),
+                                blurRadius: 40,
+                                offset: Offset(0, 20),
+                              ),
+                              BoxShadow(
+                                color: Color(0x1F000000),
+                                blurRadius: 24,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // The mark lives in the card, in its own colours. Outside it, tinted
+                                // white, it needed a gradient behind it to be visible at all.
+                                Center(
+                                  child: SvgPicture.asset(
+                                    'assets/images/logo.svg',
+                                    height: 52,
                                   ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.error_outline,
-                                      color: HodiColors.errorStart,
-                                      size: 20,
+                                const SizedBox(height: 20),
+                                // The heading carries the brand, and it is the only place on this screen
+                                // that does — gradient-clipped text, exactly as `.login__title` is.
+                                ShaderMask(
+                                  shaderCallback: (bounds) =>
+                                      HodiGradients.primary.createShader(
+                                        Rect.fromLTWH(
+                                          0,
+                                          0,
+                                          bounds.width,
+                                          bounds.height,
+                                        ),
+                                      ),
+                                  blendMode: BlendMode.srcIn,
+                                  child: Text(
+                                    'Welcome Back',
+                                    style: HodiTextStyles.heading2.copyWith(
+                                      color: HodiColors.white,
+                                      letterSpacing: -0.5,
                                     ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        authState.error!,
-                                        style:
-                                            HodiTextStyles.bodySmall.copyWith(
-                                          color: HodiColors.errorStart,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Sign in to your account',
+                                  style: HodiTextStyles.bodyMedium.copyWith(
+                                    color: HodiColors.textMedium,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+
+                                // Error message
+                                if (authState.error != null) ...[
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: HodiColors.errorStart.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      borderRadius: HodiBorderRadius.small,
+                                      border: Border.all(
+                                        color: HodiColors.errorStart.withValues(
+                                          alpha: 0.3,
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-
-                            // Username
-                            HodiTextField(
-                              controller: _usernameController,
-                              hintText: 'Username',
-                              prefixIcon: Icons.person_outline,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              validator: (v) =>
-                                  Validators.required(v, 'Username'),
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Password
-                            HodiTextField(
-                              controller: _passwordController,
-                              hintText: 'Password',
-                              prefixIcon: Icons.lock_outline,
-                              obscureText: _obscurePassword,
-                              textInputAction: TextInputAction.done,
-                              onSubmitted: (_) => _handleLogin(),
-                              validator: (v) =>
-                                  Validators.required(v, 'Password'),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  color: HodiColors.textLight,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  setState(
-                                      () => _obscurePassword = !_obscurePassword);
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-
-                            // Sign In button
-                            HodiGradientButton(
-                              text: 'Sign In',
-                              onPressed: _handleLogin,
-                              isLoading: authState.isLoading,
-                            ),
-
-                            // Biometric button
-                            if (authState.biometricEnabled) ...[
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 48,
-                                child: OutlinedButton.icon(
-                                  onPressed: authState.isLoading
-                                      ? null
-                                      : _handleBiometricLogin,
-                                  icon: const Icon(Icons.fingerprint, size: 22),
-                                  label: Text(
-                                    'Sign in with Biometrics',
-                                    style: HodiTextStyles.bodyMedium.copyWith(
-                                      color: HodiColors.primaryStart,
-                                      fontWeight: FontWeight.w600,
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline,
+                                          color: HodiColors.errorStart,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            authState.error!,
+                                            style: HodiTextStyles.bodySmall
+                                                .copyWith(
+                                                  color: HodiColors.errorStart,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: HodiColors.primaryStart,
-                                    side: const BorderSide(
-                                      color: HodiColors.primaryStart,
-                                      width: 1.5,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 16),
+                                  const SizedBox(height: 16),
+                                ],
 
-                            // Forgot password
-                            Center(
-                              child: TextButton(
-                                onPressed: () =>
-                                    context.pushNamed('forgot-password'),
-                                child: Text(
-                                  'Forgot Password?',
-                                  style: HodiTextStyles.bodyMedium.copyWith(
-                                    color: HodiColors.primaryStart,
-                                    fontWeight: FontWeight.w500,
+                                // Username
+                                HodiTextField(
+                                  controller: _usernameController,
+                                  hintText: 'Username',
+                                  prefixIcon: Icons.person_outline,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.next,
+                                  validator: (v) =>
+                                      Validators.required(v, 'Username'),
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Password
+                                HodiTextField(
+                                  controller: _passwordController,
+                                  hintText: 'Password',
+                                  prefixIcon: Icons.lock_outline,
+                                  obscureText: _obscurePassword,
+                                  textInputAction: TextInputAction.done,
+                                  onSubmitted: (_) => _handleLogin(),
+                                  validator: (v) =>
+                                      Validators.required(v, 'Password'),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                      color: HodiColors.textLight,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      setState(
+                                        () => _obscurePassword =
+                                            !_obscurePassword,
+                                      );
+                                    },
                                   ),
                                 ),
-                              ),
+                                const SizedBox(height: 24),
+
+                                // Sign In button
+                                HodiGradientButton(
+                                  text: 'Sign In',
+                                  onPressed: _handleLogin,
+                                  isLoading: authState.isLoading,
+                                ),
+
+                                // Biometric button
+                                if (authState.biometricEnabled) ...[
+                                  const SizedBox(height: 16),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 48,
+                                    child: OutlinedButton.icon(
+                                      onPressed: authState.isLoading
+                                          ? null
+                                          : _handleBiometricLogin,
+                                      icon: const Icon(
+                                        Icons.fingerprint,
+                                        size: 22,
+                                      ),
+                                      label: Text(
+                                        'Sign in with Biometrics',
+                                        style: HodiTextStyles.bodyMedium
+                                            .copyWith(
+                                              color: HodiColors.primaryStart,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor:
+                                            HodiColors.primaryStart,
+                                        side: const BorderSide(
+                                          color: HodiColors.primaryStart,
+                                          width: 1.5,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                const SizedBox(height: 16),
+
+                                // Forgot password
+                                Center(
+                                  child: TextButton(
+                                    onPressed: () =>
+                                        context.pushNamed('forgot-password'),
+                                    child: Text(
+                                      'Forgot Password?',
+                                      style: HodiTextStyles.bodyMedium.copyWith(
+                                        color: HodiColors.primaryStart,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),

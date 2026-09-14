@@ -28,7 +28,7 @@ class HodiGradientButton extends StatelessWidget {
       width: width ?? double.infinity,
       height: 52,
       decoration: BoxDecoration(
-        gradient: onPressed != null ? (gradient ?? HodiGradients.primary) : null,
+        gradient: onPressed != null ? (gradient ?? HodiGradients.button) : null,
         color: onPressed == null ? Colors.grey.shade300 : null,
         borderRadius: HodiBorderRadius.button,
         boxShadow: onPressed != null ? HodiShadows.button : null,
