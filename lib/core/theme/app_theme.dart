@@ -31,17 +31,34 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: HodiColors.textDark),
       ),
+      /*
+       * Inputs, as the web draws them.
+       *
+       * They were a grey fill with `BorderSide.none` — a field you could only find by the shade of
+       * its background, which disappears entirely on a white card and leaves somebody guessing where
+       * to tap. The web states it plainly: a white surface with a one-pixel --border-strong edge,
+       * turning brand on focus.
+       *
+       * White rather than grey matters on the login screen especially, where the card is already
+       * glass over a photograph and a grey field inside it reads as a hole.
+       */
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: HodiColors.surfaceLight,
+        fillColor: HodiColors.cardBackground,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: HodiBorderRadius.input,
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: HodiColors.dividerStrong),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: HodiBorderRadius.input,
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: HodiColors.dividerStrong),
+        ),
+        // A field nobody may type in should look settled rather than merely quiet, so it keeps an
+        // edge — the lighter one.
+        disabledBorder: OutlineInputBorder(
+          borderRadius: HodiBorderRadius.input,
+          borderSide: const BorderSide(color: HodiColors.divider),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: HodiBorderRadius.input,
