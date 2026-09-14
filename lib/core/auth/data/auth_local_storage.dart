@@ -5,6 +5,7 @@ import '../domain/token_model.dart';
 
 class AuthLocalStorage {
   static const _keyAccessToken = 'access_token';
+  static const _keyRefreshToken = 'refresh_token';
   static const _keyTokenExpiry = 'token_expiry';
   static const _keyUser = 'user_data';
   static const _keyBiometricEnabled = 'biometric_enabled';
@@ -20,16 +21,23 @@ class AuthLocalStorage {
   // Token operations
   Future<void> saveToken(TokenModel token) async {
     await _storage.write(key: _keyAccessToken, value: token.accessToken);
-    await _storage.write(key: _keyTokenExpiry, value: token.expiry.toString());
+    await _storage.write(key: _keyRefreshToken, value: token.refreshToken);
+    await _storage.write(key: _keyTokenExpiry, value: token.expiresAt.toString());
   }
 
-  Future<void> saveTokenRaw(String accessToken, int expiryMs) async {
+  Future<void> saveTokenRaw(String accessToken, String refreshToken, int expiresAt) async {
     await _storage.write(key: _keyAccessToken, value: accessToken);
-    await _storage.write(key: _keyTokenExpiry, value: expiryMs.toString());
+    await _storage.write(key: _keyRefreshToken, value: refreshToken);
+    await _storage.write(key: _keyTokenExpiry, value: expiresAt.toString());
   }
 
   Future<String?> getAccessToken() async {
     return _storage.read(key: _keyAccessToken);
+  }
+
+  /// The credential that outlives the access token — and the one biometric unlock should guard.
+  Future<String?> getRefreshToken() async {
+    return _storage.read(key: _keyRefreshToken);
   }
 
   Future<int?> getTokenExpiry() async {
@@ -86,6 +94,7 @@ class AuthLocalStorage {
   /// Clears session data (token + user) but preserves biometric credentials.
   Future<void> clearSession() async {
     await _storage.delete(key: _keyAccessToken);
+    await _storage.delete(key: _keyRefreshToken);
     await _storage.delete(key: _keyTokenExpiry);
     await _storage.delete(key: _keyUser);
   }
@@ -93,6 +102,7 @@ class AuthLocalStorage {
   /// Clears everything including biometric credentials (used on explicit logout).
   Future<void> clearAll() async {
     await _storage.delete(key: _keyAccessToken);
+    await _storage.delete(key: _keyRefreshToken);
     await _storage.delete(key: _keyTokenExpiry);
     await _storage.delete(key: _keyUser);
     await _storage.delete(key: _keyBiometricEnabled);

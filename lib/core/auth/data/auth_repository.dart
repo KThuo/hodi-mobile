@@ -23,22 +23,12 @@ class AuthRepository {
     );
 
     if (response.isSuccess && response.data != null) {
-      final user = UserModel.fromLoginResponse(response.data!);
-      final tokenData = response.data!['tokenDetails'] as Map<String, dynamic>? ?? {};
-      final expiryValue = tokenData['expiry'];
-      final int expiryMs;
-      if (expiryValue is num) {
-        expiryMs = expiryValue.toInt();
-      } else if (expiryValue is String) {
-        expiryMs = DateTime.parse(expiryValue).millisecondsSinceEpoch;
-      } else {
-        expiryMs = 0;
-      }
-
-      final token = TokenModel(
-        accessToken: tokenData['accessToken']?.toString() ?? '',
-        expiry: expiryMs,
-      );
+      // One flat object now. Legacy nested the two halves under `userDetails` and `tokenDetails`;
+      // the rebuilt `LoginResponse` carries the tokens at the top level with the profile under
+      // `user`, and states a lifetime in seconds rather than an absolute expiry.
+      final body = response.data!;
+      final user = UserModel.fromMe(body['user'] as Map<String, dynamic>? ?? const {});
+      final token = TokenModel.fromAuthResponse(body);
 
       await _storage.saveToken(token);
       await _storage.saveUser(user);
@@ -68,6 +58,35 @@ class AuthRepository {
       ApiConstants.forgotPassword,
       data: {'email': email},
     );
+  }
+
+  /// The caller's own profile, resolved fresh.
+  ///
+  /// Worth calling on resume rather than trusting what was stored: authorities come from the
+  /// database rather than the token, so somebody's permissions changing is visible on the next
+  /// reload instead of at their next sign-in.
+  Future<ApiResponse<UserModel>> me() async {
+    final response = await _apiClient.get<UserModel>(
+      ApiConstants.me,
+      fromJsonT: (data) => UserModel.fromMe(data as Map<String, dynamic>),
+    );
+    if (response.isSuccess && response.data != null) {
+      await _storage.saveUser(response.data!);
+    }
+    return response;
+  }
+
+  /// Ends the session at the server as well as here.
+  ///
+  /// The refresh token is what actually ends it — revoking the family is what stops a stolen token
+  /// being exchanged — so it is sent rather than merely deleted. The access token then dies on its
+  /// own inside its TTL.
+  Future<void> signOut() async {
+    final refresh = await _storage.getRefreshToken();
+    if (refresh != null && refresh.isNotEmpty) {
+      await _apiClient.post<void>(ApiConstants.logout, data: {'refreshToken': refresh});
+    }
+    await _storage.clearAll();
   }
 
   Future<UserModel?> getSavedUser() => _storage.getUser();

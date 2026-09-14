@@ -19,7 +19,7 @@ class MetreRepository {
     String? propertyId,
   }) async {
     return _apiClient.get<PagedResponse<MetreModel>>(
-      ApiConstants.metres,
+      ApiConstants.meters,
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
@@ -43,11 +43,10 @@ class MetreRepository {
     String? searchTerm,
   }) async {
     return _apiClient.get<PagedResponse<MetreHistoryModel>>(
-      ApiConstants.metreHistory,
+      ApiConstants.meterReadings(metreId),
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
-        'metreId': metreId,
         if (year != null) 'year': year,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
       },
@@ -58,19 +57,23 @@ class MetreRepository {
     );
   }
 
+  /// Takes a reading. The meter is in the path and the number is the whole body.
+  ///
+  /// **No image.** Legacy carried the photograph base64-encoded in this same request, which cost a
+  /// third again on the wire and lost the reading whenever the photo failed to arrive. The rebuilt
+  /// backend has no image field to send it to, and the plan is for the photograph to follow as its
+  /// own multipart upload once there is somewhere to put it — so the reading now posts alone, which
+  /// is a few hundred bytes and survives a weak signal. See docs/MOBILE_UPGRADE_PLAN.md §4.
   Future<ApiResponse<void>> updateReading({
     required String metreId,
     required String currentReading,
-    String? description,
-    String? image,
+    String? note,
   }) async {
     return _apiClient.post<void>(
-      ApiConstants.metreUpdateReading,
+      ApiConstants.meterReadings(metreId),
       data: {
-        'metreId': metreId,
         'currentReading': currentReading,
-        if (description != null && description.isNotEmpty) 'description': description,
-        'image': image ?? '',
+        if (note != null && note.isNotEmpty) 'note': note,
       },
     );
   }

@@ -49,14 +49,14 @@ class PaymentRepository {
 
   Future<ApiResponse<PaymentDetailModel>> getPaymentDetail(String rrn) async {
     return _apiClient.get<PaymentDetailModel>(
-      '${ApiConstants.paymentDetail}/$rrn',
+      '${ApiConstants.paymentReceipt}/$rrn',
       fromJsonT: (data) => PaymentDetailModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
   Future<void> downloadReceiptPdf(String rrn) async {
     await _pdfDownloader.downloadAndOpen(
-      '${ApiConstants.paymentPrint}/$rrn',
+      '${ApiConstants.paymentReceipt}/$rrn',
       'receipt_$rrn.pdf',
     );
   }

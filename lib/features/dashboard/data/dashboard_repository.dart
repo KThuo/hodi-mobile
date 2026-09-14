@@ -15,7 +15,7 @@ class DashboardRepository {
     String? propertyId,
   }) async {
     return _apiClient.get<DashboardSummary>(
-      ApiConstants.dashboardTableData,
+      ApiConstants.dashboardMonthly,
       queryParameters: {
         'status': '2',
         'estateId': ?estateId,
@@ -32,7 +32,7 @@ class DashboardRepository {
     String? year,
   }) async {
     return _apiClient.get<DashboardSummary>(
-      ApiConstants.dashboardTableData,
+      ApiConstants.dashboardMonthly,
       queryParameters: {
         'status': '4',
         'estateId': ?estateId,

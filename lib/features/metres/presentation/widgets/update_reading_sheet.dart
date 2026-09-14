@@ -27,7 +27,6 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
   bool _isLoading = false;
 
   File? _capturedImage;
-  String? _imageBase64;
   bool _isProcessingImage = false;
 
   double get _newReading => double.tryParse(_readingController.text) ?? 0;
@@ -52,21 +51,15 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
     });
 
     try {
-      // Run OCR and base64 conversion in parallel
-      final results = await Future.wait([
-        OcrHelper.recognizeText(file),
-        ImageHelper.toBase64(file),
-      ]);
-
-      final ocrText = results[0];
-      final base64 = results[1] as String;
+      // OCR only. The photograph used to be base64-encoded here in parallel and posted with the
+      // reading; there is nowhere to send it now, and encoding it was the expensive half — a third
+      // again on the wire and a third copy of the image in memory. The capture stays on screen so
+      // the dial can be checked against what was recognised, and is discarded with the sheet.
+      final ocrText = await OcrHelper.recognizeText(file);
 
       if (!mounted) return;
 
-      setState(() {
-        _imageBase64 = base64;
-        _isProcessingImage = false;
-      });
+      setState(() => _isProcessingImage = false);
 
       if (ocrText != null) {
         final reading = OcrHelper.extractReading(ocrText, widget.metre.currentReading);
@@ -87,10 +80,7 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
   }
 
   void _removeImage() {
-    setState(() {
-      _capturedImage = null;
-      _imageBase64 = null;
-    });
+    setState(() => _capturedImage = null);
   }
 
   void _showToast(String message) {
@@ -109,8 +99,7 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
     final response = await repository.updateReading(
       metreId: widget.metre.id!,
       currentReading: _readingController.text,
-      description: _descriptionController.text,
-      image: _imageBase64,
+      note: _descriptionController.text,
     );
 
     if (!mounted) return;

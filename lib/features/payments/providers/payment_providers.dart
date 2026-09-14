@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/filters/filter_provider.dart';
-import '../../../core/permissions/app_permissions.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/pdf_downloader.dart';
 import '../data/payment_repository.dart';
@@ -76,9 +75,7 @@ class PaymentListNotifier extends Notifier<PaymentListState> {
 
   bool get _isTenant {
     final authState = ref.read(authProvider);
-    final authorities = authState.user?.authorities ?? [];
-    return authorities.contains(AppPermissions.tenantAccessView) &&
-        !authorities.contains(AppPermissions.paymentsView);
+    return authState.user?.isTenant ?? false;
   }
 
   Future<void> _fetchPage(int page) async {

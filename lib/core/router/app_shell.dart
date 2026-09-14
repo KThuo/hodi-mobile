@@ -50,7 +50,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     bool hasAny(List<String> perms) => perms.any((p) => authorities.contains(p));
 
     // Houses
-    if (hasAny([AppPermissions.housesView, AppPermissions.tenantAccessView])) {
+    if (hasAny([AppPermissions.houseView, AppPermissions.tenantSelf])) {
       tabs.add(const _NavTab(
         label: 'Houses',
         icon: Icons.home_work_outlined,
@@ -61,7 +61,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
 
     // Properties
-    if (hasPermission(AppPermissions.propertiesView)) {
+    if (hasPermission(AppPermissions.propertyView)) {
       tabs.add(const _NavTab(
         label: 'Properties',
         icon: Icons.apartment_outlined,
@@ -72,7 +72,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
 
     // Invoices
-    if (hasAny([AppPermissions.invoicesGenerate, AppPermissions.tenantAccessView])) {
+    if (hasAny([AppPermissions.invoiceView, AppPermissions.tenantSelf])) {
       tabs.add(const _NavTab(
         label: 'Invoices',
         icon: Icons.receipt_long_outlined,
@@ -83,7 +83,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
 
     // Payments
-    if (hasAny([AppPermissions.paymentsNew, AppPermissions.tenantAccessView])) {
+    if (hasAny([AppPermissions.paymentView, AppPermissions.tenantSelf])) {
       tabs.add(const _NavTab(
         label: 'Payments',
         icon: Icons.payments_outlined,

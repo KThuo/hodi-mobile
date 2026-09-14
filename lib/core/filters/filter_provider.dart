@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/api_client.dart';
 import '../auth/providers/auth_provider.dart';
-import '../permissions/app_permissions.dart';
 import 'filter_option.dart';
 import 'filter_repository.dart';
 
@@ -54,17 +53,12 @@ class FilterNotifier extends Notifier<FilterState> {
 
   FilterRepository get _repository => ref.read(filterRepositoryProvider);
 
-  bool get _isSuperadmin {
-    final user = ref.read(authProvider).user;
-    return user?.usertype.toLowerCase() == 'superadmin';
-  }
+  // What somebody is comes from the server, not from what they may do. The old test here —
+  // tenant-access held and payments not — inverts on the new backend: ROLE_TENANT_ACCESS is the
+  // staff authority for granting a tenant a sign-in, and the tenant group does hold ROLE_PAYMENT_VIEW.
+  bool get _isSuperadmin => ref.read(authProvider).user?.isSuperadmin ?? false;
 
-  bool get _isTenant {
-    final user = ref.read(authProvider).user;
-    final authorities = user?.authorities ?? [];
-    return authorities.contains(AppPermissions.tenantAccessView) &&
-        !authorities.contains(AppPermissions.paymentsView);
-  }
+  bool get _isTenant => ref.read(authProvider).user?.isTenant ?? false;
 
   bool get isSuperadmin => _isSuperadmin;
   bool get isTenant => _isTenant;

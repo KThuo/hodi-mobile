@@ -34,7 +34,7 @@ class DashboardScreen extends ConsumerWidget {
     final selectedYear = ref.watch(selectedYearProvider);
 
     final userName =
-        authState.user?.firstName ?? authState.user?.name ?? 'User';
+        authState.user?.firstName ?? authState.user?.fullName ?? 'User';
 
     return Scaffold(
       backgroundColor: HodiColors.background,
@@ -82,7 +82,7 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      authState.user?.estate ?? (isAdmin ? 'Property Overview' : 'Your Dashboard'),
+                      authState.user?.estateName ?? (isAdmin ? 'Property Overview' : 'Your Dashboard'),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: HodiColors.white.withValues(alpha: 0.8),

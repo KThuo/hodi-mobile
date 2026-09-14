@@ -10,7 +10,7 @@ class ProfileRepository {
 
   Future<ApiResponse<ProfileModel>> getProfile() async {
     return _apiClient.get<ProfileModel>(
-      ApiConstants.profile,
+      ApiConstants.me,
       fromJsonT: (data) => ProfileModel.fromJson(data as Map<String, dynamic>),
     );
   }

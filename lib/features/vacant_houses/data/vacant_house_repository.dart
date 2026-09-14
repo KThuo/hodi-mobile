@@ -20,7 +20,7 @@ class VacantHouseRepository {
     String? maxRent,
   }) async {
     return _apiClient.get<PagedResponse<VacantHouseModel>>(
-      '${ApiConstants.vacantHouses}/search',
+      '${ApiConstants.vacantUnits}/search',
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
@@ -39,14 +39,14 @@ class VacantHouseRepository {
 
   Future<ApiResponse<VacantHouseDetailModel>> getVacantHouseDetail(String id) async {
     return _apiClient.get<VacantHouseDetailModel>(
-      '${ApiConstants.vacantHouses}/$id/details',
+      '${ApiConstants.vacantUnits}/$id/details',
       fromJsonT: (data) => VacantHouseDetailModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
   Future<ApiResponse<List<FilterItem>>> getCategories() async {
     return _apiClient.get<List<FilterItem>>(
-      '${ApiConstants.vacantHouses}/filters/categories',
+      '${ApiConstants.vacantUnits}/filters/categories',
       fromJsonT: (data) => (data as List)
           .map((item) => FilterItem.fromJson(item as Map<String, dynamic>))
           .toList(),
@@ -55,7 +55,7 @@ class VacantHouseRepository {
 
   Future<ApiResponse<List<FilterItem>>> getHouseTypes() async {
     return _apiClient.get<List<FilterItem>>(
-      '${ApiConstants.vacantHouses}/filters/house-types',
+      '${ApiConstants.vacantUnits}/filters/house-types',
       fromJsonT: (data) => (data as List)
           .map((item) => FilterItem.fromJson(item as Map<String, dynamic>))
           .toList(),

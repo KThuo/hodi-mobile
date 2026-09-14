@@ -10,7 +10,7 @@ class FilterRepository {
 
   Future<ApiResponse<List<FilterOption>>> getEstates() async {
     return _apiClient.get<List<FilterOption>>(
-      ApiConstants.estatesAll,
+      ApiConstants.estates,
       fromJsonT: (data) => (data as List)
           .map((item) => FilterOption.fromJson(item as Map<String, dynamic>))
           .toList(),
@@ -19,7 +19,7 @@ class FilterRepository {
 
   Future<ApiResponse<List<FilterOption>>> getProperties(String estateId) async {
     return _apiClient.get<List<FilterOption>>(
-      '${ApiConstants.propertiesAll}/$estateId',
+      '${ApiConstants.properties}/$estateId',
       fromJsonT: (data) => (data as List)
           .map((item) => FilterOption.fromJson(item as Map<String, dynamic>))
           .toList(),

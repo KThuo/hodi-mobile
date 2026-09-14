@@ -21,7 +21,7 @@ class HouseRepository {
     String? estateId,
   }) async {
     return _apiClient.get<PagedResponse<HouseModel>>(
-      ApiConstants.houses,
+      ApiConstants.units,
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
@@ -40,14 +40,14 @@ class HouseRepository {
 
   Future<ApiResponse<HouseDetailModel>> getHouseDetail(int id) async {
     return _apiClient.get<HouseDetailModel>(
-      '${ApiConstants.houseDetail}/$id',
+      '${ApiConstants.units}/$id',
       fromJsonT: (data) => HouseDetailModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
   Future<ApiResponse<List<HouseFeatureModel>>> getHouseFeatures(int houseId) async {
     return _apiClient.get<List<HouseFeatureModel>>(
-      '${ApiConstants.houseFeatures}/$houseId',
+      '${ApiConstants.catalogueFeatures}/$houseId',
       fromJsonT: (data) => (data as List)
           .map((item) => HouseFeatureModel.fromJson(item as Map<String, dynamic>))
           .toList(),

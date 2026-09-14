@@ -55,7 +55,7 @@ class _MetreHistoryScreenState extends ConsumerState<MetreHistoryScreen> {
   bool get _canUpdateReading {
     final authState = ref.read(authProvider);
     final authorities = authState.user?.authorities ?? [];
-    return authorities.contains(AppPermissions.metresEdit);
+    return authorities.contains(AppPermissions.metreEdit);
   }
 
   void _showUpdateSheet() {

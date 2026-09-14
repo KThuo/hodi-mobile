@@ -15,7 +15,23 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TokenModel {
 
- String get accessToken; int get expiry;
+ String get accessToken;/// The credential that outlives the access token, and the only one worth protecting.
+///
+/// The app used to keep the person's **password** in secure storage so biometric unlock could
+/// sign in again with it. This replaces that: a refresh token is revocable server-side, scoped
+/// to one session family, and useless once the session ends — none of which is true of a
+/// password, which also unlocks the web console and anything else it was reused on.
+ String get refreshToken;/// When the access token dies, as epoch milliseconds.
+///
+/// Stored absolute although the wire sends `expiresIn` seconds: a duration is only meaningful
+/// beside the moment it was received, and that moment is gone by the time anything reads this.
+ int get expiresAt;/// How long the session may sit idle before the client ends it, in seconds.
+///
+/// Not the same question as [expiresAt] and deliberately separate on the wire. The token's life
+/// is how often the client must rotate; this is how long somebody may walk away. The watchdog
+/// used to read the token lifetime for want of anything else, which tied being signed out for
+/// inactivity to a number chosen for unrelated reasons.
+ int get sessionTimeoutSeconds;
 /// Create a copy of TokenModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +44,16 @@ $TokenModelCopyWith<TokenModel> get copyWith => _$TokenModelCopyWithImpl<TokenMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TokenModel&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.expiry, expiry) || other.expiry == expiry));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TokenModel&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.sessionTimeoutSeconds, sessionTimeoutSeconds) || other.sessionTimeoutSeconds == sessionTimeoutSeconds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,expiry);
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,expiresAt,sessionTimeoutSeconds);
 
 @override
 String toString() {
-  return 'TokenModel(accessToken: $accessToken, expiry: $expiry)';
+  return 'TokenModel(accessToken: $accessToken, refreshToken: $refreshToken, expiresAt: $expiresAt, sessionTimeoutSeconds: $sessionTimeoutSeconds)';
 }
 
 
@@ -48,7 +64,7 @@ abstract mixin class $TokenModelCopyWith<$Res>  {
   factory $TokenModelCopyWith(TokenModel value, $Res Function(TokenModel) _then) = _$TokenModelCopyWithImpl;
 @useResult
 $Res call({
- String accessToken, int expiry
+ String accessToken, String refreshToken, int expiresAt, int sessionTimeoutSeconds
 });
 
 
@@ -65,10 +81,12 @@ class _$TokenModelCopyWithImpl<$Res>
 
 /// Create a copy of TokenModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? expiry = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? refreshToken = null,Object? expiresAt = null,Object? sessionTimeoutSeconds = null,}) {
   return _then(_self.copyWith(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
-as String,expiry: null == expiry ? _self.expiry : expiry // ignore: cast_nullable_to_non_nullable
+as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
+as String,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as int,sessionTimeoutSeconds: null == sessionTimeoutSeconds ? _self.sessionTimeoutSeconds : sessionTimeoutSeconds // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -154,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String accessToken,  int expiry)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  int expiresAt,  int sessionTimeoutSeconds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TokenModel() when $default != null:
-return $default(_that.accessToken,_that.expiry);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.expiresAt,_that.sessionTimeoutSeconds);case _:
   return orElse();
 
 }
@@ -175,10 +193,10 @@ return $default(_that.accessToken,_that.expiry);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String accessToken,  int expiry)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  int expiresAt,  int sessionTimeoutSeconds)  $default,) {final _that = this;
 switch (_that) {
 case _TokenModel():
-return $default(_that.accessToken,_that.expiry);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.expiresAt,_that.sessionTimeoutSeconds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +213,10 @@ return $default(_that.accessToken,_that.expiry);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String accessToken,  int expiry)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String accessToken,  String refreshToken,  int expiresAt,  int sessionTimeoutSeconds)?  $default,) {final _that = this;
 switch (_that) {
 case _TokenModel() when $default != null:
-return $default(_that.accessToken,_that.expiry);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.expiresAt,_that.sessionTimeoutSeconds);case _:
   return null;
 
 }
@@ -210,11 +228,29 @@ return $default(_that.accessToken,_that.expiry);case _:
 @JsonSerializable()
 
 class _TokenModel extends TokenModel {
-  const _TokenModel({required this.accessToken, required this.expiry}): super._();
+  const _TokenModel({required this.accessToken, required this.refreshToken, required this.expiresAt, this.sessionTimeoutSeconds = 0}): super._();
   factory _TokenModel.fromJson(Map<String, dynamic> json) => _$TokenModelFromJson(json);
 
 @override final  String accessToken;
-@override final  int expiry;
+/// The credential that outlives the access token, and the only one worth protecting.
+///
+/// The app used to keep the person's **password** in secure storage so biometric unlock could
+/// sign in again with it. This replaces that: a refresh token is revocable server-side, scoped
+/// to one session family, and useless once the session ends — none of which is true of a
+/// password, which also unlocks the web console and anything else it was reused on.
+@override final  String refreshToken;
+/// When the access token dies, as epoch milliseconds.
+///
+/// Stored absolute although the wire sends `expiresIn` seconds: a duration is only meaningful
+/// beside the moment it was received, and that moment is gone by the time anything reads this.
+@override final  int expiresAt;
+/// How long the session may sit idle before the client ends it, in seconds.
+///
+/// Not the same question as [expiresAt] and deliberately separate on the wire. The token's life
+/// is how often the client must rotate; this is how long somebody may walk away. The watchdog
+/// used to read the token lifetime for want of anything else, which tied being signed out for
+/// inactivity to a number chosen for unrelated reasons.
+@override@JsonKey() final  int sessionTimeoutSeconds;
 
 /// Create a copy of TokenModel
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +265,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TokenModel&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.expiry, expiry) || other.expiry == expiry));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TokenModel&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.sessionTimeoutSeconds, sessionTimeoutSeconds) || other.sessionTimeoutSeconds == sessionTimeoutSeconds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,expiry);
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,expiresAt,sessionTimeoutSeconds);
 
 @override
 String toString() {
-  return 'TokenModel(accessToken: $accessToken, expiry: $expiry)';
+  return 'TokenModel(accessToken: $accessToken, refreshToken: $refreshToken, expiresAt: $expiresAt, sessionTimeoutSeconds: $sessionTimeoutSeconds)';
 }
 
 
@@ -249,7 +285,7 @@ abstract mixin class _$TokenModelCopyWith<$Res> implements $TokenModelCopyWith<$
   factory _$TokenModelCopyWith(_TokenModel value, $Res Function(_TokenModel) _then) = __$TokenModelCopyWithImpl;
 @override @useResult
 $Res call({
- String accessToken, int expiry
+ String accessToken, String refreshToken, int expiresAt, int sessionTimeoutSeconds
 });
 
 
@@ -266,10 +302,12 @@ class __$TokenModelCopyWithImpl<$Res>
 
 /// Create a copy of TokenModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? expiry = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? refreshToken = null,Object? expiresAt = null,Object? sessionTimeoutSeconds = null,}) {
   return _then(_TokenModel(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
-as String,expiry: null == expiry ? _self.expiry : expiry // ignore: cast_nullable_to_non_nullable
+as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
+as String,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as int,sessionTimeoutSeconds: null == sessionTimeoutSeconds ? _self.sessionTimeoutSeconds : sessionTimeoutSeconds // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

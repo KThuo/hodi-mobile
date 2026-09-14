@@ -8,39 +8,53 @@ part of 'user_model.dart';
 
 _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   id: json['id'] as String,
-  name: json['name'] as String,
   username: json['username'] as String,
-  usertype: json['usertype'] as String,
-  estate: json['estate'] as String?,
-  estateId: json['estateId'] as String?,
-  email: json['email'] as String?,
+  fullName: json['fullName'] as String,
   firstName: json['firstName'] as String?,
-  userGroup: json['userGroup'] as String?,
-  groupId: json['groupId'] as String?,
-  propertyIds:
-      (json['propertyIds'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      const [],
+  email: json['email'] as String?,
+  phone: json['phone'] as String?,
+  userType: json['userType'] as String,
+  userTypeName: json['userTypeName'] as String?,
+  estateName: json['estateName'] as String?,
+  estateId: json['estateId'] as String?,
+  bankName: json['bankName'] as String?,
+  bankId: json['bankId'] as String?,
+  bankLogoUrl: json['bankLogoUrl'] as String?,
+  userGroupName: json['userGroupName'] as String?,
   authorities:
       (json['authorities'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  superadmin: json['superadmin'] as bool? ?? false,
+  bankadmin: json['bankadmin'] as bool? ?? false,
+  admin: json['admin'] as bool? ?? false,
+  caretaker: json['caretaker'] as bool? ?? false,
+  tenant: json['tenant'] as bool? ?? false,
+  mustChangePassword: json['mustChangePassword'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'name': instance.name,
       'username': instance.username,
-      'usertype': instance.usertype,
-      'estate': instance.estate,
-      'estateId': instance.estateId,
-      'email': instance.email,
+      'fullName': instance.fullName,
       'firstName': instance.firstName,
-      'userGroup': instance.userGroup,
-      'groupId': instance.groupId,
-      'propertyIds': instance.propertyIds,
+      'email': instance.email,
+      'phone': instance.phone,
+      'userType': instance.userType,
+      'userTypeName': instance.userTypeName,
+      'estateName': instance.estateName,
+      'estateId': instance.estateId,
+      'bankName': instance.bankName,
+      'bankId': instance.bankId,
+      'bankLogoUrl': instance.bankLogoUrl,
+      'userGroupName': instance.userGroupName,
       'authorities': instance.authorities,
+      'superadmin': instance.superadmin,
+      'bankadmin': instance.bankadmin,
+      'admin': instance.admin,
+      'caretaker': instance.caretaker,
+      'tenant': instance.tenant,
+      'mustChangePassword': instance.mustChangePassword,
     };

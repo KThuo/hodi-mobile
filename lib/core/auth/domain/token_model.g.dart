@@ -8,11 +8,15 @@ part of 'token_model.dart';
 
 _TokenModel _$TokenModelFromJson(Map<String, dynamic> json) => _TokenModel(
   accessToken: json['accessToken'] as String,
-  expiry: (json['expiry'] as num).toInt(),
+  refreshToken: json['refreshToken'] as String,
+  expiresAt: (json['expiresAt'] as num).toInt(),
+  sessionTimeoutSeconds: (json['sessionTimeoutSeconds'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$TokenModelToJson(_TokenModel instance) =>
     <String, dynamic>{
       'accessToken': instance.accessToken,
-      'expiry': instance.expiry,
+      'refreshToken': instance.refreshToken,
+      'expiresAt': instance.expiresAt,
+      'sessionTimeoutSeconds': instance.sessionTimeoutSeconds,
     };

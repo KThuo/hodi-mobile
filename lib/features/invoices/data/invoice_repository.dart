@@ -54,7 +54,7 @@ class InvoiceRepository {
 
   Future<void> downloadInvoicePdf(String rrn) async {
     await _pdfDownloader.downloadAndOpen(
-      '${ApiConstants.invoicePrint}/$rrn',
+      '${ApiConstants.invoiceDetail}/$rrn',
       'invoice_$rrn.pdf',
     );
   }
@@ -76,7 +76,7 @@ class InvoiceRepository {
     required Map<String, dynamic> payload,
   }) async {
     return _apiClient.post<void>(
-      ApiConstants.receivePayments,
+      ApiConstants.payments,
       data: payload,
     );
   }

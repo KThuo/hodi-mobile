@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/filters/filter_provider.dart';
-import '../../../core/permissions/app_permissions.dart';
 import '../../payments/domain/payment_model.dart';
 import '../data/dashboard_repository.dart';
 import '../domain/dashboard_summary.dart';
@@ -65,9 +64,7 @@ final collectionsProvider =
   final year = ref.watch(selectedYearProvider);
 
   final authState = ref.read(authProvider);
-  final authorities = authState.user?.authorities ?? [];
-  final isTenant = authorities.contains(AppPermissions.tenantAccessView) &&
-      !authorities.contains(AppPermissions.paymentsView);
+  final isTenant = authState.user?.isTenant ?? false;
 
   final startDate = '$year-${month.toString().padLeft(2, '0')}-01';
   final lastDay = DateTime(year, month + 1, 0).day;
