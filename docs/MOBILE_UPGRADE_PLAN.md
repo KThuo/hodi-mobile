@@ -283,7 +283,86 @@ fingerprint, not by HTTP referrer, so **this needs its own key** — the web key
 
 ---
 
-## 7. Matching the new HODI (requirement 1)
+## 7. Profile: biometrics and a PIN (requirement 7)
+
+A profile screen where somebody turns on biometric unlock and sets a PIN, with the PIN held by the
+server. `../../axis` has built this already — `axis-m/lib/features/profile/set_pin_screen.dart`,
+`axis-m/lib/core/auth/biometrics.dart`, `axis-m/lib/core/device/device_id.dart` and the PIN half of
+`axis-b/.../auth/AuthController.java` — and it is worth copying closely, because it gets several
+things right that are easy to get wrong.
+
+### The two switches are not the same kind of thing
+
+**A PIN is a credential.** The server must hold it, as a BCrypt hash through the same encoder as the
+password, with the timestamps beside it. Axis's shape ports directly: `pin_hash`, `pin_set_at`,
+`pin_changed_at` on the user row.
+
+**A fingerprint is not.** Axis states it plainly and it is the clearest sentence on the subject I
+have read anywhere: *"a fingerprint produces no credential and the server has never heard of it."*
+What the biometric prompt proves is that the person holding the phone is the person the phone belongs
+to. It guards the refresh token already sitting in the keystore — with it on, resuming the session
+costs a fingerprint. That is what every app calling this "biometric login" actually does.
+
+So **the biometric switch cannot be persisted to the backend as a credential**, because there is
+nothing to persist. It is a per-device setting and belongs in the keystore beside the token it
+guards. Two honest options if the *preference* should still follow the person:
+
+- **Leave it local.** It is per-device by nature — a phone with no sensor cannot honour it, so the
+  answer is about this handset, not about this person.
+- **Persist it as a preference**, which is nearly free: `users` already carries `show_field_hints`
+  and `show_tile_charts`, and `PUT /api/v1/auth/me/preferences` already takes a partial body. One
+  more nullable boolean and a new phone remembers the person likes biometric unlock. It still has to
+  be re-proved on each device.
+
+Recommend the second, with the first as the fallback — it costs a column and answers the request as
+asked, provided it is understood as a preference and not as a credential.
+
+### The PIN pulls in device pairing, and this is the part to decide before building
+
+Four digits is ten thousand combinations. Against an endpoint open to the internet, that is minutes
+of work for somebody with a script. It is a sensible credential **only** when something else has
+already proved the handset — which is exactly how axis does it: `MobileDeviceFilter` authenticates
+the device before the PIN is looked at, and `AuthController` notes that PIN login is refused from
+anything but a paired handset.
+
+**`hodi-b` has none of this.** There is no device table, no pairing, no device secret. The one thing
+that exists is the `X-Client: mobile` header, and `AuthController` is explicit that it is not a
+security control: *"A header is whatever the caller types."*
+
+So requirement 7 is not a screen — it is an auth subsystem:
+
+| Piece | Where | Notes |
+|---|---|---|
+| Stable device id | `hodi-m` | Axis's `device_id.dart` ports as-is: Android `ANDROID_ID` hashed, iOS random in the Keychain. A **name, not a password** — the pairing secret is what authenticates |
+| Pairing code + pair | `hodi-b` | Bound to the caller, so it can pair a device to them and nobody else |
+| Device filter | `hodi-b` | Proves the handset before PIN login is considered |
+| `pin_hash` + timestamps | `hodi-b` | BCrypt, same encoder as the password |
+| Set / change / remove PIN | both | |
+| PIN login | both | Refused from an unpaired device |
+| Attempt lockout on the PIN | `hodi-b` | Its own counter. `users.locked_until` and `user_login_attempts` already exist and should be reused rather than duplicated |
+
+### The flow, which axis also gets right
+
+Three steps, and each earns its place: **prove → choose → confirm.**
+
+- **Setting** a PIN asks for the **password**. A session left open on an unlocked phone must not be
+  able to mint a shorter way in.
+- **Changing** one asks for the **current PIN**.
+- **Confirming** matters most: a PIN mistyped once is a PIN somebody cannot sign in with and has no
+  way to discover until they are locked out.
+
+And a detail worth keeping: axis has **no endpoint whose job is to answer "is this PIN right"**. The
+current PIN is checked by attempting the change. An endpoint that validates a PIN in isolation is a
+brute-force oracle, and not building it is the whole defence.
+
+### Honest sizing
+
+This is the largest single item in this document. Everything else is migration — moving working
+behaviour onto new endpoints. This is new subsystem work in `hodi-b` with a security boundary in it,
+and it should be scoped, built and reviewed on its own rather than folded into a phase with six
+screens in it.
+
+## 8. Matching the new HODI (requirement 1)
 
 `hodi-f` resolves branding at runtime from `/api/v1/branding` — colours, logo, app name, favicon —
 resolved server-side through ESTATE → BANK → GLOBAL. The app should do the same rather than hardcode
@@ -299,23 +378,29 @@ Two things to carry across deliberately:
 
 ---
 
-## 8. Decisions needed before Phase 1
+## 9. Decisions needed before Phase 1
 
 1. ~~Is the meter photo evidence or OCR input?~~ **Answered: evidence.** It is uploaded, stored and
    viewable from meter history on both web and mobile. Two sub-decisions remain in §4 — how a tenant
    reaches it, and whether EXIF is stripped.
-2. **Which maps approach?** (§5) — baked key, static images, or OSM.
-3. ~~Who is the app for now?~~ **Largely answered by §5.** The drill-down plus To Let and Stays give
+2. **Which maps approach?** (§6) — baked key, static images, or OSM.
+3. **Is PIN login worth device pairing?** (§7) — a PIN without a paired device is a four-digit
+   password on the open internet, so the honest choices are *build the pairing subsystem* or *ship
+   biometric unlock only, which needs no backend at all*. Biometric-only is a fraction of the work
+   and covers most of what people mean by "don't make me type my password".
+4. **Biometric preference: local, or persisted?** (§7) — persisting costs one nullable column on the
+   existing preferences endpoint, but it remains a preference, never a credential.
+5. ~~Who is the app for now?~~ **Largely answered by §5.** The drill-down plus To Let and Stays give
    the app a tenant's half, which argues for one app with role-driven navigation. Confirm that is the
    intent before Phase 2 shapes the navigation around it.
-4. **Rename the GitHub repository** to `hodi-m`, or leave it as `hodi-mobile`?
-5. **Flutter 3.41 is seven months old** and 113 packages have newer versions held back by
+6. **Rename the GitHub repository** to `hodi-m`, or leave it as `hodi-mobile`?
+7. **Flutter 3.41 is seven months old** and 113 packages have newer versions held back by
    constraints. Upgrade first, or migrate first and upgrade after? Migrating onto a moving
    toolchain makes every failure ambiguous; I would upgrade first, on its own commit.
 
 ---
 
-## 9. What this plan does not cover
+## 10. What this plan does not cover
 
 Push notifications, offline capture and sync for meter readings taken where there is no signal, and
 the Play Store/App Store release path. Each is real work and none of it is in the five requirements.
