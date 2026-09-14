@@ -133,7 +133,7 @@ class _HodiAppState extends ConsumerState<HodiApp> with WidgetsBindingObserver {
                     Text(
                       message,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: HodiColors.textDark,
@@ -175,7 +175,7 @@ class _HodiAppState extends ConsumerState<HodiApp> with WidgetsBindingObserver {
                           ),
                           child: Text(
                             'OK',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: HodiColors.white,

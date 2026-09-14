@@ -42,7 +42,7 @@ class SummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: HodiColors.white.withValues(alpha: 0.8),

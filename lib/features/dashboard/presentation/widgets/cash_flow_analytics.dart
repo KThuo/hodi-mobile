@@ -64,7 +64,7 @@ class CashFlowAnalytics extends StatelessWidget {
                 ),
                 child: Text(
                   isPositive ? 'Positive Flow' : 'Negative Flow',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: isPositive ? HodiColors.successStart : HodiColors.errorStart,

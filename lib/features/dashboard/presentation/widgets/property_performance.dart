@@ -59,7 +59,7 @@ class PropertyPerformance extends StatelessWidget {
                 ),
                 child: Text(
                   badge.label,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: badge.color,

@@ -111,7 +111,7 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                 children: [
                   Text(
                     'Menu',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
                       color: HodiColors.white,
@@ -120,7 +120,7 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                   const SizedBox(height: 4),
                   Text(
                     'All features & settings',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 14,
                       color: HodiColors.white.withValues(alpha: 0.8),
                     ),

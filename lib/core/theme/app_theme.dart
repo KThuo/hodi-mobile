@@ -19,12 +19,12 @@ class AppTheme {
         onSurface: HodiColors.textDark,
         onError: HodiColors.white,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(),
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: GoogleFonts.plusJakartaSans(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: HodiColors.textDark,
@@ -55,11 +55,11 @@ class AppTheme {
           borderRadius: HodiBorderRadius.input,
           borderSide: const BorderSide(color: HodiColors.errorStart, width: 1.5),
         ),
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: GoogleFonts.plusJakartaSans(
           fontSize: 14,
           color: HodiColors.textLight,
         ),
-        labelStyle: GoogleFonts.poppins(
+        labelStyle: GoogleFonts.plusJakartaSans(
           fontSize: 14,
           color: HodiColors.textMedium,
         ),
@@ -70,7 +70,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: HodiBorderRadius.button,
           ),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.plusJakartaSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -104,22 +104,22 @@ class AppTheme {
         rangePickerShape: RoundedRectangleBorder(
           borderRadius: HodiBorderRadius.card,
         ),
-        headerHelpStyle: GoogleFonts.poppins(
+        headerHelpStyle: GoogleFonts.plusJakartaSans(
           fontSize: 14,
           fontWeight: FontWeight.w400,
           color: HodiColors.white.withValues(alpha: 0.8),
         ),
-        headerHeadlineStyle: GoogleFonts.poppins(
+        headerHeadlineStyle: GoogleFonts.plusJakartaSans(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: HodiColors.white,
         ),
-        weekdayStyle: GoogleFonts.poppins(
+        weekdayStyle: GoogleFonts.plusJakartaSans(
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: HodiColors.textMedium,
         ),
-        dayStyle: GoogleFonts.poppins(
+        dayStyle: GoogleFonts.plusJakartaSans(
           fontSize: 14,
           fontWeight: FontWeight.w400,
           color: HodiColors.textDark,
@@ -130,11 +130,11 @@ class AppTheme {
         selectedItemColor: HodiColors.primaryStart,
         unselectedItemColor: HodiColors.textLight,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: GoogleFonts.poppins(
+        selectedLabelStyle: GoogleFonts.plusJakartaSans(
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: GoogleFonts.poppins(
+        unselectedLabelStyle: GoogleFonts.plusJakartaSans(
           fontSize: 11,
           fontWeight: FontWeight.w400,
         ),

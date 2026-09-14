@@ -355,7 +355,71 @@ behaviour onto new endpoints. This is new subsystem work in `hodi-b` with a secu
 and it should be scoped, built and reviewed on its own rather than folded into a phase with six
 screens in it.
 
-## 8. Matching the new HODI (requirement 1)
+## 8. Printing: one document, rendered once (requirement 8)
+
+There are no print endpoints on the rebuilt backend, and the web does not need any — `hodi-f` renders
+the invoice as HTML in the page and hands it to the browser's own print dialogue
+(`printDocument.ts`). A phone cannot do that, so the question is where a receipt comes from.
+
+**It comes from the server, and the machinery is already built.** `PdfDocuments` in
+`hodi-b/platform/documents` renders a Thymeleaf template to PDF with the estate's branding inlined,
+and its own note says what it is waiting for:
+
+> *"Extracted from the lease agreement when the settlement statement became its second caller, and
+> **before the invoice PDF becomes its third**."*
+
+So the architecture has already chosen. Follow the lease agreement exactly — it is the worked
+example, down to the tenant's copy:
+
+```
+GET /api/v1/invoices/{id}/invoice.pdf          ROLE_INVOICE_VIEW
+GET /api/v1/invoices/mine/{id}/invoice.pdf     the tenant's own
+GET /api/v1/payments/{id}/receipt.pdf          ROLE_PAYMENT_VIEW
+GET /api/v1/payments/mine/{id}/receipt.pdf     the tenant's own
+```
+
+returning `ResponseEntity<Resource>` with a content disposition, as `LeaseController.send` does.
+Templates sit beside `templates/lease/agreement.html`.
+
+### Why server-side, when the client could render it
+
+Because "standard receipts" is the requirement, and a client-rendered document cannot be standard.
+
+- **The web's PDF is currently whatever the browser makes of it.** Print to PDF from Chrome and from
+  Safari, with different paper sizes and the "headers and footers" box in whatever state the person
+  left it, and you get different documents. A tenant and a landlord comparing two copies of one
+  receipt should not find they differ.
+- **A Dart template would be the third copy of the same document.** The web already has HTML and the
+  server already has Thymeleaf; adding `pdf`-package layout code in Flutter means the invoice exists
+  three times and drifts three ways. That exact drift is what `printDocument.ts` was written to stop
+  after five copies had become four behaviours.
+- **Branding resolves server-side**, ESTATE → BANK → GLOBAL. A client rendering its own receipt has
+  to re-implement that resolution or get the logo wrong.
+
+One renderer, one template, identical bytes on every client. The web should move onto it too, which
+retires `printDocument.ts` and makes the browser's print dialogue irrelevant to what the document
+looks like.
+
+### View and download, on the phone
+
+Both from the same bytes:
+
+| | How |
+|---|---|
+| **View** | Fetch to a temp file and show it in an in-app PDF view. Nothing renders a document twice |
+| **Download** | The same file, saved and handed to the system — `open_filex` and `path_provider` are already dependencies, and the repository already has `downloadFile` |
+| **Share** | Falls out of the above for free, and is what most people actually want when they say download |
+
+The one new mobile dependency is a PDF viewer. `printing` also gives a share sheet and an OS print
+path, which is worth having on a document somebody may want on paper.
+
+### What this costs
+
+`hodi-b`: two templates and four endpoints, on machinery that exists. `hodi-m`: a viewer screen and
+a download action. `hodi-f`: swap the print button's target, then delete `printDocument.ts` and the
+print CSS with it.
+
+## 9. Matching the new HODI (requirement 1)
 
 `hodi-f` resolves branding at runtime from `/api/v1/branding` — colours, logo, app name, favicon —
 resolved server-side through ESTATE → BANK → GLOBAL. The app should do the same rather than hardcode
@@ -371,7 +435,7 @@ Two things to carry across deliberately:
 
 ---
 
-## 9. Decisions needed before Phase 1
+## 10. Decisions needed before Phase 1
 
 1. ~~Is the meter photo evidence or OCR input?~~ **Answered: evidence.** It is uploaded, stored and
    viewable from meter history on both web and mobile. Two sub-decisions remain in §4 — how a tenant
@@ -393,7 +457,7 @@ Two things to carry across deliberately:
 
 ---
 
-## 10. What this plan does not cover
+## 11. What this plan does not cover
 
 Push notifications, offline capture and sync for meter readings taken where there is no signal, and
 the Play Store/App Store release path. Each is real work and none of it is in the five requirements.

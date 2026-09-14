@@ -70,7 +70,7 @@ class DashboardScreen extends ConsumerWidget {
                         Expanded(
                           child: Text(
                             'Hello, $userName',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
                               color: HodiColors.white,
@@ -83,7 +83,7 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       authState.user?.estateName ?? (isAdmin ? 'Property Overview' : 'Your Dashboard'),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 14,
                         color: HodiColors.white.withValues(alpha: 0.8),
                       ),

@@ -28,10 +28,10 @@ class HodiSearchBar extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
-        style: GoogleFonts.poppins(fontSize: 14, color: HodiColors.textDark),
+        style: GoogleFonts.plusJakartaSans(fontSize: 14, color: HodiColors.textDark),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: GoogleFonts.poppins(fontSize: 14, color: HodiColors.textLight),
+          hintStyle: GoogleFonts.plusJakartaSans(fontSize: 14, color: HodiColors.textLight),
           prefixIcon: const Icon(Icons.search, color: HodiColors.textLight, size: 20),
           suffixIcon: controller != null && controller!.text.isNotEmpty
               ? IconButton(

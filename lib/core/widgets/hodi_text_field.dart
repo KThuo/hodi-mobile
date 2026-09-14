@@ -46,7 +46,7 @@ class HodiTextField extends StatelessWidget {
       maxLines: maxLines,
       textInputAction: textInputAction,
       onFieldSubmitted: onSubmitted,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.plusJakartaSans(
         fontSize: 14,
         color: HodiColors.textDark,
       ),
