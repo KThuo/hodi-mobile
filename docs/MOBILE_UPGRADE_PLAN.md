@@ -184,7 +184,7 @@ is the expensive part.
 | **Mobile** | The reading row in meter history | Tap to open full-screen, pinch to zoom |
 | **Web** (`hodi-f`) | The reading row in meter history | Click to open a lightbox — legacy's eye icon and modal |
 
-### Two things to decide
+### One decided, one to decide
 
 **Tenant access is not currently possible.** The seeded `Tenants` group holds ten authorities —
 `ROLE_INVOICE_VIEW`, `ROLE_PAYMENT_VIEW`, `ROLE_MAINT_*`, `ROLE_VISIT_*`, `ROLE_TENANT_SELF` — and
@@ -194,8 +194,8 @@ and tenant" needs a decision:
 - *Grant tenants `ROLE_METRE_VIEW`.* Simple, and wrong — it opens the estate's entire meter list.
 - *Add a self-scoped path* gated on `ROLE_TENANT_SELF`, reaching only meters on the unit they occupy.
   More work, consistent with how the platform already scopes tenants, and the safe answer.
-  Recommended. The natural entry point is the utility line on their invoice: the charge, then the
-  reading behind it, then the photograph behind that.
+  **This is the decided approach** — see §5, which gives it its entry point: My houses, the
+  occupation, then Meters.
 
 **EXIF.** `AssetService` sanitises SVG but does not strip photo metadata, so a meter photo carries
 whatever the camera wrote — including GPS. The capture time is arguably useful evidence, but the
@@ -203,7 +203,52 @@ server already stamps `readOn`, and the coordinates of somebody's home recorded 
 are personal data nobody asked to collect. Recommend stripping GPS at minimum, on upload, server-side
 where it cannot be skipped by an old client.
 
-## 5. To Let, Stays and maps (requirement 4)
+## 5. My houses, and what is under it (requirement 6)
+
+Today "My houses" is a list and a dead end: a tenant sees the unit they occupy and can go no further.
+The drill-down turns it into the place they actually manage their tenancy from — tap the occupation,
+and find **Invoices · Payments · Meters** for it.
+
+This is mostly wiring, because the backend was built for it.
+
+| Tab | Endpoint | Authority the tenant already holds |
+|---|---|---|
+| The list itself | `GET /api/v1/occupations` | `ROLE_TENANT_SELF` — already accepted |
+| Invoices | `GET /api/v1/invoices?occupationId={hash}` | `ROLE_INVOICE_VIEW` |
+| Payments | `GET /api/v1/payments?occupationId={hash}` | `ROLE_PAYMENT_VIEW` |
+| Meters | **needs a new path** — see below | none |
+
+**A tenant cannot see anybody else's rows through these**, and not because the client is careful. The
+tenancy scope in the search engine answers a tenant with their own rows whatever the query string
+says; `occupationId` narrows within that, it does not widen it. The separate `mine` flag exists for a
+different reason worth knowing — one person is often both a landlord and a tenant, and a superadmin
+is answered with everything — so "mine" is read from the session and never from a parameter.
+
+**Put the balance at the top.** `GET /api/v1/payments/balance/{occupationId}` returns a tenancy
+balance, and *what do I owe* is the question somebody opens this screen to answer. Answering it above
+the tabs saves them reading an invoice list to work it out.
+
+### This settles the tenant-access question in §4
+
+§4 asked how a tenant reaches a meter photograph and suggested the utility line on their invoice.
+This is the better entry point, and it is the one to build: **My houses → the occupation → Meters →
+a reading → the photograph.** It reads the way somebody would look for it, and it puts the
+self-scoping in one place instead of hanging it off a line item.
+
+The meters tab is the only one needing backend work, and it is the same work §4 already describes.
+`GET /api/v1/occupations/{id}/meters` gated on `ROLE_TENANT_SELF` is the shape to prefer over
+granting tenants `ROLE_METRE_VIEW` — the authority opens an estate's entire meter list, the path
+opens one tenancy's. Readings and the photograph hang off it exactly as they do for staff.
+
+### Why this is worth doing beyond the drill-down
+
+It changes what the app is for. Everything else in it is staff-shaped — properties, tenants, meters,
+receipting — and a tenant signing in currently finds a list of one. With this, To Let and Stays
+(§6), the app has a tenant's half: what I occupy, what I owe, what I paid, what my meters read, and
+what else is available to rent. That is the answer to §8's "who is the app for" question, and it
+argues for one app with role-driven navigation rather than two.
+
+## 6. To Let, Stays and maps (requirement 4)
 
 **The backend is ready.** `/api/v1/vacant-units/**`, `/api/v1/stays/**` and `/api/v1/map-config` are
 all in `SecurityConfig.PUBLIC_PATHS`, so a tenant — or somebody with no account at all — can browse
@@ -238,7 +283,7 @@ fingerprint, not by HTTP referrer, so **this needs its own key** — the web key
 
 ---
 
-## 6. Matching the new HODI (requirement 1)
+## 7. Matching the new HODI (requirement 1)
 
 `hodi-f` resolves branding at runtime from `/api/v1/branding` — colours, logo, app name, favicon —
 resolved server-side through ESTATE → BANK → GLOBAL. The app should do the same rather than hardcode
@@ -254,15 +299,15 @@ Two things to carry across deliberately:
 
 ---
 
-## 7. Decisions needed before Phase 1
+## 8. Decisions needed before Phase 1
 
 1. ~~Is the meter photo evidence or OCR input?~~ **Answered: evidence.** It is uploaded, stored and
    viewable from meter history on both web and mobile. Two sub-decisions remain in §4 — how a tenant
    reaches it, and whether EXIF is stripped.
 2. **Which maps approach?** (§5) — baked key, static images, or OSM.
-3. **Who is the app for now?** It is currently staff-shaped: properties, tenants, meters, payments.
-   Requirement 4 adds tenant browsing. One app with role-driven navigation, or a tenant experience
-   that is clearly its own thing?
+3. ~~Who is the app for now?~~ **Largely answered by §5.** The drill-down plus To Let and Stays give
+   the app a tenant's half, which argues for one app with role-driven navigation. Confirm that is the
+   intent before Phase 2 shapes the navigation around it.
 4. **Rename the GitHub repository** to `hodi-m`, or leave it as `hodi-mobile`?
 5. **Flutter 3.41 is seven months old** and 113 packages have newer versions held back by
    constraints. Upgrade first, or migrate first and upgrade after? Migrating onto a moving
@@ -270,7 +315,7 @@ Two things to carry across deliberately:
 
 ---
 
-## 8. What this plan does not cover
+## 9. What this plan does not cover
 
 Push notifications, offline capture and sync for meter readings taken where there is no signal, and
 the Play Store/App Store release path. Each is real work and none of it is in the five requirements.
