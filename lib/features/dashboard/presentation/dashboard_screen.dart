@@ -56,7 +56,11 @@ class DashboardScreen extends ConsumerWidget {
                   bottom: 24,
                 ),
                 decoration: const BoxDecoration(
-                  gradient: HodiGradients.primary,
+                  // The app's one gradient, and it is deliberately the only one. Built from the ink
+                  // rather than the brand: a navy that deepens toward blue reads as a header, where
+                  // full brand-into-accent reads as a warning label. axis-m makes the same choice on
+                  // its home screen for the same reason.
+                  gradient: HodiGradients.header,
                   borderRadius: BorderRadius.vertical(
                     bottom: Radius.circular(24),
                   ),
@@ -124,27 +128,27 @@ class DashboardScreen extends ConsumerWidget {
                       children: [
                         SummaryCard(
                           label: 'Total Invoiced',
-                          amount: summary.totalRent,
+                          amount: summary.totalInvoice,
                           icon: Icons.receipt_long,
-                          gradient: HodiGradients.primary,
+                          tone: HodiColors.primaryStart,
                         ),
                         SummaryCard(
                           label: 'Total Payments',
                           amount: summary.totalPayment,
                           icon: Icons.payments,
-                          gradient: HodiGradients.success,
+                          tone: HodiColors.successStart,
                         ),
                         SummaryCard(
                           label: 'Expenses',
                           amount: summary.totalExpense,
                           icon: Icons.account_balance_wallet,
-                          gradient: HodiGradients.warning,
+                          tone: HodiColors.warningStart,
                         ),
                         SummaryCard(
                           label: 'Arrears',
                           amount: summary.totalArrears,
                           icon: Icons.warning_amber,
-                          gradient: HodiGradients.error,
+                          tone: HodiColors.errorStart,
                         ),
                       ],
                     ),
@@ -162,21 +166,21 @@ class DashboardScreen extends ConsumerWidget {
                     children: [
                       SummaryCard(
                         label: 'Total Invoiced',
-                        amount: summary.totalRent,
+                        amount: summary.totalInvoice,
                         icon: Icons.receipt_long,
-                        gradient: HodiGradients.primary,
+                        tone: HodiColors.primaryStart,
                       ),
                       SummaryCard(
                         label: 'Total Payments',
                         amount: summary.totalPayment,
                         icon: Icons.payments,
-                        gradient: HodiGradients.success,
+                        tone: HodiColors.successStart,
                       ),
                       SummaryCard(
                         label: 'Arrears',
                         amount: summary.totalArrears,
                         icon: Icons.warning_amber,
-                        gradient: HodiGradients.error,
+                        tone: HodiColors.errorStart,
                       ),
                     ],
                   ),
@@ -296,19 +300,19 @@ class _QuickAccessSection extends StatelessWidget {
               icon: Icons.people_outline,
               label: 'Tenants',
               path: '/more/tenants',
-              gradient: HodiGradients.primary,
+              tone: HodiColors.primaryStart,
             ),
             _QuickAccessItem(
               icon: Icons.receipt_long_outlined,
               label: 'Invoices',
               path: '/invoices',
-              gradient: HodiGradients.warning,
+              tone: HodiColors.warningStart,
             ),
             _QuickAccessItem(
               icon: Icons.speed_outlined,
               label: 'Metres',
               path: '/more/metres',
-              gradient: HodiGradients.success,
+              tone: HodiColors.successStart,
             ),
           ]
         : const [
@@ -316,19 +320,19 @@ class _QuickAccessSection extends StatelessWidget {
               icon: Icons.home_work_outlined,
               label: 'My Houses',
               path: '/houses',
-              gradient: HodiGradients.primary,
+              tone: HodiColors.primaryStart,
             ),
             _QuickAccessItem(
               icon: Icons.receipt_long_outlined,
               label: 'My Invoices',
               path: '/invoices',
-              gradient: HodiGradients.warning,
+              tone: HodiColors.warningStart,
             ),
             _QuickAccessItem(
               icon: Icons.payments_outlined,
               label: 'My Payments',
               path: '/payments',
-              gradient: HodiGradients.success,
+              tone: HodiColors.successStart,
             ),
           ];
 
@@ -353,13 +357,15 @@ class _QuickAccessItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String path;
-  final LinearGradient gradient;
+
+  /// Which shortcut this is, in colour — the icon and the wash behind it, nothing more.
+  final Color tone;
 
   const _QuickAccessItem({
     required this.icon,
     required this.label,
     required this.path,
-    required this.gradient,
+    required this.tone,
   });
 
   @override
@@ -378,10 +384,11 @@ class _QuickAccessItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: gradient,
+                // 12% of the tone. Enough to group the glyph with its colour, not enough to shout.
+                color: tone.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: HodiColors.white, size: 22),
+              child: Icon(icon, color: tone, size: 22),
             ),
             const SizedBox(height: 8),
             Text(

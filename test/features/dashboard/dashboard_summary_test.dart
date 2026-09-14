@@ -49,6 +49,16 @@ void main() {
       expect(s.totalOverpayments, 22700);
     });
 
+    test('the Total Invoiced card has a figure to show', () {
+      final s = DashboardSummary.fromOverall(payload);
+
+      // Regression. The card reads totalRent, fromOverall left it unset, and it showed nought
+      // against a database holding 121,000. The overall query selects sum(rent_amount) AS invoiced,
+      // so the two names are one figure and both must carry it.
+      expect(s.totalRent, 900000);
+      expect(s.totalInvoice, s.totalRent);
+    });
+
     test('no units, so occupancy declines to invent a rate', () {
       final s = DashboardSummary.fromOverall(payload);
 

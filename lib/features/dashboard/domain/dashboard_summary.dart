@@ -51,13 +51,22 @@ abstract class DashboardSummary with _$DashboardSummary {
 
   /// `GET /dashboard/overall` — `{label, totals}`, all time unless a year is named.
   ///
-  /// No rent, unit counts or expense breakdown: the overall card is about money in and money owed
-  /// across every period there has been, and the backend does not compute a rent split for it.
+  /// **`invoiced` fills both [totalInvoice] and [totalRent], and that is not a fudge.** The overall
+  /// query selects `sum(property_reports.rent_amount) as invoiced` — the period's own charge — which
+  /// is what legacy has always meant by "Total Invoice". It deliberately does *not* sum
+  /// `invoices.amount`, because that carries each month's arrears forward and summing it counts the
+  /// same debt once for every month it was carried; the backend's own note records that this read
+  /// 2,466,110 where the portal showed 3,361,910.
+  ///
+  /// So the two names are one figure here, and the cards may read either. Leaving [totalRent] unset
+  /// is what made "Total Invoiced" show nought against a database holding 121,000.
   factory DashboardSummary.fromOverall(Map<String, dynamic> json) {
     final t = _map(json['totals']);
+    final invoiced = _num(t['invoiced']);
     return DashboardSummary(
       label: json['label']?.toString(),
-      totalInvoice: _num(t['invoiced']),
+      totalInvoice: invoiced,
+      totalRent: invoiced,
       totalPayment: _num(t['collected']),
       totalExpense: _num(t['spent']),
       totalArrears: _num(t['arrears']),
