@@ -14,18 +14,27 @@ if [[ "$FORMAT" != "apk" && "$FORMAT" != "appbundle" ]]; then
   exit 1
 fi
 
+if [[ "$ENV" == "prod" ]]; then
+  API_BASE_URL="https://hodi.qnex.io"
+else
+  API_BASE_URL="https://hodi-test.qnex.io"
+fi
+
 echo "Building $ENV $FORMAT..."
+echo "API base URL: $API_BASE_URL"
 
 if [[ "$FORMAT" == "apk" ]]; then
   flutter build apk --split-per-abi \
     --obfuscate \
     --split-debug-info=build/debug-info \
-    --dart-define=ENV="$ENV"
+    --dart-define=ENV="$ENV" \
+    --dart-define=API_BASE_URL="$API_BASE_URL"
 else
   flutter build appbundle \
     --obfuscate \
     --split-debug-info=build/debug-info \
-    --dart-define=ENV="$ENV"
+    --dart-define=ENV="$ENV" \
+    --dart-define=API_BASE_URL="$API_BASE_URL"
 fi
 
 echo ""

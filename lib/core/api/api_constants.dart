@@ -1,8 +1,13 @@
 abstract class ApiConstants {
   static const String _env = String.fromEnvironment('ENV', defaultValue: 'test');
-  static const String baseUrl = _env == 'prod'
-      ? 'https://hodi.qnex.io'
-      : 'https://hodi-test.qnex.io';
+  // Prefer the URL injected by scripts/build.sh; fall back to the ENV-derived
+  // default so `flutter run`/`flutter test` without defines still works.
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: _env == 'prod'
+        ? 'https://hodi.qnex.io'
+        : 'https://hodi-test.qnex.io',
+  );
   static const String apiPrefix = '/api';
 
   // Timeouts
