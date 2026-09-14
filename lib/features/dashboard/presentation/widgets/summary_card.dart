@@ -15,17 +15,23 @@ import '../../../../core/utils/currency_formatter.dart';
 /// written faintly over them. Correcting the brand made it worse rather than better: HODI's blue
 /// into magenta is more vivid than the indigo-into-purple it replaced.
 ///
-/// Two references agree on the answer, which is what makes it the answer rather than a preference:
+/// This now follows `axis-m`'s figure card, which solves it with a **wash rather than a rule**: the
+/// tone is blended into the surface at 6% and bordered at 22%, so the whole card is faintly that
+/// colour. Its own note says what the colour is for — *"the colour identifies which figure it is at
+/// a glance — the point of a dashboard is being read from arm's length — and it carries no claim
+/// about the number being good or bad."*
 ///
-/// - **`hodi-f`'s `KpiTile`** — HODI's own design language for this exact component — is a white
-///   surface with a four-pixel coloured left edge, a small muted label, and the figure itself in the
-///   tone colour. The colour says *which* figure this is; it does not fill the card.
-/// - **`axis-m`** has exactly one gradient in the whole application, on its home header, and it is
-///   built from the ink rather than the brand. Everywhere else is a flat surface with muted labels,
-///   and colour appears as a low-alpha wash.
+/// Two details of that are worth copying exactly:
 ///
-/// So the tone moves to the edge and the icon, and the figure becomes the loudest thing on the card,
-/// which is what a card showing a figure is for.
+/// - **The wash is blended, not laid over.** `Color.alphaBlend` against the surface gives an opaque
+///   colour; a translucent fill would pick up whatever sits behind the card and shift between
+///   screens.
+/// - **The label carries the tone; the figure is ink.** Colouring the number too made the card read
+///   as a status rather than a measurement. One coloured element per card is enough to identify it.
+///
+/// A four-pixel left rule was the previous attempt, borrowed from `hodi-f`'s `KpiTile`. It works on
+/// a wide web tile beside eleven others; on a phone, four of them stacked two-by-two read as stripes
+/// down the page rather than as a set of cards.
 class SummaryCard extends StatelessWidget {
   const SummaryCard({
     super.key,
@@ -48,18 +54,18 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Blended against the surface rather than laid over it — see the note above.
+    final wash = Color.alphaBlend(
+      tone.withValues(alpha: 0.06),
+      HodiColors.cardBackground,
+    );
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: HodiColors.cardBackground,
+        color: wash,
         borderRadius: HodiBorderRadius.card,
-        border: Border(
-          // The solid edge that says which figure this is, as the web's tile has.
-          left: BorderSide(color: tone, width: 4),
-          top: const BorderSide(color: HodiColors.divider),
-          right: const BorderSide(color: HodiColors.divider),
-          bottom: const BorderSide(color: HodiColors.divider),
-        ),
+        border: Border.all(color: tone.withValues(alpha: 0.22)),
         boxShadow: HodiShadows.cardLight,
       ),
       child: Column(
@@ -68,16 +74,15 @@ class SummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: tone, size: 18),
-              const SizedBox(width: 6),
+              Icon(icon, color: tone, size: 22),
+              const SizedBox(width: 7),
               Expanded(
                 child: Text(
-                  label.toUpperCase(),
+                  label,
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                    color: HodiColors.textLight,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: tone,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -85,38 +90,34 @@ class SummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'KES ${CurrencyFormatter.format(amount)}',
-                // Tabular figures, so a column of amounts lines up digit under digit. The web asks
-                // for the same thing for the same reason.
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: tone,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          // Shrinks rather than clipping: a figure in the millions must stay readable, and an
+          // ellipsis in the middle of an amount is worse than a slightly smaller one.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'KES ${CurrencyFormatter.format(amount)}',
+              // Tabular figures, so a column of amounts lines up digit under digit.
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
+                color: HodiColors.textDark,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
-              if (note != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text(
-                    note!,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
-                      color: HodiColors.textLight,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-            ],
+              maxLines: 1,
+            ),
           ),
+          if (note != null)
+            Text(
+              note!,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                color: HodiColors.textMedium,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
         ],
       ),
     );

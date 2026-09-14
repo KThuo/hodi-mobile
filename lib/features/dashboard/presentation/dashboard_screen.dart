@@ -124,7 +124,7 @@ class DashboardScreen extends ConsumerWidget {
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 1.4,
+                      childAspectRatio: 1.75,
                       children: [
                         SummaryCard(
                           label: 'Total Invoiced',
@@ -162,7 +162,7 @@ class DashboardScreen extends ConsumerWidget {
                     crossAxisCount: 2,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 1.4,
+                    childAspectRatio: 1.75,
                     children: [
                       SummaryCard(
                         label: 'Total Invoiced',
@@ -388,7 +388,7 @@ class _QuickAccessItem extends StatelessWidget {
                 color: tone.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: tone, size: 22),
+              child: Icon(icon, color: tone, size: 26),
             ),
             const SizedBox(height: 8),
             Text(
