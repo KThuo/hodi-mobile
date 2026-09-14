@@ -25,6 +25,18 @@ class AuthState {
   final bool biometricEnabled;
   final bool pendingBiometricVerification;
 
+  /// Whether the stored session has been looked at yet.
+  ///
+  /// True only for the first state, and false everywhere else — which is why it defaults to false
+  /// rather than to true. A dozen places in this file build an `AuthState`, and one of them
+  /// forgetting to clear a default-true flag would send a signed-in app back to the splash and leave
+  /// it there. Only [AuthNotifier.build] opts in; finishing is then the absence of a decision.
+  ///
+  /// Without it `isAuthenticated` reads false for the moment before the keystore answers, and the
+  /// router cannot tell "signed out" from "not asked yet" — so somebody with a live session was
+  /// bounced to the login screen and pulled back to the dashboard a beat later.
+  final bool restoring;
+
   const AuthState({
     this.user,
     this.isLoading = false,
@@ -33,11 +45,13 @@ class AuthState {
     this.biometricAvailable = false,
     this.biometricEnabled = false,
     this.pendingBiometricVerification = false,
+    this.restoring = false,
   });
 
   AuthState copyWith({
     UserModel? user,
     bool? isLoading,
+    bool? restoring,
     String? error,
     bool? isAuthenticated,
     bool? biometricAvailable,
@@ -53,13 +67,14 @@ class AuthState {
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       pendingBiometricVerification:
           pendingBiometricVerification ?? this.pendingBiometricVerification,
+      restoring: restoring ?? this.restoring,
     );
   }
 }
 
 class AuthNotifier extends Notifier<AuthState> {
   @override
-  AuthState build() => const AuthState();
+  AuthState build() => const AuthState(restoring: true);
 
   AuthRepository get _repository => ref.read(authRepositoryProvider);
   BiometricService get _biometricService => ref.read(biometricServiceProvider);

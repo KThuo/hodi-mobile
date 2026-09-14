@@ -85,10 +85,15 @@ flutter_launcher_icons:
   adaptive_icon_background: "#667EEA"
   adaptive_icon_foreground: "assets/images/app-icon.png"
 
+# The frame before Flutter is running. It cannot animate, so all it has to do is not contradict what
+# comes next: the in-app splash shows login-bg.png, so this shows the same photograph, and the ink
+# behind it covers the moment before the image is decoded. It used to be a panel of #667EEA — an
+# indigo that was never HODI's — so a cold start ran purple, photograph, dashboard.
 flutter_native_splash:
-  color: "#667EEA"
+  color: "#0B3358"
+  background_image: "assets/images/login-bg.png"
   image: "assets/images/splash-logo.png"
   android_12:
-    color: "#667EEA"
+    color: "#0B3358"
     image: "assets/images/splash-logo.png"
-    icon_background_color: "#667EEA"
+    icon_background_color: "#0B3358"

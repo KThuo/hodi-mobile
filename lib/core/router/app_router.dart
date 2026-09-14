@@ -24,6 +24,7 @@ import '../../features/metres/presentation/metre_history_screen.dart';
 import '../../features/vacant_houses/presentation/vacant_houses_screen.dart';
 import '../../features/vacant_houses/presentation/vacant_house_detail_screen.dart';
 import '../../features/vacate_notices/presentation/vacate_notices_screen.dart';
+import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/vacate_notices/presentation/vacate_notice_detail_screen.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -36,6 +37,15 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/home',
     debugLogDiagnostics: true,
     redirect: (context, state) {
+      // Nothing is decided until the keystore has answered. Sending somebody to /login while the
+      // question is still open is what made a live session flash the wrong screen on every start.
+      if (authState.restoring) {
+        return state.matchedLocation == '/splash' ? null : '/splash';
+      }
+      if (state.matchedLocation == '/splash') {
+        return authState.isAuthenticated ? '/home' : '/login';
+      }
+
       final isAuthenticated = authState.isAuthenticated;
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/forgot-password';
@@ -52,6 +62,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+
       // Auth routes (no shell)
       GoRoute(
         path: '/login',
