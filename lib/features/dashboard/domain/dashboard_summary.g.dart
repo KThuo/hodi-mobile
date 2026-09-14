@@ -13,16 +13,15 @@ _DashboardSummary _$DashboardSummaryFromJson(Map<String, dynamic> json) =>
       totalPayment: (json['totalPayment'] as num?)?.toDouble() ?? 0,
       totalExpense: (json['totalExpense'] as num?)?.toDouble() ?? 0,
       totalArrears: (json['totalArrears'] as num?)?.toDouble() ?? 0,
-      monthlyOverpayments:
-          (json['monthlyOverpayments'] as num?)?.toDouble() ?? 0,
       totalOverpayments: (json['totalOverpayments'] as num?)?.toDouble() ?? 0,
       totalTopups: (json['totalTopups'] as num?)?.toDouble() ?? 0,
       totalClearedAmount: (json['totalClearedAmount'] as num?)?.toDouble() ?? 0,
-      invoiceCount: (json['invoiceCount'] as num?)?.toInt() ?? 0,
-      paymentCount: (json['paymentCount'] as num?)?.toInt() ?? 0,
-      expenseCount: (json['expenseCount'] as num?)?.toInt() ?? 0,
+      totalCredit: (json['totalCredit'] as num?)?.toDouble() ?? 0,
+      totalForfeited: (json['totalForfeited'] as num?)?.toDouble() ?? 0,
+      properties: (json['properties'] as num?)?.toInt(),
       totalUnits: (json['totalUnits'] as num?)?.toInt(),
       occupiedUnits: (json['occupiedUnits'] as num?)?.toInt(),
+      label: json['label'] as String?,
     );
 
 Map<String, dynamic> _$DashboardSummaryToJson(_DashboardSummary instance) =>
@@ -32,13 +31,13 @@ Map<String, dynamic> _$DashboardSummaryToJson(_DashboardSummary instance) =>
       'totalPayment': instance.totalPayment,
       'totalExpense': instance.totalExpense,
       'totalArrears': instance.totalArrears,
-      'monthlyOverpayments': instance.monthlyOverpayments,
       'totalOverpayments': instance.totalOverpayments,
       'totalTopups': instance.totalTopups,
       'totalClearedAmount': instance.totalClearedAmount,
-      'invoiceCount': instance.invoiceCount,
-      'paymentCount': instance.paymentCount,
-      'expenseCount': instance.expenseCount,
+      'totalCredit': instance.totalCredit,
+      'totalForfeited': instance.totalForfeited,
+      'properties': instance.properties,
       'totalUnits': instance.totalUnits,
       'occupiedUnits': instance.occupiedUnits,
+      'label': instance.label,
     };

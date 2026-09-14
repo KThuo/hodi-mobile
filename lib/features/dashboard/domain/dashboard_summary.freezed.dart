@@ -15,7 +15,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DashboardSummary {
 
- double get totalInvoice; double get totalRent; double get totalPayment; double get totalExpense; double get totalArrears; double get monthlyOverpayments; double get totalOverpayments; double get totalTopups; double get totalClearedAmount; int get invoiceCount; int get paymentCount; int get expenseCount; int? get totalUnits; int? get occupiedUnits;
+ double get totalInvoice; double get totalRent; double get totalPayment; double get totalExpense; double get totalArrears; double get totalOverpayments; double get totalTopups; double get totalClearedAmount;/// Unallocated money standing across live payments **today** — a balance, not something that
+/// arose in the period. The backend's own note warns these two are not interchangeable, and
+/// that showing the difference between them once made the dashboard read 782,700 where the
+/// portal read 4,700.
+ double get totalCredit; double get totalForfeited;/// How many properties the figures above cover. Distinct, not rows.
+ int? get properties; int? get totalUnits; int? get occupiedUnits;/// The period these figures are for, in the server's words — "September 2026", "All time".
+ String? get label;
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +34,16 @@ $DashboardSummaryCopyWith<DashboardSummary> get copyWith => _$DashboardSummaryCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardSummary&&(identical(other.totalInvoice, totalInvoice) || other.totalInvoice == totalInvoice)&&(identical(other.totalRent, totalRent) || other.totalRent == totalRent)&&(identical(other.totalPayment, totalPayment) || other.totalPayment == totalPayment)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.totalArrears, totalArrears) || other.totalArrears == totalArrears)&&(identical(other.monthlyOverpayments, monthlyOverpayments) || other.monthlyOverpayments == monthlyOverpayments)&&(identical(other.totalOverpayments, totalOverpayments) || other.totalOverpayments == totalOverpayments)&&(identical(other.totalTopups, totalTopups) || other.totalTopups == totalTopups)&&(identical(other.totalClearedAmount, totalClearedAmount) || other.totalClearedAmount == totalClearedAmount)&&(identical(other.invoiceCount, invoiceCount) || other.invoiceCount == invoiceCount)&&(identical(other.paymentCount, paymentCount) || other.paymentCount == paymentCount)&&(identical(other.expenseCount, expenseCount) || other.expenseCount == expenseCount)&&(identical(other.totalUnits, totalUnits) || other.totalUnits == totalUnits)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardSummary&&(identical(other.totalInvoice, totalInvoice) || other.totalInvoice == totalInvoice)&&(identical(other.totalRent, totalRent) || other.totalRent == totalRent)&&(identical(other.totalPayment, totalPayment) || other.totalPayment == totalPayment)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.totalArrears, totalArrears) || other.totalArrears == totalArrears)&&(identical(other.totalOverpayments, totalOverpayments) || other.totalOverpayments == totalOverpayments)&&(identical(other.totalTopups, totalTopups) || other.totalTopups == totalTopups)&&(identical(other.totalClearedAmount, totalClearedAmount) || other.totalClearedAmount == totalClearedAmount)&&(identical(other.totalCredit, totalCredit) || other.totalCredit == totalCredit)&&(identical(other.totalForfeited, totalForfeited) || other.totalForfeited == totalForfeited)&&(identical(other.properties, properties) || other.properties == properties)&&(identical(other.totalUnits, totalUnits) || other.totalUnits == totalUnits)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits)&&(identical(other.label, label) || other.label == label));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalInvoice,totalRent,totalPayment,totalExpense,totalArrears,monthlyOverpayments,totalOverpayments,totalTopups,totalClearedAmount,invoiceCount,paymentCount,expenseCount,totalUnits,occupiedUnits);
+int get hashCode => Object.hash(runtimeType,totalInvoice,totalRent,totalPayment,totalExpense,totalArrears,totalOverpayments,totalTopups,totalClearedAmount,totalCredit,totalForfeited,properties,totalUnits,occupiedUnits,label);
 
 @override
 String toString() {
-  return 'DashboardSummary(totalInvoice: $totalInvoice, totalRent: $totalRent, totalPayment: $totalPayment, totalExpense: $totalExpense, totalArrears: $totalArrears, monthlyOverpayments: $monthlyOverpayments, totalOverpayments: $totalOverpayments, totalTopups: $totalTopups, totalClearedAmount: $totalClearedAmount, invoiceCount: $invoiceCount, paymentCount: $paymentCount, expenseCount: $expenseCount, totalUnits: $totalUnits, occupiedUnits: $occupiedUnits)';
+  return 'DashboardSummary(totalInvoice: $totalInvoice, totalRent: $totalRent, totalPayment: $totalPayment, totalExpense: $totalExpense, totalArrears: $totalArrears, totalOverpayments: $totalOverpayments, totalTopups: $totalTopups, totalClearedAmount: $totalClearedAmount, totalCredit: $totalCredit, totalForfeited: $totalForfeited, properties: $properties, totalUnits: $totalUnits, occupiedUnits: $occupiedUnits, label: $label)';
 }
 
 
@@ -48,7 +54,7 @@ abstract mixin class $DashboardSummaryCopyWith<$Res>  {
   factory $DashboardSummaryCopyWith(DashboardSummary value, $Res Function(DashboardSummary) _then) = _$DashboardSummaryCopyWithImpl;
 @useResult
 $Res call({
- double totalInvoice, double totalRent, double totalPayment, double totalExpense, double totalArrears, double monthlyOverpayments, double totalOverpayments, double totalTopups, double totalClearedAmount, int invoiceCount, int paymentCount, int expenseCount, int? totalUnits, int? occupiedUnits
+ double totalInvoice, double totalRent, double totalPayment, double totalExpense, double totalArrears, double totalOverpayments, double totalTopups, double totalClearedAmount, double totalCredit, double totalForfeited, int? properties, int? totalUnits, int? occupiedUnits, String? label
 });
 
 
@@ -65,23 +71,23 @@ class _$DashboardSummaryCopyWithImpl<$Res>
 
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? totalInvoice = null,Object? totalRent = null,Object? totalPayment = null,Object? totalExpense = null,Object? totalArrears = null,Object? monthlyOverpayments = null,Object? totalOverpayments = null,Object? totalTopups = null,Object? totalClearedAmount = null,Object? invoiceCount = null,Object? paymentCount = null,Object? expenseCount = null,Object? totalUnits = freezed,Object? occupiedUnits = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? totalInvoice = null,Object? totalRent = null,Object? totalPayment = null,Object? totalExpense = null,Object? totalArrears = null,Object? totalOverpayments = null,Object? totalTopups = null,Object? totalClearedAmount = null,Object? totalCredit = null,Object? totalForfeited = null,Object? properties = freezed,Object? totalUnits = freezed,Object? occupiedUnits = freezed,Object? label = freezed,}) {
   return _then(_self.copyWith(
 totalInvoice: null == totalInvoice ? _self.totalInvoice : totalInvoice // ignore: cast_nullable_to_non_nullable
 as double,totalRent: null == totalRent ? _self.totalRent : totalRent // ignore: cast_nullable_to_non_nullable
 as double,totalPayment: null == totalPayment ? _self.totalPayment : totalPayment // ignore: cast_nullable_to_non_nullable
 as double,totalExpense: null == totalExpense ? _self.totalExpense : totalExpense // ignore: cast_nullable_to_non_nullable
 as double,totalArrears: null == totalArrears ? _self.totalArrears : totalArrears // ignore: cast_nullable_to_non_nullable
-as double,monthlyOverpayments: null == monthlyOverpayments ? _self.monthlyOverpayments : monthlyOverpayments // ignore: cast_nullable_to_non_nullable
 as double,totalOverpayments: null == totalOverpayments ? _self.totalOverpayments : totalOverpayments // ignore: cast_nullable_to_non_nullable
 as double,totalTopups: null == totalTopups ? _self.totalTopups : totalTopups // ignore: cast_nullable_to_non_nullable
 as double,totalClearedAmount: null == totalClearedAmount ? _self.totalClearedAmount : totalClearedAmount // ignore: cast_nullable_to_non_nullable
-as double,invoiceCount: null == invoiceCount ? _self.invoiceCount : invoiceCount // ignore: cast_nullable_to_non_nullable
-as int,paymentCount: null == paymentCount ? _self.paymentCount : paymentCount // ignore: cast_nullable_to_non_nullable
-as int,expenseCount: null == expenseCount ? _self.expenseCount : expenseCount // ignore: cast_nullable_to_non_nullable
-as int,totalUnits: freezed == totalUnits ? _self.totalUnits : totalUnits // ignore: cast_nullable_to_non_nullable
+as double,totalCredit: null == totalCredit ? _self.totalCredit : totalCredit // ignore: cast_nullable_to_non_nullable
+as double,totalForfeited: null == totalForfeited ? _self.totalForfeited : totalForfeited // ignore: cast_nullable_to_non_nullable
+as double,properties: freezed == properties ? _self.properties : properties // ignore: cast_nullable_to_non_nullable
+as int?,totalUnits: freezed == totalUnits ? _self.totalUnits : totalUnits // ignore: cast_nullable_to_non_nullable
 as int?,occupiedUnits: freezed == occupiedUnits ? _self.occupiedUnits : occupiedUnits // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,label: freezed == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -166,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double totalInvoice,  double totalRent,  double totalPayment,  double totalExpense,  double totalArrears,  double monthlyOverpayments,  double totalOverpayments,  double totalTopups,  double totalClearedAmount,  int invoiceCount,  int paymentCount,  int expenseCount,  int? totalUnits,  int? occupiedUnits)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double totalInvoice,  double totalRent,  double totalPayment,  double totalExpense,  double totalArrears,  double totalOverpayments,  double totalTopups,  double totalClearedAmount,  double totalCredit,  double totalForfeited,  int? properties,  int? totalUnits,  int? occupiedUnits,  String? label)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DashboardSummary() when $default != null:
-return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.totalExpense,_that.totalArrears,_that.monthlyOverpayments,_that.totalOverpayments,_that.totalTopups,_that.totalClearedAmount,_that.invoiceCount,_that.paymentCount,_that.expenseCount,_that.totalUnits,_that.occupiedUnits);case _:
+return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.totalExpense,_that.totalArrears,_that.totalOverpayments,_that.totalTopups,_that.totalClearedAmount,_that.totalCredit,_that.totalForfeited,_that.properties,_that.totalUnits,_that.occupiedUnits,_that.label);case _:
   return orElse();
 
 }
@@ -187,10 +193,10 @@ return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.tota
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double totalInvoice,  double totalRent,  double totalPayment,  double totalExpense,  double totalArrears,  double monthlyOverpayments,  double totalOverpayments,  double totalTopups,  double totalClearedAmount,  int invoiceCount,  int paymentCount,  int expenseCount,  int? totalUnits,  int? occupiedUnits)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double totalInvoice,  double totalRent,  double totalPayment,  double totalExpense,  double totalArrears,  double totalOverpayments,  double totalTopups,  double totalClearedAmount,  double totalCredit,  double totalForfeited,  int? properties,  int? totalUnits,  int? occupiedUnits,  String? label)  $default,) {final _that = this;
 switch (_that) {
 case _DashboardSummary():
-return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.totalExpense,_that.totalArrears,_that.monthlyOverpayments,_that.totalOverpayments,_that.totalTopups,_that.totalClearedAmount,_that.invoiceCount,_that.paymentCount,_that.expenseCount,_that.totalUnits,_that.occupiedUnits);case _:
+return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.totalExpense,_that.totalArrears,_that.totalOverpayments,_that.totalTopups,_that.totalClearedAmount,_that.totalCredit,_that.totalForfeited,_that.properties,_that.totalUnits,_that.occupiedUnits,_that.label);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +213,10 @@ return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.tota
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double totalInvoice,  double totalRent,  double totalPayment,  double totalExpense,  double totalArrears,  double monthlyOverpayments,  double totalOverpayments,  double totalTopups,  double totalClearedAmount,  int invoiceCount,  int paymentCount,  int expenseCount,  int? totalUnits,  int? occupiedUnits)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double totalInvoice,  double totalRent,  double totalPayment,  double totalExpense,  double totalArrears,  double totalOverpayments,  double totalTopups,  double totalClearedAmount,  double totalCredit,  double totalForfeited,  int? properties,  int? totalUnits,  int? occupiedUnits,  String? label)?  $default,) {final _that = this;
 switch (_that) {
 case _DashboardSummary() when $default != null:
-return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.totalExpense,_that.totalArrears,_that.monthlyOverpayments,_that.totalOverpayments,_that.totalTopups,_that.totalClearedAmount,_that.invoiceCount,_that.paymentCount,_that.expenseCount,_that.totalUnits,_that.occupiedUnits);case _:
+return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.totalExpense,_that.totalArrears,_that.totalOverpayments,_that.totalTopups,_that.totalClearedAmount,_that.totalCredit,_that.totalForfeited,_that.properties,_that.totalUnits,_that.occupiedUnits,_that.label);case _:
   return null;
 
 }
@@ -222,7 +228,7 @@ return $default(_that.totalInvoice,_that.totalRent,_that.totalPayment,_that.tota
 @JsonSerializable()
 
 class _DashboardSummary extends DashboardSummary {
-  const _DashboardSummary({this.totalInvoice = 0, this.totalRent = 0, this.totalPayment = 0, this.totalExpense = 0, this.totalArrears = 0, this.monthlyOverpayments = 0, this.totalOverpayments = 0, this.totalTopups = 0, this.totalClearedAmount = 0, this.invoiceCount = 0, this.paymentCount = 0, this.expenseCount = 0, this.totalUnits, this.occupiedUnits}): super._();
+  const _DashboardSummary({this.totalInvoice = 0, this.totalRent = 0, this.totalPayment = 0, this.totalExpense = 0, this.totalArrears = 0, this.totalOverpayments = 0, this.totalTopups = 0, this.totalClearedAmount = 0, this.totalCredit = 0, this.totalForfeited = 0, this.properties, this.totalUnits, this.occupiedUnits, this.label}): super._();
   factory _DashboardSummary.fromJson(Map<String, dynamic> json) => _$DashboardSummaryFromJson(json);
 
 @override@JsonKey() final  double totalInvoice;
@@ -230,15 +236,21 @@ class _DashboardSummary extends DashboardSummary {
 @override@JsonKey() final  double totalPayment;
 @override@JsonKey() final  double totalExpense;
 @override@JsonKey() final  double totalArrears;
-@override@JsonKey() final  double monthlyOverpayments;
 @override@JsonKey() final  double totalOverpayments;
 @override@JsonKey() final  double totalTopups;
 @override@JsonKey() final  double totalClearedAmount;
-@override@JsonKey() final  int invoiceCount;
-@override@JsonKey() final  int paymentCount;
-@override@JsonKey() final  int expenseCount;
+/// Unallocated money standing across live payments **today** — a balance, not something that
+/// arose in the period. The backend's own note warns these two are not interchangeable, and
+/// that showing the difference between them once made the dashboard read 782,700 where the
+/// portal read 4,700.
+@override@JsonKey() final  double totalCredit;
+@override@JsonKey() final  double totalForfeited;
+/// How many properties the figures above cover. Distinct, not rows.
+@override final  int? properties;
 @override final  int? totalUnits;
 @override final  int? occupiedUnits;
+/// The period these figures are for, in the server's words — "September 2026", "All time".
+@override final  String? label;
 
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
@@ -253,16 +265,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardSummary&&(identical(other.totalInvoice, totalInvoice) || other.totalInvoice == totalInvoice)&&(identical(other.totalRent, totalRent) || other.totalRent == totalRent)&&(identical(other.totalPayment, totalPayment) || other.totalPayment == totalPayment)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.totalArrears, totalArrears) || other.totalArrears == totalArrears)&&(identical(other.monthlyOverpayments, monthlyOverpayments) || other.monthlyOverpayments == monthlyOverpayments)&&(identical(other.totalOverpayments, totalOverpayments) || other.totalOverpayments == totalOverpayments)&&(identical(other.totalTopups, totalTopups) || other.totalTopups == totalTopups)&&(identical(other.totalClearedAmount, totalClearedAmount) || other.totalClearedAmount == totalClearedAmount)&&(identical(other.invoiceCount, invoiceCount) || other.invoiceCount == invoiceCount)&&(identical(other.paymentCount, paymentCount) || other.paymentCount == paymentCount)&&(identical(other.expenseCount, expenseCount) || other.expenseCount == expenseCount)&&(identical(other.totalUnits, totalUnits) || other.totalUnits == totalUnits)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardSummary&&(identical(other.totalInvoice, totalInvoice) || other.totalInvoice == totalInvoice)&&(identical(other.totalRent, totalRent) || other.totalRent == totalRent)&&(identical(other.totalPayment, totalPayment) || other.totalPayment == totalPayment)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.totalArrears, totalArrears) || other.totalArrears == totalArrears)&&(identical(other.totalOverpayments, totalOverpayments) || other.totalOverpayments == totalOverpayments)&&(identical(other.totalTopups, totalTopups) || other.totalTopups == totalTopups)&&(identical(other.totalClearedAmount, totalClearedAmount) || other.totalClearedAmount == totalClearedAmount)&&(identical(other.totalCredit, totalCredit) || other.totalCredit == totalCredit)&&(identical(other.totalForfeited, totalForfeited) || other.totalForfeited == totalForfeited)&&(identical(other.properties, properties) || other.properties == properties)&&(identical(other.totalUnits, totalUnits) || other.totalUnits == totalUnits)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits)&&(identical(other.label, label) || other.label == label));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalInvoice,totalRent,totalPayment,totalExpense,totalArrears,monthlyOverpayments,totalOverpayments,totalTopups,totalClearedAmount,invoiceCount,paymentCount,expenseCount,totalUnits,occupiedUnits);
+int get hashCode => Object.hash(runtimeType,totalInvoice,totalRent,totalPayment,totalExpense,totalArrears,totalOverpayments,totalTopups,totalClearedAmount,totalCredit,totalForfeited,properties,totalUnits,occupiedUnits,label);
 
 @override
 String toString() {
-  return 'DashboardSummary(totalInvoice: $totalInvoice, totalRent: $totalRent, totalPayment: $totalPayment, totalExpense: $totalExpense, totalArrears: $totalArrears, monthlyOverpayments: $monthlyOverpayments, totalOverpayments: $totalOverpayments, totalTopups: $totalTopups, totalClearedAmount: $totalClearedAmount, invoiceCount: $invoiceCount, paymentCount: $paymentCount, expenseCount: $expenseCount, totalUnits: $totalUnits, occupiedUnits: $occupiedUnits)';
+  return 'DashboardSummary(totalInvoice: $totalInvoice, totalRent: $totalRent, totalPayment: $totalPayment, totalExpense: $totalExpense, totalArrears: $totalArrears, totalOverpayments: $totalOverpayments, totalTopups: $totalTopups, totalClearedAmount: $totalClearedAmount, totalCredit: $totalCredit, totalForfeited: $totalForfeited, properties: $properties, totalUnits: $totalUnits, occupiedUnits: $occupiedUnits, label: $label)';
 }
 
 
@@ -273,7 +285,7 @@ abstract mixin class _$DashboardSummaryCopyWith<$Res> implements $DashboardSumma
   factory _$DashboardSummaryCopyWith(_DashboardSummary value, $Res Function(_DashboardSummary) _then) = __$DashboardSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- double totalInvoice, double totalRent, double totalPayment, double totalExpense, double totalArrears, double monthlyOverpayments, double totalOverpayments, double totalTopups, double totalClearedAmount, int invoiceCount, int paymentCount, int expenseCount, int? totalUnits, int? occupiedUnits
+ double totalInvoice, double totalRent, double totalPayment, double totalExpense, double totalArrears, double totalOverpayments, double totalTopups, double totalClearedAmount, double totalCredit, double totalForfeited, int? properties, int? totalUnits, int? occupiedUnits, String? label
 });
 
 
@@ -290,23 +302,23 @@ class __$DashboardSummaryCopyWithImpl<$Res>
 
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? totalInvoice = null,Object? totalRent = null,Object? totalPayment = null,Object? totalExpense = null,Object? totalArrears = null,Object? monthlyOverpayments = null,Object? totalOverpayments = null,Object? totalTopups = null,Object? totalClearedAmount = null,Object? invoiceCount = null,Object? paymentCount = null,Object? expenseCount = null,Object? totalUnits = freezed,Object? occupiedUnits = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? totalInvoice = null,Object? totalRent = null,Object? totalPayment = null,Object? totalExpense = null,Object? totalArrears = null,Object? totalOverpayments = null,Object? totalTopups = null,Object? totalClearedAmount = null,Object? totalCredit = null,Object? totalForfeited = null,Object? properties = freezed,Object? totalUnits = freezed,Object? occupiedUnits = freezed,Object? label = freezed,}) {
   return _then(_DashboardSummary(
 totalInvoice: null == totalInvoice ? _self.totalInvoice : totalInvoice // ignore: cast_nullable_to_non_nullable
 as double,totalRent: null == totalRent ? _self.totalRent : totalRent // ignore: cast_nullable_to_non_nullable
 as double,totalPayment: null == totalPayment ? _self.totalPayment : totalPayment // ignore: cast_nullable_to_non_nullable
 as double,totalExpense: null == totalExpense ? _self.totalExpense : totalExpense // ignore: cast_nullable_to_non_nullable
 as double,totalArrears: null == totalArrears ? _self.totalArrears : totalArrears // ignore: cast_nullable_to_non_nullable
-as double,monthlyOverpayments: null == monthlyOverpayments ? _self.monthlyOverpayments : monthlyOverpayments // ignore: cast_nullable_to_non_nullable
 as double,totalOverpayments: null == totalOverpayments ? _self.totalOverpayments : totalOverpayments // ignore: cast_nullable_to_non_nullable
 as double,totalTopups: null == totalTopups ? _self.totalTopups : totalTopups // ignore: cast_nullable_to_non_nullable
 as double,totalClearedAmount: null == totalClearedAmount ? _self.totalClearedAmount : totalClearedAmount // ignore: cast_nullable_to_non_nullable
-as double,invoiceCount: null == invoiceCount ? _self.invoiceCount : invoiceCount // ignore: cast_nullable_to_non_nullable
-as int,paymentCount: null == paymentCount ? _self.paymentCount : paymentCount // ignore: cast_nullable_to_non_nullable
-as int,expenseCount: null == expenseCount ? _self.expenseCount : expenseCount // ignore: cast_nullable_to_non_nullable
-as int,totalUnits: freezed == totalUnits ? _self.totalUnits : totalUnits // ignore: cast_nullable_to_non_nullable
+as double,totalCredit: null == totalCredit ? _self.totalCredit : totalCredit // ignore: cast_nullable_to_non_nullable
+as double,totalForfeited: null == totalForfeited ? _self.totalForfeited : totalForfeited // ignore: cast_nullable_to_non_nullable
+as double,properties: freezed == properties ? _self.properties : properties // ignore: cast_nullable_to_non_nullable
+as int?,totalUnits: freezed == totalUnits ? _self.totalUnits : totalUnits // ignore: cast_nullable_to_non_nullable
 as int?,occupiedUnits: freezed == occupiedUnits ? _self.occupiedUnits : occupiedUnits // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,label: freezed == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

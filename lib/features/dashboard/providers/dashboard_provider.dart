@@ -50,8 +50,8 @@ final monthlySummaryProvider =
   final response = await repo.getMonthlySummary(
     estateId: filters.selectedEstateId,
     propertyId: filters.selectedPropertyId,
-    month: month.toString(),
-    year: year.toString(),
+    month: month,
+    year: year,
   );
   if (response.isEstateOverdue) return null;
   return response.isSuccess ? response.data : null;
