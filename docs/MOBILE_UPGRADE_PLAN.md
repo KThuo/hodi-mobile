@@ -303,19 +303,12 @@ What the biometric prompt proves is that the person holding the phone is the per
 to. It guards the refresh token already sitting in the keystore — with it on, resuming the session
 costs a fingerprint. That is what every app calling this "biometric login" actually does.
 
-So **the biometric switch cannot be persisted to the backend as a credential**, because there is
-nothing to persist. It is a per-device setting and belongs in the keystore beside the token it
-guards. Two honest options if the *preference* should still follow the person:
+So **the biometric switch stays on the handset**, in the keystore beside the token it guards. It is
+per-device by nature: the question is whether *this phone* should unlock with *this finger*, which is
+not a question another phone can inherit an answer to. A phone with no sensor, or with nothing
+enrolled, cannot honour a preference set elsewhere anyway.
 
-- **Leave it local.** It is per-device by nature — a phone with no sensor cannot honour it, so the
-  answer is about this handset, not about this person.
-- **Persist it as a preference**, which is nearly free: `users` already carries `show_field_hints`
-  and `show_tile_charts`, and `PUT /api/v1/auth/me/preferences` already takes a partial body. One
-  more nullable boolean and a new phone remembers the person likes biometric unlock. It still has to
-  be re-proved on each device.
-
-Recommend the second, with the first as the fallback — it costs a column and answers the request as
-asked, provided it is understood as a preference and not as a credential.
+Nothing about it reaches `hodi-b`. **The PIN is the only thing persisted.**
 
 ### The PIN pulls in device pairing, and this is the part to decide before building
 
@@ -388,8 +381,8 @@ Two things to carry across deliberately:
    password on the open internet, so the honest choices are *build the pairing subsystem* or *ship
    biometric unlock only, which needs no backend at all*. Biometric-only is a fraction of the work
    and covers most of what people mean by "don't make me type my password".
-4. **Biometric preference: local, or persisted?** (§7) — persisting costs one nullable column on the
-   existing preferences endpoint, but it remains a preference, never a credential.
+4. ~~Biometric preference: local, or persisted?~~ **Answered: local, per device.** Only the PIN is
+   persisted. No column, no preferences change, nothing reaching `hodi-b`.
 5. ~~Who is the app for now?~~ **Largely answered by §5.** The drill-down plus To Let and Stays give
    the app a tenant's half, which argues for one app with role-driven navigation. Confirm that is the
    intent before Phase 2 shapes the navigation around it.
