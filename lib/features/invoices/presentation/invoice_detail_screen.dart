@@ -202,7 +202,7 @@ class _BottomActions extends ConsumerWidget {
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: HodiColors.primaryStart,
-                side: const BorderSide(color: HodiColors.primaryStart),
+                side: BorderSide(color: HodiColors.primaryStart),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

@@ -19,22 +19,71 @@ import 'package:flutter/material.dart';
 ///
 /// The semantic colours needed no change: success, warning and danger were already HODI's.
 abstract class HodiColors {
-  // ── Brand ─────────────────────────────────────────────────────────────────
-  // --brand and --accent. Together they are --grad-brand, the one primary fill.
-  static const Color primaryStart = Color(0xFF2190F2); // --brand
-  static const Color primaryEnd = Color(0xFFEC278D);   // --accent
-  static const Color primaryHover = Color(0xFF47A4F5); // --brand-hover
-  static const Color primaryPressed = Color(0xFF1877CC); // --brand-pressed
+  // ── Brand — resolved at runtime ───────────────────────────────────────────
+  //
+  // These are **not** const, and that is the whole point. The server resolves branding through
+  // ESTATE → BANK → GLOBAL and serves it from /api/v1/branding; the values below are only what the
+  // app paints with until it answers. The shipped defaults were read off hodi-f's theme.css, which
+  // states the *fallback* palette rather than the configured one — so the app was showing #2190F2
+  // against a deployment configured for #1D4ED8, and an app in different colours from the console
+  // looks like a different product.
+  //
+  // Mutable statics rather than a threaded theme because six hundred call sites already name these
+  // constants; making them follow the brand is one assignment, and re-plumbing every widget through
+  // an InheritedWidget is a large mechanical edit where every touch is a chance to break a screen.
+  // See [applyBrand].
+
+  /// `--brand`, the colour buttons, links and active state are painted in.
+  static Color primaryStart = _fallbackBrand;
+  /// `--accent`, the far stop of the heading gradient.
+  static Color primaryEnd = _fallbackAccent;
+  static Color primaryHover = const Color(0xFF47A4F5);
+  static Color primaryPressed = const Color(0xFF1877CC);
 
   /// The wordmark's magenta, standing alone rather than as a gradient end.
-  static const Color secondary = Color(0xFFEC278D); // --accent
-  static const Color accent = Color(0xFFEC278D);    // --accent
-  static const Color accentLight = Color(0xFFF76FB3); // --accent-light
+  static Color secondary = _fallbackAccent;
+  static Color accent = _fallbackAccent;
+  static Color accentLight = const Color(0xFFF76FB3);
 
-  /// The navy the sidebar and document headers are built from.
-  static const Color ink = Color(0xFF0B3358);     // --ink-800
-  static const Color inkDeep = Color(0xFF04182B); // --ink-900
-  static const Color onInk = Color(0xFFE9F1F9);   // --on-ink
+  /// The navy the headers and document furniture are built from — `--ink-800`.
+  static Color ink = _fallbackInk;
+  static Color inkDeep = const Color(0xFF04182B);
+  static const Color onInk = Color(0xFFE9F1F9);
+
+  static const Color _fallbackBrand = Color(0xFF2190F2);
+  static const Color _fallbackAccent = Color(0xFFEC278D);
+  static const Color _fallbackInk = Color(0xFF0B3358);
+
+  /// Paint with what the server said, keeping the shipped value for anything it left blank.
+  ///
+  /// The derived shades are computed rather than configured: one colour in, a coherent ramp out, so
+  /// an estate choosing its own brand cannot pick a hover that clashes with its own base. `hodi-f`
+  /// derives them the same way and from the same percentages.
+  static void applyBrand({Color? brand, Color? accentColor, Color? inkColor}) {
+    if (brand != null) {
+      primaryStart = brand;
+      primaryHover = _shade(brand, 0.14);
+      primaryPressed = _shade(brand, -0.16);
+    }
+    if (accentColor != null) {
+      primaryEnd = accentColor;
+      secondary = accentColor;
+      accent = accentColor;
+      accentLight = _shade(accentColor, 0.32);
+    }
+    if (inkColor != null) {
+      ink = inkColor;
+      inkDeep = _shade(inkColor, -0.5);
+    }
+  }
+
+  /// Toward white for a positive amount, toward black for a negative one.
+  static Color _shade(Color c, double amount) {
+    final target = amount < 0 ? 0.0 : 255.0;
+    final t = amount.abs();
+    double mix(double channel) => (channel * 255 + (target - channel * 255) * t) / 255;
+    return Color.from(alpha: c.a, red: mix(c.r), green: mix(c.g), blue: mix(c.b));
+  }
 
   // ── Semantic ──────────────────────────────────────────────────────────────
   // Already correct before this port; the values are HODI's and stay put.

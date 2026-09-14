@@ -47,7 +47,7 @@ class _HodiWebviewPageState extends State<HodiWebviewPage> {
         children: [
           WebViewWidget(controller: _controller),
           if (_isLoading)
-            const Center(
+            Center(
               child: CircularProgressIndicator(color: HodiColors.primaryStart),
             ),
         ],

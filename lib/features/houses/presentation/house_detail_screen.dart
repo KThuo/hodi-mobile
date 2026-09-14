@@ -168,7 +168,7 @@ class _HouseInfoCard extends StatelessWidget {
                   color: HodiColors.primaryStart.withValues(alpha: 0.1),
                   borderRadius: HodiBorderRadius.small,
                 ),
-                child: const Icon(Icons.info_outline, color: HodiColors.primaryStart, size: 18),
+                child: Icon(Icons.info_outline, color: HodiColors.primaryStart, size: 18),
               ),
               const SizedBox(width: 10),
               Text('House Information', style: HodiTextStyles.heading3.copyWith(fontSize: 16)),

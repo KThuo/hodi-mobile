@@ -225,7 +225,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
               // Content
               Expanded(
                 child: _isLoadingTypes
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(
                           color: HodiColors.primaryStart,
                         ),

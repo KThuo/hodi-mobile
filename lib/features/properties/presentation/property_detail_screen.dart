@@ -659,7 +659,7 @@ class _AutomationSettingsCard extends StatelessWidget {
                   color: HodiColors.secondary.withValues(alpha: 0.1),
                   borderRadius: HodiBorderRadius.small,
                 ),
-                child: const Icon(Icons.settings_outlined,
+                child: Icon(Icons.settings_outlined,
                     color: HodiColors.secondary, size: 18),
               ),
               const SizedBox(width: 10),

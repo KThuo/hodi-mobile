@@ -9,10 +9,15 @@ abstract class HodiGradients {
   /// surface, and a surface in full brand-into-accent shouts. The web mixes only 30% of the accent
   /// into the brand for the far stop — `color-mix(in srgb, accent 30%, brand)`, which resolves to
   /// #5E71D4 — so the button reads as blue with a warm edge rather than as a stripe of two colours.
-  static const LinearGradient button = LinearGradient(
+  static LinearGradient get button => LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF2190F2), Color(0xFF5E71D4)],
+    // 30% of the accent mixed into the brand, computed rather than written down, so a configured
+    // brand carries the button with it.
+    colors: [
+      HodiColors.primaryStart,
+      Color.lerp(HodiColors.primaryStart, HodiColors.accent, 0.30)!,
+    ],
   );
 
   /// The app's one gradient: the dashboard header.
@@ -22,19 +27,19 @@ abstract class HodiGradients {
   /// four of them sat together at the top of the dashboard; the figures were the quietest thing on
   /// their own cards. `hodi-f`'s tiles and `axis-m` both put the colour on an edge or an icon and
   /// leave the surface alone, and this follows them.
-  static const LinearGradient header = LinearGradient(
+  static LinearGradient get header => LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [HodiColors.ink, HodiColors.inkDeep],
   );
 
-  static const LinearGradient primary = LinearGradient(
+  static LinearGradient get primary => LinearGradient(
     colors: [HodiColors.primaryStart, HodiColors.primaryEnd],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const LinearGradient primaryHorizontal = LinearGradient(
+  static LinearGradient get primaryHorizontal => LinearGradient(
     colors: [HodiColors.primaryStart, HodiColors.primaryEnd],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,

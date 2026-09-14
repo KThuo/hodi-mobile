@@ -44,7 +44,7 @@ class FilterButton extends ConsumerWidget {
             child: Container(
               width: 8,
               height: 8,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: HodiColors.primaryStart,
                 shape: BoxShape.circle,
               ),
@@ -154,7 +154,7 @@ class _FilterDropdown extends StatelessWidget {
           value: value,
           isExpanded: true,
           icon: isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(

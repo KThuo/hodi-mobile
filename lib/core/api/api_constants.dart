@@ -56,6 +56,10 @@ abstract class ApiConstants {
   static const String deleteAccount = '$apiPrefix/auth/delete-account';
   static const String forgotPassword = '$apiPrefix/auth/forgot-password';
 
+  /// The deployment's colours, name and logo. Public: the login screen has to be in the right
+  /// colours before anybody has signed in.
+  static const String brandingPublic = '$apiPrefix/branding/public';
+
   // ── Dashboard ─────────────────────────────────────────────────────────────
   //
   // Legacy had one endpoint and a `table-data` companion. The rebuild splits it by the question

@@ -9,7 +9,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       scaffoldBackgroundColor: HodiColors.background,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme.light(
         primary: HodiColors.primaryStart,
         secondary: HodiColors.secondary,
         error: HodiColors.errorStart,
@@ -62,7 +62,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: HodiBorderRadius.input,
-          borderSide: const BorderSide(color: HodiColors.primaryStart, width: 1.5),
+          borderSide: BorderSide(color: HodiColors.primaryStart, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: HodiBorderRadius.input,

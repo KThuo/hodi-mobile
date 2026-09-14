@@ -55,13 +55,13 @@ class DashboardScreen extends ConsumerWidget {
                   right: 20,
                   bottom: 24,
                 ),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   // The app's one gradient, and it is deliberately the only one. Built from the ink
                   // rather than the brand: a navy that deepens toward blue reads as a header, where
                   // full brand-into-accent reads as a warning label. axis-m makes the same choice on
                   // its home screen for the same reason.
                   gradient: HodiGradients.header,
-                  borderRadius: BorderRadius.vertical(
+                  borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(24),
                   ),
                 ),
@@ -247,8 +247,8 @@ class DashboardScreen extends ConsumerWidget {
                               ],
                             );
                           },
-                          loading: () => const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 24),
+                          loading: () => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
                             child: Center(
                               child: CircularProgressIndicator(
                                 color: HodiColors.primaryStart,
@@ -295,40 +295,40 @@ class _QuickAccessSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = isAdmin
-        ? const [
+        ? [
             _QuickAccessItem(
               icon: Icons.people_outline,
               label: 'Tenants',
               path: '/more/tenants',
               tone: HodiColors.primaryStart,
             ),
-            _QuickAccessItem(
+            const _QuickAccessItem(
               icon: Icons.receipt_long_outlined,
               label: 'Invoices',
               path: '/invoices',
               tone: HodiColors.warningStart,
             ),
-            _QuickAccessItem(
+            const _QuickAccessItem(
               icon: Icons.speed_outlined,
               label: 'Metres',
               path: '/more/metres',
               tone: HodiColors.successStart,
             ),
           ]
-        : const [
+        : [
             _QuickAccessItem(
               icon: Icons.home_work_outlined,
               label: 'My Houses',
               path: '/houses',
               tone: HodiColors.primaryStart,
             ),
-            _QuickAccessItem(
+            const _QuickAccessItem(
               icon: Icons.receipt_long_outlined,
               label: 'My Invoices',
               path: '/invoices',
               tone: HodiColors.warningStart,
             ),
-            _QuickAccessItem(
+            const _QuickAccessItem(
               icon: Icons.payments_outlined,
               label: 'My Payments',
               path: '/payments',

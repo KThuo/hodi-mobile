@@ -153,8 +153,8 @@ class _TenantInvoicesTabState extends ConsumerState<TenantInvoicesTab> {
       itemCount: _invoices.length + (_hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == _invoices.length) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
+          return Padding(
+            padding: const EdgeInsets.all(16),
             child: Center(child: CircularProgressIndicator(color: HodiColors.primaryStart)),
           );
         }

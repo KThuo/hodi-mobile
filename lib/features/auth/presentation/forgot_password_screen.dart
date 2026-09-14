@@ -71,7 +71,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           // Background gradient
           Container(
             decoration:
-                const BoxDecoration(gradient: HodiGradients.primary),
+                BoxDecoration(gradient: HodiGradients.primary),
           ),
 
           // Background image

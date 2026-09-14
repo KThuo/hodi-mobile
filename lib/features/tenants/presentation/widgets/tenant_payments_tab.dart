@@ -163,8 +163,8 @@ class _TenantPaymentsTabState extends ConsumerState<TenantPaymentsTab> {
       itemCount: _payments.length + (_hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == _payments.length) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
+          return Padding(
+            padding: const EdgeInsets.all(16),
             child: Center(child: CircularProgressIndicator(color: HodiColors.primaryStart)),
           );
         }
@@ -259,7 +259,7 @@ class _DateRangeChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.calendar_today_outlined,
               size: 16,
               color: HodiColors.primaryStart,

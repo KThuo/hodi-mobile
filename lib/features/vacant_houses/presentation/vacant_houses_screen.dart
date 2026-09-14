@@ -99,7 +99,7 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
                   child: Container(
                     width: 8,
                     height: 8,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: HodiColors.primaryStart,
                       shape: BoxShape.circle,
                     ),
@@ -173,8 +173,8 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
       itemCount: state.houses.length + (state.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == state.houses.length) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
+          return Padding(
+            padding: const EdgeInsets.all(16),
             child: Center(child: CircularProgressIndicator(color: HodiColors.primaryStart)),
           );
         }
@@ -263,7 +263,7 @@ class _ActiveChip extends StatelessWidget {
           const SizedBox(width: 2),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(Icons.close, size: 16, color: HodiColors.primaryStart),
+            child: Icon(Icons.close, size: 16, color: HodiColors.primaryStart),
           ),
         ],
       ),

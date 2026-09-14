@@ -23,7 +23,7 @@ class PropertyListItem extends StatelessWidget {
               color: HodiColors.primaryStart.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.apartment,
               color: HodiColors.primaryStart,
               size: 24,

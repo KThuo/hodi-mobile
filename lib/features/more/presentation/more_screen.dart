@@ -100,9 +100,9 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                 right: 20,
                 bottom: 24,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: HodiGradients.primary,
-                borderRadius: BorderRadius.vertical(
+                borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(24),
                 ),
               ),
@@ -540,7 +540,7 @@ class _BiometricToggleRow extends StatelessWidget {
               color: HodiColors.primaryStart.withValues(alpha: 0.1),
               borderRadius: HodiBorderRadius.small,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.fingerprint,
               size: 20,
               color: HodiColors.primaryStart,

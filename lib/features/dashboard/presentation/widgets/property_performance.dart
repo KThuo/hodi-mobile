@@ -31,7 +31,7 @@ class PropertyPerformance extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.apartment, size: 20, color: HodiColors.primaryStart),
+              Icon(Icons.apartment, size: 20, color: HodiColors.primaryStart),
               const SizedBox(width: 8),
               Text('Property Performance', style: HodiTextStyles.heading3.copyWith(fontSize: 16)),
             ],
@@ -103,7 +103,7 @@ class PropertyPerformance extends StatelessWidget {
 
   _PerformanceBadge _performanceBadge(double rate) {
     if (rate >= 95) return const _PerformanceBadge('Excellent', HodiColors.successStart);
-    if (rate >= 80) return const _PerformanceBadge('Good', HodiColors.primaryStart);
+    if (rate >= 80) return _PerformanceBadge('Good', HodiColors.primaryStart);
     if (rate >= 60) return const _PerformanceBadge('Fair', HodiColors.warningStart);
     return const _PerformanceBadge('Needs Attention', HodiColors.errorStart);
   }

@@ -100,7 +100,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: HodiColors.primaryStart.withValues(alpha: 0.1),
                     borderRadius: HodiBorderRadius.small,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.fingerprint,
                     color: HodiColors.primaryStart,
                     size: 24,
@@ -375,7 +375,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor:
                                             HodiColors.primaryStart,
-                                        side: const BorderSide(
+                                        side: BorderSide(
                                           color: HodiColors.primaryStart,
                                           width: 1.5,
                                         ),

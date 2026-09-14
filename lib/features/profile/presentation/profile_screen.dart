@@ -151,7 +151,7 @@ class _AccountDetailsCard extends StatelessWidget {
                   color: HodiColors.primaryStart.withValues(alpha: 0.1),
                   borderRadius: HodiBorderRadius.small,
                 ),
-                child: const Icon(Icons.person_outline, color: HodiColors.primaryStart, size: 18),
+                child: Icon(Icons.person_outline, color: HodiColors.primaryStart, size: 18),
               ),
               const SizedBox(width: 10),
               Text('Account Details', style: HodiTextStyles.heading3.copyWith(fontSize: 16)),

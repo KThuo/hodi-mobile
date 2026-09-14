@@ -8,6 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/hodi_colors.dart';
 import 'core/auth/providers/auth_provider.dart';
 import 'core/api/api_client.dart';
+import 'core/branding/branding_repository.dart';
 
 class HodiApp extends ConsumerStatefulWidget {
   const HodiApp({super.key});
@@ -25,8 +26,26 @@ class _HodiAppState extends ConsumerState<HodiApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    Future.microtask(() {
-      ref.read(authProvider.notifier).checkAuth();
+    Future.microtask(() async {
+      /*
+       * Branding first, and the cache before the network.
+       *
+       * The cached palette is applied synchronously so the splash is already in this deployment's
+       * colours rather than the shipped ones; the refresh then catches a brand that changed since
+       * last launch. Neither can fail the start — both resolve to whatever is already painted.
+       *
+       * Both run before the session check finishes, so they happen inside the splash the router is
+       * holding on rather than adding a wait of their own. See SplashScreen.
+       */
+      final branding = ref.read(brandingRepositoryProvider);
+      await branding.cached();
+      if (mounted) setState(() {});
+
+      unawaited(branding.refresh().then((_) {
+        if (mounted) setState(() {});
+      }));
+
+      await ref.read(authProvider.notifier).checkAuth();
     });
 
     Future.microtask(() {
@@ -146,7 +165,7 @@ class _HodiAppState extends ConsumerState<HodiApp> with WidgetsBindingObserver {
                       height: 48,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [HodiColors.primaryStart, HodiColors.primaryEnd],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,

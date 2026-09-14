@@ -70,7 +70,7 @@ class _CollectionsTableState extends State<CollectionsTable> {
         children: [
           Row(
             children: [
-              const Icon(Icons.list_alt, size: 20, color: HodiColors.primaryStart),
+              Icon(Icons.list_alt, size: 20, color: HodiColors.primaryStart),
               const SizedBox(width: 8),
               Text(
                 'Payment Collections',

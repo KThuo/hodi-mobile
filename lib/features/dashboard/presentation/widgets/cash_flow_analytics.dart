@@ -31,7 +31,7 @@ class CashFlowAnalytics extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.analytics, size: 20, color: HodiColors.primaryStart),
+              Icon(Icons.analytics, size: 20, color: HodiColors.primaryStart),
               const SizedBox(width: 8),
               Text('Cash Flow Analytics', style: HodiTextStyles.heading3.copyWith(fontSize: 16)),
             ],

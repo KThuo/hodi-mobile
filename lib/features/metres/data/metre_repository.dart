@@ -23,7 +23,7 @@ class MetreRepository {
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
-        if (currentReading != null) 'currentReading': currentReading,
+        'currentReading': ?currentReading,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
         'estateId': ?estateId,
         'propertyId': ?propertyId,
@@ -47,7 +47,7 @@ class MetreRepository {
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
-        if (year != null) 'year': year,
+        'year': ?year,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
       },
       fromJsonT: (data) => PagedResponse.fromJson(

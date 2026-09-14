@@ -279,7 +279,7 @@ class _HouseInfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionHeader(
+          _SectionHeader(
             icon: Icons.info_outline,
             title: 'Property Details',
             color: HodiColors.primaryStart,
@@ -400,7 +400,7 @@ class _BillsFeesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionHeader(
+          _SectionHeader(
             icon: Icons.receipt_long_outlined,
             title: 'Bills & Fees',
             color: HodiColors.secondary,
