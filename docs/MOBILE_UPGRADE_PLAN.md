@@ -93,8 +93,9 @@ on an id. Anywhere the app builds a URL from an id, the hash is what goes in.
 `periodMonth`, `periodYear` and `note`. **There is no image field.** The legacy API took a base64
 string; the new one does not accept one at all.
 
-This turned out not to be a gap to fill. The photo is OCR input rather than evidence, so it stops at
-the handset and the absence of a field is correct. See §4.
+This is a real gap. The photo is evidence and has to be stored, so `hodi-b` needs a nullable
+`asset_id` on `meter_readings`, a `hasPhoto` flag on the row, and two endpoints — one to receive the
+upload, one to serve it back. See §4.
 
 ---
 
@@ -120,61 +121,87 @@ at a time against a running `hodi-b`, not in a big bang.
 
 ## 4. The meter photo (requirement 3)
 
-### What it does now
+**The photo is evidence.** It is captured so that a landlord and a tenant can both look at the dial
+afterwards and agree about what it said. OCR is only how the number gets typed for you — the number
+is corrected by hand when recognition is wrong, and the photograph is what settles the argument the
+correction might later cause. Legacy showed it on the web from a meter's history, and that capability
+comes across.
 
-`update_reading_sheet.dart:45` captures at 1024×1024, quality 70, then runs ML Kit OCR and
-`base64Encode` **in parallel**, holds the result in a `String`, and posts it inside the JSON body.
+So the photo is stored, and the work is making that cheap rather than avoiding it.
 
-The parallelism is a nice touch. Everything around it is expensive:
+### What it costs now
 
-- **Base64 costs 33% on the wire**, before JSON escaping. A 300KB photo becomes ~400KB of string.
-- **Three copies in memory at once** — the `File` bytes, the ML Kit input, and the base64 `String`.
-  On a cheap Android handset this is where it will be killed.
-- **The upload is welded to the reading.** One request carries both, so a flaky connection loses the
+`update_reading_sheet.dart:45` captures at 1024x1024 quality 70, runs ML Kit OCR and `base64Encode`
+in parallel, holds the result in a `String`, and posts it inside the JSON body. Legacy then handed it
+back the same way — `GET /api/metres/reading-image/{historyId}` returned base64 inside the
+`ResponseModel` envelope (`MetreImage.vue:49`). Base64 on the way up and base64 on the way down.
+
+Three costs, none of which the evidence requirement actually needs:
+
+- **33% on the wire, twice.** A 300KB photo is ~400KB of string going up and ~400KB coming back, and
+  JSON-escaped on top.
+- **Three copies in memory at once** — file bytes, ML Kit input, and the base64 `String`. On a cheap
+  Android handset this is where the app is killed.
+- **The reading and the photo are welded into one request.** A bad signal in a stairwell loses the
   reading because the photo did not make it, and there is no retry that keeps the number.
 
-### Decided: the photo never leaves the handset
+### The design
 
-The question was whether the photo is *evidence* — something to be stored and audited later — or
-merely *OCR input*. It is OCR input. Recognition runs on-device through ML Kit, the capture is
-optional, and a reading the OCR gets wrong is typed over by the person standing at the meter. The
-number is the record; the photo is only how the number was obtained, and once it has been read there
-is nothing left in it that anybody needs.
+**1. The reading posts alone, first.** `POST /api/v1/meters/{id}/readings` is a few hundred bytes and
+survives a weak signal. It returns the reading's id.
 
-The new backend had already reached the same conclusion independently: `ReadingRequest` has no image
-field, and no column behind it. Uploading was a legacy habit, not a requirement.
+**2. The photo follows as multipart**, to a new `POST /api/v1/meters/readings/{id}/photo` — raw
+bytes, no base64 tax, streamed from disk rather than held as a `String`. If it fails, the *photo*
+retries; the reading is already safe. This ordering is deliberate: photo-first would orphan assets
+whenever somebody abandons the sheet.
 
-**So requirement 3 is answered by deletion, which is the most efficient version of any feature.**
+**3. Storage already exists and should not be reinvented.** `AssetService.storePhoto()` does the
+whole job — a 4MB ceiling with a sentence explaining it, magic-byte checking against the declared
+type, SHA-256 content addressing and deduplication. A `METER_READING` kind and a nullable `asset_id`
+on `meter_readings` is the entire schema change.
 
-| | Now | After |
+**4. The list says whether there is one; it does not carry it.** Add `hasPhoto` to `ReadingRow`.
+Legacy got this right with `imageStatus` — the eye icon appears only when there is something to look
+at, and nothing is fetched until somebody asks. A history of twenty readings must not drag twenty
+photographs with it.
+
+**5. Viewing streams bytes from a scoped endpoint**, not base64 from a JSON one:
+`GET /api/v1/meters/readings/{id}/photo`. That gives HTTP caching for free — the asset store already
+serves immutable, year-long `Cache-Control` because the key is the content hash — so the web
+lightbox and the mobile viewer both re-open instantly. It must be its own endpoint rather than
+`/api/v1/assets/{sha256}`: that path is deliberately *not* public, and `ListingImageController`
+exists for exactly this reason — "making that path public would publish every asset".
+
+**6. Capture stays legible.** Evidence that cannot be read is not evidence, so the current 1024px /
+quality 70 stays. (An earlier draft of this plan suggested shrinking it further; that was written
+when the photo was assumed disposable and is wrong now.) What can still go is the base64 step, which
+is the expensive part.
+
+### Where it is viewed
+
+| | Entry point | Behaviour |
 |---|---|---|
-| Wire | ~400KB of base64 inside a JSON body | nothing |
-| Memory | file bytes + ML Kit input + base64 `String` | file bytes + ML Kit input |
-| Requests | reading and photo welded together — a flaky link loses both | reading alone, small and retryable |
-| Backend | needs a new field and column | needs nothing |
+| **Mobile** | The reading row in meter history | Tap to open full-screen, pinch to zoom |
+| **Web** (`hodi-f`) | The reading row in meter history | Click to open a lightbox — legacy's eye icon and modal |
 
-What to do:
+### Two things to decide
 
-1. **Delete `ImageHelper.toBase64` and `_imageBase64`.** With them goes the third copy of the image
-   in memory, which on a cheap Android handset is where this gets killed.
-2. **Drop `image` from `updateReading`.** The reading posts on its own to
-   `POST /api/v1/meters/{id}/readings`, which is a few hundred bytes and will survive a bad signal
-   in a stairwell.
-3. **Keep the capture, keep the preview, keep the OCR.** The thumbnail stays on screen while the
-   sheet is open so somebody can check the dial against what was recognised. It is discarded with
-   the sheet.
-4. **Capture leaner, since it is now transient.** ML Kit does not need 1024² at quality 70 to read a
-   dial — around 800px on the long edge is legible, recognises faster, and allocates less. Take the
-   bytes straight to ML Kit rather than through a temporary `File` where the platform allows it.
-5. **Show what was recognised, and that it can be corrected.** The reading field is already
-   editable; say so, rather than leaving somebody to guess whether the number is theirs to change.
+**Tenant access is not currently possible.** The seeded `Tenants` group holds ten authorities —
+`ROLE_INVOICE_VIEW`, `ROLE_PAYMENT_VIEW`, `ROLE_MAINT_*`, `ROLE_VISIT_*`, `ROLE_TENANT_SELF` — and
+**no meter authority whatever**. A tenant cannot see a reading today, so "evidence for both landlord
+and tenant" needs a decision:
 
-**If audit evidence is ever wanted**, it is an additive change and nothing here blocks it: multipart
-to the content-addressed asset store (`AssetController` already serves `/api/v1/assets/{sha256}`),
-an `imageRef` on the reading, uploaded as a second request so the number is never lost with the
-photo. It is deliberately not being built now.
+- *Grant tenants `ROLE_METRE_VIEW`.* Simple, and wrong — it opens the estate's entire meter list.
+- *Add a self-scoped path* gated on `ROLE_TENANT_SELF`, reaching only meters on the unit they occupy.
+  More work, consistent with how the platform already scopes tenants, and the safe answer.
+  Recommended. The natural entry point is the utility line on their invoice: the charge, then the
+  reading behind it, then the photograph behind that.
 
----
+**EXIF.** `AssetService` sanitises SVG but does not strip photo metadata, so a meter photo carries
+whatever the camera wrote — including GPS. The capture time is arguably useful evidence, but the
+server already stamps `readOn`, and the coordinates of somebody's home recorded against their name
+are personal data nobody asked to collect. Recommend stripping GPS at minimum, on upload, server-side
+where it cannot be skipped by an old client.
 
 ## 5. To Let, Stays and maps (requirement 4)
 
@@ -229,7 +256,9 @@ Two things to carry across deliberately:
 
 ## 7. Decisions needed before Phase 1
 
-1. ~~Is the meter photo evidence or OCR input?~~ **Answered: OCR input.** It is not uploaded. See §4.
+1. ~~Is the meter photo evidence or OCR input?~~ **Answered: evidence.** It is uploaded, stored and
+   viewable from meter history on both web and mobile. Two sub-decisions remain in §4 — how a tenant
+   reaches it, and whether EXIF is stripped.
 2. **Which maps approach?** (§5) — baked key, static images, or OSM.
 3. **Who is the app for now?** It is currently staff-shaped: properties, tenants, meters, payments.
    Requirement 4 adds tenant browsing. One app with role-driven navigation, or a tenant experience
