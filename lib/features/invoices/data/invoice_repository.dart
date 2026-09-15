@@ -80,10 +80,16 @@ class InvoiceRepository {
     );
   }
 
+  /// The invoice as a PDF, rendered by the server.
+  ///
+  /// This used to fetch `/detail/{rrn}` — the JSON document — and save the bytes under a `.pdf`
+  /// name, so the file downloaded and then would not open, because it was never a PDF. The server
+  /// renders one now, from the same `PublicInvoice` the screen shows, so the paper and the screen
+  /// cannot disagree.
   Future<void> downloadInvoicePdf(String rrn) async {
     await _pdfDownloader.downloadAndOpen(
-      '${ApiConstants.invoiceDetail}/$rrn',
-      'invoice_$rrn.pdf',
+      '${ApiConstants.invoiceDetail}/$rrn/invoice.pdf',
+      'invoice-$rrn.pdf',
     );
   }
 

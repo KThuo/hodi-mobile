@@ -18,9 +18,25 @@ class PdfDownloader {
     await _apiClient.downloadFile(url, filePath);
 
     final file = File(filePath);
-    if (await file.exists()) {
-      await OpenFilex.open(filePath);
+    if (!await file.exists()) {
+      throw Exception('That document could not be downloaded.');
     }
+
+    /*
+     * Check it is a PDF before handing it to the OS.
+     *
+     * A failed request still writes a file — an error envelope, an HTML error page, a tunnel's
+     * interstitial — and `OpenFilex` then hands the system something it cannot open, which surfaces
+     * as "no app can perform this action" and sends somebody looking for a PDF reader they already
+     * have. Five bytes of header turns that into a sentence about the document.
+     */
+    final header = await file.openRead(0, 5).first;
+    if (String.fromCharCodes(header) != '%PDF-') {
+      await file.delete();
+      throw Exception('That document could not be downloaded. Try again in a moment.');
+    }
+
+    await OpenFilex.open(filePath);
   }
 }
 
