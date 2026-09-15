@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'widgets/reading_photo_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/auth/providers/auth_provider.dart';
@@ -178,10 +180,16 @@ class _MetreHistoryScreenState extends ConsumerState<MetreHistoryScreen> {
         return _HistoryListItem(
           history: history,
           onTap: () {
-            if (history.rrn != null && history.rrn!.isNotEmpty) {
-              context.push('/invoices/${history.rrn}');
+            if (history.invoiceRrn != null && history.invoiceRrn!.isNotEmpty) {
+              context.push('/invoices/${history.invoiceRrn}');
             }
           },
+          // Only where there is something to look at. Legacy's eye icon appeared on the same
+          // condition, and it is the whole reason the row carries a flag rather than a URL.
+          onViewPhoto: history.hasPhoto && history.id != null
+              ? () => ReadingPhotoView.open(context, history.id!,
+                  periodLabel: history.periodLabel)
+              : null,
         );
       },
     );
@@ -192,7 +200,10 @@ class _HistoryListItem extends StatelessWidget {
   final MetreHistoryModel history;
   final VoidCallback? onTap;
 
-  const _HistoryListItem({required this.history, this.onTap});
+  /// Null where this reading has no photograph, which is most of them.
+  final VoidCallback? onViewPhoto;
+
+  const _HistoryListItem({required this.history, this.onTap, this.onViewPhoto});
 
   @override
   Widget build(BuildContext context) {
@@ -205,15 +216,27 @@ class _HistoryListItem extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  history.monthName ?? '-',
+                  history.periodLabel ?? '-',
                   style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (history.rrn != null && history.rrn!.isNotEmpty)
+              if (onViewPhoto != null)
+                // The evidence, one tap away. Its own target rather than the row's, because the row
+                // already opens the invoice and a reading can have both.
+                IconButton(
+                  onPressed: onViewPhoto,
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  tooltip: 'View the meter photo',
+                  icon: Icon(Icons.photo_camera_outlined,
+                      size: 18, color: HodiColors.primaryStart),
+                ),
+              if (history.invoiceRrn != null && history.invoiceRrn!.isNotEmpty)
                 Text(
-                  history.rrn!,
+                  history.invoiceRrn!,
                   style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.primaryStart),
                 ),
             ],
@@ -244,7 +267,7 @@ class _HistoryListItem extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Charge: ${history.charge}/unit',
+                'Charge: ${history.rate}/unit',
                 style: HodiTextStyles.bodySmall,
               ),
               const Spacer(),
@@ -254,12 +277,12 @@ class _HistoryListItem extends StatelessWidget {
               ),
             ],
           ),
-          if (history.updatedOn != null) ...[
+          if (history.readOn != null) ...[
             const SizedBox(height: 4),
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                history.updatedOn!,
+                history.readOn!,
                 style: HodiTextStyles.bodySmall,
               ),
             ),

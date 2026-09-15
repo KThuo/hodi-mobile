@@ -9,31 +9,45 @@ part of 'metre_history_model.dart';
 _MetreHistoryModel _$MetreHistoryModelFromJson(Map<String, dynamic> json) =>
     _MetreHistoryModel(
       id: json['id'] as String?,
-      rrn: json['rrn'] as String?,
-      monthName: json['monthName'] as String?,
-      property: json['property'] as String?,
-      estate: json['estate'] as String?,
-      previousReading: (json['previousReading'] as num?)?.toDouble() ?? 0,
-      currentReading: (json['currentReading'] as num?)?.toDouble() ?? 0,
-      consumedUnits: (json['consumedUnits'] as num?)?.toDouble() ?? 0,
-      charge: (json['charge'] as num?)?.toDouble() ?? 0,
-      amount: (json['amount'] as num?)?.toDouble() ?? 0,
-      updatedOn: json['updatedOn'] as String?,
-      imageStatus: (json['imageStatus'] as num?)?.toInt(),
+      meterId: json['meterId'] as String?,
+      meterNo: json['meterNo'] as String?,
+      chargeName: json['chargeName'] as String?,
+      unitLabel: json['unitLabel'] as String?,
+      previousReading: json['previousReading'] == null
+          ? 0
+          : parseDouble(json['previousReading']),
+      currentReading: json['currentReading'] == null
+          ? 0
+          : parseDouble(json['currentReading']),
+      consumedUnits: json['consumedUnits'] == null
+          ? 0
+          : parseDouble(json['consumedUnits']),
+      rate: json['rate'] == null ? 0 : parseDouble(json['rate']),
+      amount: json['amount'] == null ? 0 : parseDouble(json['amount']),
+      periodLabel: json['periodLabel'] as String?,
+      readOn: json['readOn'] as String?,
+      note: json['note'] as String?,
+      invoiceRrn: json['invoiceRrn'] as String?,
+      billed: json['billed'] as bool? ?? false,
+      hasPhoto: json['hasPhoto'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$MetreHistoryModelToJson(_MetreHistoryModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'rrn': instance.rrn,
-      'monthName': instance.monthName,
-      'property': instance.property,
-      'estate': instance.estate,
+      'meterId': instance.meterId,
+      'meterNo': instance.meterNo,
+      'chargeName': instance.chargeName,
+      'unitLabel': instance.unitLabel,
       'previousReading': instance.previousReading,
       'currentReading': instance.currentReading,
       'consumedUnits': instance.consumedUnits,
-      'charge': instance.charge,
+      'rate': instance.rate,
       'amount': instance.amount,
-      'updatedOn': instance.updatedOn,
-      'imageStatus': instance.imageStatus,
+      'periodLabel': instance.periodLabel,
+      'readOn': instance.readOn,
+      'note': instance.note,
+      'invoiceRrn': instance.invoiceRrn,
+      'billed': instance.billed,
+      'hasPhoto': instance.hasPhoto,
     };

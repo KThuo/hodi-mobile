@@ -103,10 +103,31 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
     );
 
     if (!mounted) return;
-    setState(() => _isLoading = false);
 
     if (response.isSuccess) {
-      // Refresh history and list
+      /*
+       * The photograph follows, and the reading is already safe.
+       *
+       * This is the whole reason it is a second request. A failure here loses the picture and
+       * nothing else — the number is written, and the person at the meter does not have to type it
+       * again because a photograph would not upload in a stairwell.
+       *
+       * So it is reported quietly rather than as a failed reading. Saying "Failed to update reading"
+       * over a reading that was in fact recorded is how somebody comes to enter it twice.
+       */
+      final readingId = response.data?.id;
+      var photoFailed = false;
+      if (_capturedImage != null && readingId != null) {
+        final upload = await repository.attachPhoto(
+          readingId: readingId,
+          photo: _capturedImage!,
+        );
+        photoFailed = !upload.isSuccess;
+      }
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
       ref.read(metreHistoryProvider.notifier).refresh();
       ref.read(metreListProvider.notifier).refresh();
 
@@ -114,12 +135,16 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response.message.isNotEmpty ? response.message : 'Reading updated'),
-            backgroundColor: HodiColors.successStart,
+            content: Text(photoFailed
+                ? 'Reading saved. The photograph did not upload.'
+                : (response.message.isNotEmpty ? response.message : 'Reading updated')),
+            backgroundColor:
+                photoFailed ? HodiColors.warningStart : HodiColors.successStart,
           ),
         );
       }
     } else {
+      setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
