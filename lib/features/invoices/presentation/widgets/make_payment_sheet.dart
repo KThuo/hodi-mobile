@@ -149,8 +149,18 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
 
     setState(() => _isSubmitting = false);
 
+    /*
+     * Closed on success, left up on failure.
+     *
+     * PESI is synchronous: it answers once the payer has approved or declined, so a success here is
+     * the payment rather than an acknowledgement — the money has moved and the invoice is credited.
+     * There is nothing to poll and nothing further to wait for, so a sheet that stayed up would read
+     * as unfinished and somebody would wait at it.
+     *
+     * A failure is the opposite: the sheet stays exactly as it was, with the amount and the number
+     * still typed, because the next thing anybody does is try again.
+     */
     if (response.isSuccess) {
-      // Refresh invoice detail
       ref.invalidate(invoiceDetailProvider(widget.invoice.rrn ?? ''));
 
       if (mounted) {
