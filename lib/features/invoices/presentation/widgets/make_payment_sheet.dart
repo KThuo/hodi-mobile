@@ -39,9 +39,11 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
   @override
   void initState() {
     super.initState();
-    _amountController.text = widget.invoice.rentOwed.toStringAsFixed(0);
-    _paidByController.text = widget.invoice.tenantName ?? '';
-    _phoneController.text = _formatPhone(widget.invoice.tenantPhone ?? '');
+    // What is still owed, not the whole bill: prefilling the full amount on a part-paid
+    // invoice asks somebody to notice and correct it every time.
+    _amountController.text = widget.invoice.balance.toStringAsFixed(0);
+    _paidByController.text = widget.invoice.invoice.tenantName ?? '';
+    _phoneController.text = _formatPhone(widget.invoice.invoice.tenantPhone ?? '');
     _loadPaymentTypes();
   }
 
@@ -65,21 +67,24 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
     return phone;
   }
 
+  /// The ways this invoice may be paid.
+  ///
+  /// By reference alone. This used to need a property id and a self-managed flag, which meant the
+  /// app had to know whose account the money belongs in and could refuse outright — "Property
+  /// information not available" — whenever the detail payload happened not to carry the id. The
+  /// server resolves the property, the estate and the ownership from the reference now.
   Future<void> _loadPaymentTypes() async {
-    final propertyId = widget.invoice.propertyId;
-    if (propertyId == null) {
+    final rrn = widget.invoice.rrn;
+    if (rrn == null || rrn.isEmpty) {
       setState(() {
         _isLoadingTypes = false;
-        _typesError = 'Property information not available';
+        _typesError = 'This invoice has no reference to pay against';
       });
       return;
     }
 
     final repo = ref.read(invoiceRepositoryProvider);
-    final response = await repo.getPaymentTypes(
-      propertyId: propertyId,
-      isSelf: widget.invoice.self,
-    );
+    final response = await repo.payMethods(rrn);
 
     if (!mounted) return;
 
@@ -104,28 +109,41 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
 
     setState(() => _isSubmitting = true);
 
-    final payload = <String, dynamic>{
-      'invoiceId': widget.invoice.id,
-      'amount': double.tryParse(_amountController.text) ?? 0,
-      'paymentTypeId': int.tryParse(_selectedType!.typeId ?? '1') ?? 1,
-      'paidBy': _paidByController.text.trim(),
-      'description': _descriptionController.text.trim(),
-    };
-
-    // Method-specific fields
-    if (_selectedType!.typeId == '2') {
-      payload['refNo'] = _refNoController.text.trim();
-      payload['bankName'] =
-          '${_chequeNameController.text.trim()} (${_bankNameController.text.trim()})';
-    } else if (_selectedType!.typeId == '11') {
-      payload['refNo'] = _refNoController.text.trim();
-    } else if (_selectedType!.typeId == '12') {
-      payload['bankId'] = int.tryParse(_selectedType!.bankId ?? '');
-      payload['phoneNo'] = _phoneController.text.trim();
-    }
-
     final repo = ref.read(invoiceRepositoryProvider);
-    final response = await repo.receivePayment(payload: payload);
+    final amount = double.tryParse(_amountController.text) ?? 0;
+    final method = _selectedType!;
+
+    /*
+     * A prompt is not a payment, and it is not recorded as one.
+     *
+     * Pressing it asks the payer's handset for money; nothing has been received until they approve
+     * it and the gateway says so. Legacy posted STK through the same receive-payment call as cash,
+     * which wrote a payment for money that had not arrived. It has its own endpoint, and the channel
+     * is checked server-side against what this invoice actually offers.
+     */
+    final response = method.isPrompt
+        ? await repo.prompt(
+            rrn: widget.invoice.rrn ?? '',
+            paymentTypeId: method.id ?? '',
+            amount: amount,
+            phone: _formatPhone(_phoneController.text.trim()),
+          )
+        : await repo.receivePayment(payload: <String, dynamic>{
+            // The tenancy the money belongs to. The invoice narrows it; the tenancy is what a
+            // payment is actually against, which is how an overpayment finds somewhere to sit.
+            'occupationId': widget.invoice.invoice.occupationId,
+            'invoiceId': widget.invoice.invoice.id,
+            'amount': amount,
+            'method': method.renderAs,
+            'paymentAccountId': method.id,
+            if (_refNoController.text.trim().isNotEmpty)
+              'reference': _refNoController.text.trim(),
+            'paidBy': _paidByController.text.trim(),
+            if (_phoneController.text.trim().isNotEmpty)
+              'payerPhone': _formatPhone(_phoneController.text.trim()),
+            if (_descriptionController.text.trim().isNotEmpty)
+              'narration': _descriptionController.text.trim(),
+          });
 
     if (!mounted) return;
 
@@ -205,7 +223,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
                               style: HodiTextStyles.heading3),
                           const SizedBox(height: 2),
                           Text(
-                            'Amount Due: KES ${CurrencyFormatter.format(widget.invoice.rentOwed)}',
+                            'Amount Due: KES ${CurrencyFormatter.format(widget.invoice.balance)}',
                             style: HodiTextStyles.bodySmall
                                 .copyWith(color: HodiColors.textMedium),
                           ),
@@ -307,7 +325,9 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
           const SizedBox(height: 14),
 
           // Cheque-specific fields
-          if (_selectedType?.typeId == '2') ...[
+          // Which fields a method needs comes from `renderAs` now, not from a type id the app had
+          // memorised. A channel the app has never heard of renders its common fields and works.
+          if (_selectedType?.renderAs == 'CHEQUE') ...[
             HodiTextField(
               controller: _refNoController,
               labelText: 'Cheque Number *',
@@ -351,7 +371,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
           ],
 
           // Bank slip-specific fields
-          if (_selectedType?.typeId == '11') ...[
+          if (_selectedType?.renderAs == 'VALIDATE') ...[
             HodiTextField(
               controller: _refNoController,
               labelText: 'Slip Reference *',
@@ -368,7 +388,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
           ],
 
           // Bank deposit-specific fields
-          if (_selectedType?.typeId == '12') ...[
+          if (_selectedType?.isPrompt == true) ...[
             HodiTextField(
               controller: _phoneController,
               labelText: 'Phone Number *',
@@ -420,20 +440,9 @@ class _PaymentMethodSelector extends StatelessWidget {
     required this.onSelect,
   });
 
-  IconData _iconForType(PaymentTypeModel type) {
-    switch (type.typeId) {
-      case '1':
-        return Icons.money;
-      case '2':
-        return Icons.receipt_outlined;
-      case '11':
-        return Icons.receipt_long_outlined;
-      case '12':
-        return Icons.account_balance_outlined;
-      default:
-        return Icons.payment;
-    }
-  }
+  // The channel says what it is; the model turns that into a glyph. Kept as one line here so the
+  // mapping lives beside the other things a channel knows about itself rather than in a sheet.
+  IconData _iconForType(PaymentTypeModel type) => type.icon;
 
   @override
   Widget build(BuildContext context) {
@@ -441,8 +450,9 @@ class _PaymentMethodSelector extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: types.map((type) {
-        final isSelected = selected?.typeId == type.typeId &&
-            selected?.bankId == type.bankId;
+        // The id is the identity. It used to compare a type id and a bank id together, because
+        // two banks shared one type id; a hashed per-channel id needs no such pair.
+        final isSelected = selected?.id == type.id;
         return GestureDetector(
           onTap: () => onSelect(type),
           child: Container(

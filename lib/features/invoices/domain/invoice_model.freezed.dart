@@ -15,7 +15,17 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$InvoiceModel {
 
- int? get id; String? get rrn; String? get houseName; String? get houseCode; String? get estate; String? get property; String? get tenantName; String? get tenantPhone; String? get monthName; double get rentOwed; double get rentPaid; String? get category; String? get houseType; String? get dueDate; String? get paidOn; String? get voidedOn; int get status; bool get overdueEstate;
+/// Hashed and salted per user. Opaque: never parse it, never sort by it.
+ String? get id; String? get rrn; String? get invoiceType; int get status;/// The status in words, from the server. Preferred over reading [status]: the integers are a
+/// storage detail, and `RecordStatus.DELETED` is also 2, which has caught this codebase before.
+ String? get statusLabel;/// "September 2026" — composed by the server so the month's name exists in one language, in one
+/// place, rather than in every client that shows it.
+ String? get periodLabel; int get periodMonth; int get periodYear; String? get tenantName; String? get tenantPhone; String? get houseCode; String? get houseNumber;/// "WA03 (2nd Floor)" — the unit as somebody says it out loud.
+ String? get houseLabel; String? get propertyName; String? get estateName;@JsonKey(fromJson: parseDouble) double get amount;@JsonKey(fromJson: parseDouble) double get paidAmount;@JsonKey(fromJson: parseDouble) double get outstanding; String? get dueDate; String? get issuedOn;/// When it was settled in full — the date the last payment landed, not the date it was raised.
+/// Null on anything unsettled, and on a few migrated rows whose legacy record named no date.
+ String? get paidOn;/// Past its due date and still owed. What colours the row, and the server's judgement rather
+/// than a date comparison done differently on each client.
+ bool get overdue; String? get occupationId; String? get houseId;
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +38,16 @@ $InvoiceModelCopyWith<InvoiceModel> get copyWith => _$InvoiceModelCopyWithImpl<I
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.property, property) || other.property == property)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.monthName, monthName) || other.monthName == monthName)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.rentPaid, rentPaid) || other.rentPaid == rentPaid)&&(identical(other.category, category) || other.category == category)&&(identical(other.houseType, houseType) || other.houseType == houseType)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.paidOn, paidOn) || other.paidOn == paidOn)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.status, status) || other.status == status)&&(identical(other.overdueEstate, overdueEstate) || other.overdueEstate == overdueEstate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.invoiceType, invoiceType) || other.invoiceType == invoiceType)&&(identical(other.status, status) || other.status == status)&&(identical(other.statusLabel, statusLabel) || other.statusLabel == statusLabel)&&(identical(other.periodLabel, periodLabel) || other.periodLabel == periodLabel)&&(identical(other.periodMonth, periodMonth) || other.periodMonth == periodMonth)&&(identical(other.periodYear, periodYear) || other.periodYear == periodYear)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paidAmount, paidAmount) || other.paidAmount == paidAmount)&&(identical(other.outstanding, outstanding) || other.outstanding == outstanding)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.issuedOn, issuedOn) || other.issuedOn == issuedOn)&&(identical(other.paidOn, paidOn) || other.paidOn == paidOn)&&(identical(other.overdue, overdue) || other.overdue == overdue)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,rrn,houseName,houseCode,estate,property,tenantName,tenantPhone,monthName,rentOwed,rentPaid,category,houseType,dueDate,paidOn,voidedOn,status,overdueEstate);
+int get hashCode => Object.hashAll([runtimeType,id,rrn,invoiceType,status,statusLabel,periodLabel,periodMonth,periodYear,tenantName,tenantPhone,houseCode,houseNumber,houseLabel,propertyName,estateName,amount,paidAmount,outstanding,dueDate,issuedOn,paidOn,overdue,occupationId,houseId]);
 
 @override
 String toString() {
-  return 'InvoiceModel(id: $id, rrn: $rrn, houseName: $houseName, houseCode: $houseCode, estate: $estate, property: $property, tenantName: $tenantName, tenantPhone: $tenantPhone, monthName: $monthName, rentOwed: $rentOwed, rentPaid: $rentPaid, category: $category, houseType: $houseType, dueDate: $dueDate, paidOn: $paidOn, voidedOn: $voidedOn, status: $status, overdueEstate: $overdueEstate)';
+  return 'InvoiceModel(id: $id, rrn: $rrn, invoiceType: $invoiceType, status: $status, statusLabel: $statusLabel, periodLabel: $periodLabel, periodMonth: $periodMonth, periodYear: $periodYear, tenantName: $tenantName, tenantPhone: $tenantPhone, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, amount: $amount, paidAmount: $paidAmount, outstanding: $outstanding, dueDate: $dueDate, issuedOn: $issuedOn, paidOn: $paidOn, overdue: $overdue, occupationId: $occupationId, houseId: $houseId)';
 }
 
 
@@ -48,7 +58,7 @@ abstract mixin class $InvoiceModelCopyWith<$Res>  {
   factory $InvoiceModelCopyWith(InvoiceModel value, $Res Function(InvoiceModel) _then) = _$InvoiceModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String? rrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? category, String? houseType, String? dueDate, String? paidOn, String? voidedOn, int status, bool overdueEstate
+ String? id, String? rrn, String? invoiceType, int status, String? statusLabel, String? periodLabel, int periodMonth, int periodYear, String? tenantName, String? tenantPhone, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double amount,@JsonKey(fromJson: parseDouble) double paidAmount,@JsonKey(fromJson: parseDouble) double outstanding, String? dueDate, String? issuedOn, String? paidOn, bool overdue, String? occupationId, String? houseId
 });
 
 
@@ -65,27 +75,33 @@ class _$InvoiceModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? category = freezed,Object? houseType = freezed,Object? dueDate = freezed,Object? paidOn = freezed,Object? voidedOn = freezed,Object? status = null,Object? overdueEstate = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? rrn = freezed,Object? invoiceType = freezed,Object? status = null,Object? statusLabel = freezed,Object? periodLabel = freezed,Object? periodMonth = null,Object? periodYear = null,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? amount = null,Object? paidAmount = null,Object? outstanding = null,Object? dueDate = freezed,Object? issuedOn = freezed,Object? paidOn = freezed,Object? overdue = null,Object? occupationId = freezed,Object? houseId = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
-as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
-as String?,monthName: freezed == monthName ? _self.monthName : monthName // ignore: cast_nullable_to_non_nullable
-as String?,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
-as double,rentPaid: null == rentPaid ? _self.rentPaid : rentPaid // ignore: cast_nullable_to_non_nullable
-as double,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable
-as String?,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
-as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
-as String?,voidedOn: freezed == voidedOn ? _self.voidedOn : voidedOn // ignore: cast_nullable_to_non_nullable
+as String?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
+as String?,invoiceType: freezed == invoiceType ? _self.invoiceType : invoiceType // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int,overdueEstate: null == overdueEstate ? _self.overdueEstate : overdueEstate // ignore: cast_nullable_to_non_nullable
-as bool,
+as int,statusLabel: freezed == statusLabel ? _self.statusLabel : statusLabel // ignore: cast_nullable_to_non_nullable
+as String?,periodLabel: freezed == periodLabel ? _self.periodLabel : periodLabel // ignore: cast_nullable_to_non_nullable
+as String?,periodMonth: null == periodMonth ? _self.periodMonth : periodMonth // ignore: cast_nullable_to_non_nullable
+as int,periodYear: null == periodYear ? _self.periodYear : periodYear // ignore: cast_nullable_to_non_nullable
+as int,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
+as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double,paidAmount: null == paidAmount ? _self.paidAmount : paidAmount // ignore: cast_nullable_to_non_nullable
+as double,outstanding: null == outstanding ? _self.outstanding : outstanding // ignore: cast_nullable_to_non_nullable
+as double,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
+as String?,issuedOn: freezed == issuedOn ? _self.issuedOn : issuedOn // ignore: cast_nullable_to_non_nullable
+as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
+as String?,overdue: null == overdue ? _self.overdue : overdue // ignore: cast_nullable_to_non_nullable
+as bool,occupationId: freezed == occupationId ? _self.occupationId : occupationId // ignore: cast_nullable_to_non_nullable
+as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -170,10 +186,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  int status,  bool overdueEstate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? rrn,  String? invoiceType,  int status,  String? statusLabel,  String? periodLabel,  int periodMonth,  int periodYear,  String? tenantName,  String? tenantPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double paidAmount, @JsonKey(fromJson: parseDouble)  double outstanding,  String? dueDate,  String? issuedOn,  String? paidOn,  bool overdue,  String? occupationId,  String? houseId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _InvoiceModel() when $default != null:
-return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.category,_that.houseType,_that.dueDate,_that.paidOn,_that.voidedOn,_that.status,_that.overdueEstate);case _:
+return $default(_that.id,_that.rrn,_that.invoiceType,_that.status,_that.statusLabel,_that.periodLabel,_that.periodMonth,_that.periodYear,_that.tenantName,_that.tenantPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.paidAmount,_that.outstanding,_that.dueDate,_that.issuedOn,_that.paidOn,_that.overdue,_that.occupationId,_that.houseId);case _:
   return orElse();
 
 }
@@ -191,10 +207,10 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  int status,  bool overdueEstate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? rrn,  String? invoiceType,  int status,  String? statusLabel,  String? periodLabel,  int periodMonth,  int periodYear,  String? tenantName,  String? tenantPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double paidAmount, @JsonKey(fromJson: parseDouble)  double outstanding,  String? dueDate,  String? issuedOn,  String? paidOn,  bool overdue,  String? occupationId,  String? houseId)  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceModel():
-return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.category,_that.houseType,_that.dueDate,_that.paidOn,_that.voidedOn,_that.status,_that.overdueEstate);case _:
+return $default(_that.id,_that.rrn,_that.invoiceType,_that.status,_that.statusLabel,_that.periodLabel,_that.periodMonth,_that.periodYear,_that.tenantName,_that.tenantPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.paidAmount,_that.outstanding,_that.dueDate,_that.issuedOn,_that.paidOn,_that.overdue,_that.occupationId,_that.houseId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -211,10 +227,10 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? rrn,  String? houseName,  String? houseCode,  String? estate,  String? property,  String? tenantName,  String? tenantPhone,  String? monthName,  double rentOwed,  double rentPaid,  String? category,  String? houseType,  String? dueDate,  String? paidOn,  String? voidedOn,  int status,  bool overdueEstate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? rrn,  String? invoiceType,  int status,  String? statusLabel,  String? periodLabel,  int periodMonth,  int periodYear,  String? tenantName,  String? tenantPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double paidAmount, @JsonKey(fromJson: parseDouble)  double outstanding,  String? dueDate,  String? issuedOn,  String? paidOn,  bool overdue,  String? occupationId,  String? houseId)?  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceModel() when $default != null:
-return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,_that.property,_that.tenantName,_that.tenantPhone,_that.monthName,_that.rentOwed,_that.rentPaid,_that.category,_that.houseType,_that.dueDate,_that.paidOn,_that.voidedOn,_that.status,_that.overdueEstate);case _:
+return $default(_that.id,_that.rrn,_that.invoiceType,_that.status,_that.statusLabel,_that.periodLabel,_that.periodMonth,_that.periodYear,_that.tenantName,_that.tenantPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.paidAmount,_that.outstanding,_that.dueDate,_that.issuedOn,_that.paidOn,_that.overdue,_that.occupationId,_that.houseId);case _:
   return null;
 
 }
@@ -226,27 +242,43 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.estate,
 @JsonSerializable()
 
 class _InvoiceModel extends InvoiceModel {
-  const _InvoiceModel({this.id, this.rrn, this.houseName, this.houseCode, this.estate, this.property, this.tenantName, this.tenantPhone, this.monthName, this.rentOwed = 0, this.rentPaid = 0, this.category, this.houseType, this.dueDate, this.paidOn, this.voidedOn, this.status = 0, this.overdueEstate = false}): super._();
+  const _InvoiceModel({this.id, this.rrn, this.invoiceType, this.status = 0, this.statusLabel, this.periodLabel, this.periodMonth = 0, this.periodYear = 0, this.tenantName, this.tenantPhone, this.houseCode, this.houseNumber, this.houseLabel, this.propertyName, this.estateName, @JsonKey(fromJson: parseDouble) this.amount = 0, @JsonKey(fromJson: parseDouble) this.paidAmount = 0, @JsonKey(fromJson: parseDouble) this.outstanding = 0, this.dueDate, this.issuedOn, this.paidOn, this.overdue = false, this.occupationId, this.houseId}): super._();
   factory _InvoiceModel.fromJson(Map<String, dynamic> json) => _$InvoiceModelFromJson(json);
 
-@override final  int? id;
+/// Hashed and salted per user. Opaque: never parse it, never sort by it.
+@override final  String? id;
 @override final  String? rrn;
-@override final  String? houseName;
-@override final  String? houseCode;
-@override final  String? estate;
-@override final  String? property;
+@override final  String? invoiceType;
+@override@JsonKey() final  int status;
+/// The status in words, from the server. Preferred over reading [status]: the integers are a
+/// storage detail, and `RecordStatus.DELETED` is also 2, which has caught this codebase before.
+@override final  String? statusLabel;
+/// "September 2026" — composed by the server so the month's name exists in one language, in one
+/// place, rather than in every client that shows it.
+@override final  String? periodLabel;
+@override@JsonKey() final  int periodMonth;
+@override@JsonKey() final  int periodYear;
 @override final  String? tenantName;
 @override final  String? tenantPhone;
-@override final  String? monthName;
-@override@JsonKey() final  double rentOwed;
-@override@JsonKey() final  double rentPaid;
-@override final  String? category;
-@override final  String? houseType;
+@override final  String? houseCode;
+@override final  String? houseNumber;
+/// "WA03 (2nd Floor)" — the unit as somebody says it out loud.
+@override final  String? houseLabel;
+@override final  String? propertyName;
+@override final  String? estateName;
+@override@JsonKey(fromJson: parseDouble) final  double amount;
+@override@JsonKey(fromJson: parseDouble) final  double paidAmount;
+@override@JsonKey(fromJson: parseDouble) final  double outstanding;
 @override final  String? dueDate;
+@override final  String? issuedOn;
+/// When it was settled in full — the date the last payment landed, not the date it was raised.
+/// Null on anything unsettled, and on a few migrated rows whose legacy record named no date.
 @override final  String? paidOn;
-@override final  String? voidedOn;
-@override@JsonKey() final  int status;
-@override@JsonKey() final  bool overdueEstate;
+/// Past its due date and still owed. What colours the row, and the server's judgement rather
+/// than a date comparison done differently on each client.
+@override@JsonKey() final  bool overdue;
+@override final  String? occupationId;
+@override final  String? houseId;
 
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
@@ -261,16 +293,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.property, property) || other.property == property)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.monthName, monthName) || other.monthName == monthName)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.rentPaid, rentPaid) || other.rentPaid == rentPaid)&&(identical(other.category, category) || other.category == category)&&(identical(other.houseType, houseType) || other.houseType == houseType)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.paidOn, paidOn) || other.paidOn == paidOn)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.status, status) || other.status == status)&&(identical(other.overdueEstate, overdueEstate) || other.overdueEstate == overdueEstate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.invoiceType, invoiceType) || other.invoiceType == invoiceType)&&(identical(other.status, status) || other.status == status)&&(identical(other.statusLabel, statusLabel) || other.statusLabel == statusLabel)&&(identical(other.periodLabel, periodLabel) || other.periodLabel == periodLabel)&&(identical(other.periodMonth, periodMonth) || other.periodMonth == periodMonth)&&(identical(other.periodYear, periodYear) || other.periodYear == periodYear)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paidAmount, paidAmount) || other.paidAmount == paidAmount)&&(identical(other.outstanding, outstanding) || other.outstanding == outstanding)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.issuedOn, issuedOn) || other.issuedOn == issuedOn)&&(identical(other.paidOn, paidOn) || other.paidOn == paidOn)&&(identical(other.overdue, overdue) || other.overdue == overdue)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,rrn,houseName,houseCode,estate,property,tenantName,tenantPhone,monthName,rentOwed,rentPaid,category,houseType,dueDate,paidOn,voidedOn,status,overdueEstate);
+int get hashCode => Object.hashAll([runtimeType,id,rrn,invoiceType,status,statusLabel,periodLabel,periodMonth,periodYear,tenantName,tenantPhone,houseCode,houseNumber,houseLabel,propertyName,estateName,amount,paidAmount,outstanding,dueDate,issuedOn,paidOn,overdue,occupationId,houseId]);
 
 @override
 String toString() {
-  return 'InvoiceModel(id: $id, rrn: $rrn, houseName: $houseName, houseCode: $houseCode, estate: $estate, property: $property, tenantName: $tenantName, tenantPhone: $tenantPhone, monthName: $monthName, rentOwed: $rentOwed, rentPaid: $rentPaid, category: $category, houseType: $houseType, dueDate: $dueDate, paidOn: $paidOn, voidedOn: $voidedOn, status: $status, overdueEstate: $overdueEstate)';
+  return 'InvoiceModel(id: $id, rrn: $rrn, invoiceType: $invoiceType, status: $status, statusLabel: $statusLabel, periodLabel: $periodLabel, periodMonth: $periodMonth, periodYear: $periodYear, tenantName: $tenantName, tenantPhone: $tenantPhone, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, amount: $amount, paidAmount: $paidAmount, outstanding: $outstanding, dueDate: $dueDate, issuedOn: $issuedOn, paidOn: $paidOn, overdue: $overdue, occupationId: $occupationId, houseId: $houseId)';
 }
 
 
@@ -281,7 +313,7 @@ abstract mixin class _$InvoiceModelCopyWith<$Res> implements $InvoiceModelCopyWi
   factory _$InvoiceModelCopyWith(_InvoiceModel value, $Res Function(_InvoiceModel) _then) = __$InvoiceModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String? rrn, String? houseName, String? houseCode, String? estate, String? property, String? tenantName, String? tenantPhone, String? monthName, double rentOwed, double rentPaid, String? category, String? houseType, String? dueDate, String? paidOn, String? voidedOn, int status, bool overdueEstate
+ String? id, String? rrn, String? invoiceType, int status, String? statusLabel, String? periodLabel, int periodMonth, int periodYear, String? tenantName, String? tenantPhone, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double amount,@JsonKey(fromJson: parseDouble) double paidAmount,@JsonKey(fromJson: parseDouble) double outstanding, String? dueDate, String? issuedOn, String? paidOn, bool overdue, String? occupationId, String? houseId
 });
 
 
@@ -298,27 +330,33 @@ class __$InvoiceModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? estate = freezed,Object? property = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? monthName = freezed,Object? rentOwed = null,Object? rentPaid = null,Object? category = freezed,Object? houseType = freezed,Object? dueDate = freezed,Object? paidOn = freezed,Object? voidedOn = freezed,Object? status = null,Object? overdueEstate = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? rrn = freezed,Object? invoiceType = freezed,Object? status = null,Object? statusLabel = freezed,Object? periodLabel = freezed,Object? periodMonth = null,Object? periodYear = null,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? amount = null,Object? paidAmount = null,Object? outstanding = null,Object? dueDate = freezed,Object? issuedOn = freezed,Object? paidOn = freezed,Object? overdue = null,Object? occupationId = freezed,Object? houseId = freezed,}) {
   return _then(_InvoiceModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
-as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
-as String?,monthName: freezed == monthName ? _self.monthName : monthName // ignore: cast_nullable_to_non_nullable
-as String?,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
-as double,rentPaid: null == rentPaid ? _self.rentPaid : rentPaid // ignore: cast_nullable_to_non_nullable
-as double,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable
-as String?,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
-as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
-as String?,voidedOn: freezed == voidedOn ? _self.voidedOn : voidedOn // ignore: cast_nullable_to_non_nullable
+as String?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
+as String?,invoiceType: freezed == invoiceType ? _self.invoiceType : invoiceType // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int,overdueEstate: null == overdueEstate ? _self.overdueEstate : overdueEstate // ignore: cast_nullable_to_non_nullable
-as bool,
+as int,statusLabel: freezed == statusLabel ? _self.statusLabel : statusLabel // ignore: cast_nullable_to_non_nullable
+as String?,periodLabel: freezed == periodLabel ? _self.periodLabel : periodLabel // ignore: cast_nullable_to_non_nullable
+as String?,periodMonth: null == periodMonth ? _self.periodMonth : periodMonth // ignore: cast_nullable_to_non_nullable
+as int,periodYear: null == periodYear ? _self.periodYear : periodYear // ignore: cast_nullable_to_non_nullable
+as int,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
+as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double,paidAmount: null == paidAmount ? _self.paidAmount : paidAmount // ignore: cast_nullable_to_non_nullable
+as double,outstanding: null == outstanding ? _self.outstanding : outstanding // ignore: cast_nullable_to_non_nullable
+as double,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
+as String?,issuedOn: freezed == issuedOn ? _self.issuedOn : issuedOn // ignore: cast_nullable_to_non_nullable
+as String?,paidOn: freezed == paidOn ? _self.paidOn : paidOn // ignore: cast_nullable_to_non_nullable
+as String?,overdue: null == overdue ? _self.overdue : overdue // ignore: cast_nullable_to_non_nullable
+as bool,occupationId: freezed == occupationId ? _self.occupationId : occupationId // ignore: cast_nullable_to_non_nullable
+as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

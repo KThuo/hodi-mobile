@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PaymentTypeModel {
 
- String? get typeId; String? get bankId; String? get name;
+/// Hashed. It goes back on the prompt, and is checked against what this invoice actually offers.
+ String? get id; String? get name;/// `STK`, `VALIDATE`, `CASH`, `CHEQUE` or `TRANSFER`. Which form the pay screen should show.
+ String get renderAs; String? get bankName; String? get bankLogoUrl; String? get payBillNo; String? get accountNo;
 /// Create a copy of PaymentTypeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +30,16 @@ $PaymentTypeModelCopyWith<PaymentTypeModel> get copyWith => _$PaymentTypeModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentTypeModel&&(identical(other.typeId, typeId) || other.typeId == typeId)&&(identical(other.bankId, bankId) || other.bankId == bankId)&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentTypeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.renderAs, renderAs) || other.renderAs == renderAs)&&(identical(other.bankName, bankName) || other.bankName == bankName)&&(identical(other.bankLogoUrl, bankLogoUrl) || other.bankLogoUrl == bankLogoUrl)&&(identical(other.payBillNo, payBillNo) || other.payBillNo == payBillNo)&&(identical(other.accountNo, accountNo) || other.accountNo == accountNo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,typeId,bankId,name);
+int get hashCode => Object.hash(runtimeType,id,name,renderAs,bankName,bankLogoUrl,payBillNo,accountNo);
 
 @override
 String toString() {
-  return 'PaymentTypeModel(typeId: $typeId, bankId: $bankId, name: $name)';
+  return 'PaymentTypeModel(id: $id, name: $name, renderAs: $renderAs, bankName: $bankName, bankLogoUrl: $bankLogoUrl, payBillNo: $payBillNo, accountNo: $accountNo)';
 }
 
 
@@ -48,7 +50,7 @@ abstract mixin class $PaymentTypeModelCopyWith<$Res>  {
   factory $PaymentTypeModelCopyWith(PaymentTypeModel value, $Res Function(PaymentTypeModel) _then) = _$PaymentTypeModelCopyWithImpl;
 @useResult
 $Res call({
- String? typeId, String? bankId, String? name
+ String? id, String? name, String renderAs, String? bankName, String? bankLogoUrl, String? payBillNo, String? accountNo
 });
 
 
@@ -65,11 +67,15 @@ class _$PaymentTypeModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentTypeModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? typeId = freezed,Object? bankId = freezed,Object? name = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? renderAs = null,Object? bankName = freezed,Object? bankLogoUrl = freezed,Object? payBillNo = freezed,Object? accountNo = freezed,}) {
   return _then(_self.copyWith(
-typeId: freezed == typeId ? _self.typeId : typeId // ignore: cast_nullable_to_non_nullable
-as String?,bankId: freezed == bankId ? _self.bankId : bankId // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,renderAs: null == renderAs ? _self.renderAs : renderAs // ignore: cast_nullable_to_non_nullable
+as String,bankName: freezed == bankName ? _self.bankName : bankName // ignore: cast_nullable_to_non_nullable
+as String?,bankLogoUrl: freezed == bankLogoUrl ? _self.bankLogoUrl : bankLogoUrl // ignore: cast_nullable_to_non_nullable
+as String?,payBillNo: freezed == payBillNo ? _self.payBillNo : payBillNo // ignore: cast_nullable_to_non_nullable
+as String?,accountNo: freezed == accountNo ? _self.accountNo : accountNo // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -155,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? typeId,  String? bankId,  String? name)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? name,  String renderAs,  String? bankName,  String? bankLogoUrl,  String? payBillNo,  String? accountNo)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PaymentTypeModel() when $default != null:
-return $default(_that.typeId,_that.bankId,_that.name);case _:
+return $default(_that.id,_that.name,_that.renderAs,_that.bankName,_that.bankLogoUrl,_that.payBillNo,_that.accountNo);case _:
   return orElse();
 
 }
@@ -176,10 +182,10 @@ return $default(_that.typeId,_that.bankId,_that.name);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? typeId,  String? bankId,  String? name)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? name,  String renderAs,  String? bankName,  String? bankLogoUrl,  String? payBillNo,  String? accountNo)  $default,) {final _that = this;
 switch (_that) {
 case _PaymentTypeModel():
-return $default(_that.typeId,_that.bankId,_that.name);case _:
+return $default(_that.id,_that.name,_that.renderAs,_that.bankName,_that.bankLogoUrl,_that.payBillNo,_that.accountNo);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +202,10 @@ return $default(_that.typeId,_that.bankId,_that.name);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? typeId,  String? bankId,  String? name)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? name,  String renderAs,  String? bankName,  String? bankLogoUrl,  String? payBillNo,  String? accountNo)?  $default,) {final _that = this;
 switch (_that) {
 case _PaymentTypeModel() when $default != null:
-return $default(_that.typeId,_that.bankId,_that.name);case _:
+return $default(_that.id,_that.name,_that.renderAs,_that.bankName,_that.bankLogoUrl,_that.payBillNo,_that.accountNo);case _:
   return null;
 
 }
@@ -211,12 +217,18 @@ return $default(_that.typeId,_that.bankId,_that.name);case _:
 @JsonSerializable()
 
 class _PaymentTypeModel extends PaymentTypeModel {
-  const _PaymentTypeModel({this.typeId, this.bankId, this.name}): super._();
+  const _PaymentTypeModel({this.id, this.name, this.renderAs = '', this.bankName, this.bankLogoUrl, this.payBillNo, this.accountNo}): super._();
   factory _PaymentTypeModel.fromJson(Map<String, dynamic> json) => _$PaymentTypeModelFromJson(json);
 
-@override final  String? typeId;
-@override final  String? bankId;
+/// Hashed. It goes back on the prompt, and is checked against what this invoice actually offers.
+@override final  String? id;
 @override final  String? name;
+/// `STK`, `VALIDATE`, `CASH`, `CHEQUE` or `TRANSFER`. Which form the pay screen should show.
+@override@JsonKey() final  String renderAs;
+@override final  String? bankName;
+@override final  String? bankLogoUrl;
+@override final  String? payBillNo;
+@override final  String? accountNo;
 
 /// Create a copy of PaymentTypeModel
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentTypeModel&&(identical(other.typeId, typeId) || other.typeId == typeId)&&(identical(other.bankId, bankId) || other.bankId == bankId)&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentTypeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.renderAs, renderAs) || other.renderAs == renderAs)&&(identical(other.bankName, bankName) || other.bankName == bankName)&&(identical(other.bankLogoUrl, bankLogoUrl) || other.bankLogoUrl == bankLogoUrl)&&(identical(other.payBillNo, payBillNo) || other.payBillNo == payBillNo)&&(identical(other.accountNo, accountNo) || other.accountNo == accountNo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,typeId,bankId,name);
+int get hashCode => Object.hash(runtimeType,id,name,renderAs,bankName,bankLogoUrl,payBillNo,accountNo);
 
 @override
 String toString() {
-  return 'PaymentTypeModel(typeId: $typeId, bankId: $bankId, name: $name)';
+  return 'PaymentTypeModel(id: $id, name: $name, renderAs: $renderAs, bankName: $bankName, bankLogoUrl: $bankLogoUrl, payBillNo: $payBillNo, accountNo: $accountNo)';
 }
 
 
@@ -251,7 +263,7 @@ abstract mixin class _$PaymentTypeModelCopyWith<$Res> implements $PaymentTypeMod
   factory _$PaymentTypeModelCopyWith(_PaymentTypeModel value, $Res Function(_PaymentTypeModel) _then) = __$PaymentTypeModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? typeId, String? bankId, String? name
+ String? id, String? name, String renderAs, String? bankName, String? bankLogoUrl, String? payBillNo, String? accountNo
 });
 
 
@@ -268,11 +280,15 @@ class __$PaymentTypeModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentTypeModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? typeId = freezed,Object? bankId = freezed,Object? name = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? renderAs = null,Object? bankName = freezed,Object? bankLogoUrl = freezed,Object? payBillNo = freezed,Object? accountNo = freezed,}) {
   return _then(_PaymentTypeModel(
-typeId: freezed == typeId ? _self.typeId : typeId // ignore: cast_nullable_to_non_nullable
-as String?,bankId: freezed == bankId ? _self.bankId : bankId // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,renderAs: null == renderAs ? _self.renderAs : renderAs // ignore: cast_nullable_to_non_nullable
+as String,bankName: freezed == bankName ? _self.bankName : bankName // ignore: cast_nullable_to_non_nullable
+as String?,bankLogoUrl: freezed == bankLogoUrl ? _self.bankLogoUrl : bankLogoUrl // ignore: cast_nullable_to_non_nullable
+as String?,payBillNo: freezed == payBillNo ? _self.payBillNo : payBillNo // ignore: cast_nullable_to_non_nullable
+as String?,accountNo: freezed == accountNo ? _self.accountNo : accountNo // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

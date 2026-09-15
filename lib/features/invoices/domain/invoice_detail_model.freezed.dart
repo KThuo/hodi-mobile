@@ -15,7 +15,15 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$InvoiceDetailModel {
 
- String? get rrn; String? get month; String? get estateName; String? get houseNumber; String? get houseCode; String? get date; String? get location; String? get propertyName;@JsonKey(fromJson: parseDouble) double get invoiceAmount;@JsonKey(fromJson: parseDouble) double get rentOwed;@JsonKey(fromJson: parseDouble) double get paidAmount; String? get contactNo; String? get contactEmail; String? get status; int get flag; String? get tenantName; String? get tenantPhone; String? get tenantEmail; String? get message;@JsonKey(name: 'bills') List<InvoiceLineItem> get items; bool get self; int? get propertyId; int? get estateId; int? get id; String? get currency; String? get paymentInstructions; String? get invoiceFooter;
+ InvoiceModel get invoice; List<InvoiceLineItem> get lines;/// Arrears carried into this invoice from earlier periods.
+///
+/// Inside [InvoiceModel.amount] and outside the sum of [lines], which is why it is stated
+/// separately: a detail screen that added the lines and expected the total would be short by
+/// exactly this, and would look like an arithmetic bug rather than a brought-forward balance.
+@JsonKey(fromJson: parseDouble) double get broughtForward;/// What is actually due — the amount less what has been paid.
+@JsonKey(fromJson: parseDouble) double get totalPayable; String? get voidReason; String? get voidedBy; String? get voidedOn;/// How to pay, and the footer — both resolved server-side from the property and the estate, so
+/// a document the app renders says what the printed one says.
+ String? get paymentInstructions; String? get footer;
 /// Create a copy of InvoiceDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +36,16 @@ $InvoiceDetailModelCopyWith<InvoiceDetailModel> get copyWith => _$InvoiceDetailM
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceDetailModel&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.month, month) || other.month == month)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.date, date) || other.date == date)&&(identical(other.location, location) || other.location == location)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.invoiceAmount, invoiceAmount) || other.invoiceAmount == invoiceAmount)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.paidAmount, paidAmount) || other.paidAmount == paidAmount)&&(identical(other.contactNo, contactNo) || other.contactNo == contactNo)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail)&&(identical(other.status, status) || other.status == status)&&(identical(other.flag, flag) || other.flag == flag)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.tenantEmail, tenantEmail) || other.tenantEmail == tenantEmail)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.self, self) || other.self == self)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.id, id) || other.id == id)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.invoiceFooter, invoiceFooter) || other.invoiceFooter == invoiceFooter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceDetailModel&&(identical(other.invoice, invoice) || other.invoice == invoice)&&const DeepCollectionEquality().equals(other.lines, lines)&&(identical(other.broughtForward, broughtForward) || other.broughtForward == broughtForward)&&(identical(other.totalPayable, totalPayable) || other.totalPayable == totalPayable)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.voidedBy, voidedBy) || other.voidedBy == voidedBy)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.footer, footer) || other.footer == footer));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,rrn,month,estateName,houseNumber,houseCode,date,location,propertyName,invoiceAmount,rentOwed,paidAmount,contactNo,contactEmail,status,flag,tenantName,tenantPhone,tenantEmail,message,const DeepCollectionEquality().hash(items),self,propertyId,estateId,id,currency,paymentInstructions,invoiceFooter]);
+int get hashCode => Object.hash(runtimeType,invoice,const DeepCollectionEquality().hash(lines),broughtForward,totalPayable,voidReason,voidedBy,voidedOn,paymentInstructions,footer);
 
 @override
 String toString() {
-  return 'InvoiceDetailModel(rrn: $rrn, month: $month, estateName: $estateName, houseNumber: $houseNumber, houseCode: $houseCode, date: $date, location: $location, propertyName: $propertyName, invoiceAmount: $invoiceAmount, rentOwed: $rentOwed, paidAmount: $paidAmount, contactNo: $contactNo, contactEmail: $contactEmail, status: $status, flag: $flag, tenantName: $tenantName, tenantPhone: $tenantPhone, tenantEmail: $tenantEmail, message: $message, items: $items, self: $self, propertyId: $propertyId, estateId: $estateId, id: $id, currency: $currency, paymentInstructions: $paymentInstructions, invoiceFooter: $invoiceFooter)';
+  return 'InvoiceDetailModel(invoice: $invoice, lines: $lines, broughtForward: $broughtForward, totalPayable: $totalPayable, voidReason: $voidReason, voidedBy: $voidedBy, voidedOn: $voidedOn, paymentInstructions: $paymentInstructions, footer: $footer)';
 }
 
 
@@ -48,11 +56,11 @@ abstract mixin class $InvoiceDetailModelCopyWith<$Res>  {
   factory $InvoiceDetailModelCopyWith(InvoiceDetailModel value, $Res Function(InvoiceDetailModel) _then) = _$InvoiceDetailModelCopyWithImpl;
 @useResult
 $Res call({
- String? rrn, String? month, String? estateName, String? houseNumber, String? houseCode, String? date, String? location, String? propertyName,@JsonKey(fromJson: parseDouble) double invoiceAmount,@JsonKey(fromJson: parseDouble) double rentOwed,@JsonKey(fromJson: parseDouble) double paidAmount, String? contactNo, String? contactEmail, String? status, int flag, String? tenantName, String? tenantPhone, String? tenantEmail, String? message,@JsonKey(name: 'bills') List<InvoiceLineItem> items, bool self, int? propertyId, int? estateId, int? id, String? currency, String? paymentInstructions, String? invoiceFooter
+ InvoiceModel invoice, List<InvoiceLineItem> lines,@JsonKey(fromJson: parseDouble) double broughtForward,@JsonKey(fromJson: parseDouble) double totalPayable, String? voidReason, String? voidedBy, String? voidedOn, String? paymentInstructions, String? footer
 });
 
 
-
+$InvoiceModelCopyWith<$Res> get invoice;
 
 }
 /// @nodoc
@@ -65,39 +73,30 @@ class _$InvoiceDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? rrn = freezed,Object? month = freezed,Object? estateName = freezed,Object? houseNumber = freezed,Object? houseCode = freezed,Object? date = freezed,Object? location = freezed,Object? propertyName = freezed,Object? invoiceAmount = null,Object? rentOwed = null,Object? paidAmount = null,Object? contactNo = freezed,Object? contactEmail = freezed,Object? status = freezed,Object? flag = null,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? tenantEmail = freezed,Object? message = freezed,Object? items = null,Object? self = null,Object? propertyId = freezed,Object? estateId = freezed,Object? id = freezed,Object? currency = freezed,Object? paymentInstructions = freezed,Object? invoiceFooter = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? invoice = null,Object? lines = null,Object? broughtForward = null,Object? totalPayable = null,Object? voidReason = freezed,Object? voidedBy = freezed,Object? voidedOn = freezed,Object? paymentInstructions = freezed,Object? footer = freezed,}) {
   return _then(_self.copyWith(
-rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
-as String?,month: freezed == month ? _self.month : month // ignore: cast_nullable_to_non_nullable
-as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,date: freezed == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
-as String?,invoiceAmount: null == invoiceAmount ? _self.invoiceAmount : invoiceAmount // ignore: cast_nullable_to_non_nullable
-as double,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
-as double,paidAmount: null == paidAmount ? _self.paidAmount : paidAmount // ignore: cast_nullable_to_non_nullable
-as double,contactNo: freezed == contactNo ? _self.contactNo : contactNo // ignore: cast_nullable_to_non_nullable
-as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,flag: null == flag ? _self.flag : flag // ignore: cast_nullable_to_non_nullable
-as int,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
-as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
-as String?,tenantEmail: freezed == tenantEmail ? _self.tenantEmail : tenantEmail // ignore: cast_nullable_to_non_nullable
-as String?,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String?,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
-as List<InvoiceLineItem>,self: null == self ? _self.self : self // ignore: cast_nullable_to_non_nullable
-as bool,propertyId: freezed == propertyId ? _self.propertyId : propertyId // ignore: cast_nullable_to_non_nullable
-as int?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
-as int?,id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,currency: freezed == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+invoice: null == invoice ? _self.invoice : invoice // ignore: cast_nullable_to_non_nullable
+as InvoiceModel,lines: null == lines ? _self.lines : lines // ignore: cast_nullable_to_non_nullable
+as List<InvoiceLineItem>,broughtForward: null == broughtForward ? _self.broughtForward : broughtForward // ignore: cast_nullable_to_non_nullable
+as double,totalPayable: null == totalPayable ? _self.totalPayable : totalPayable // ignore: cast_nullable_to_non_nullable
+as double,voidReason: freezed == voidReason ? _self.voidReason : voidReason // ignore: cast_nullable_to_non_nullable
+as String?,voidedBy: freezed == voidedBy ? _self.voidedBy : voidedBy // ignore: cast_nullable_to_non_nullable
+as String?,voidedOn: freezed == voidedOn ? _self.voidedOn : voidedOn // ignore: cast_nullable_to_non_nullable
 as String?,paymentInstructions: freezed == paymentInstructions ? _self.paymentInstructions : paymentInstructions // ignore: cast_nullable_to_non_nullable
-as String?,invoiceFooter: freezed == invoiceFooter ? _self.invoiceFooter : invoiceFooter // ignore: cast_nullable_to_non_nullable
+as String?,footer: freezed == footer ? _self.footer : footer // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
-
+/// Create a copy of InvoiceDetailModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$InvoiceModelCopyWith<$Res> get invoice {
+  
+  return $InvoiceModelCopyWith<$Res>(_self.invoice, (value) {
+    return _then(_self.copyWith(invoice: value));
+  });
+}
 }
 
 
@@ -179,10 +178,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? rrn,  String? month,  String? estateName,  String? houseNumber,  String? houseCode,  String? date,  String? location,  String? propertyName, @JsonKey(fromJson: parseDouble)  double invoiceAmount, @JsonKey(fromJson: parseDouble)  double rentOwed, @JsonKey(fromJson: parseDouble)  double paidAmount,  String? contactNo,  String? contactEmail,  String? status,  int flag,  String? tenantName,  String? tenantPhone,  String? tenantEmail,  String? message, @JsonKey(name: 'bills')  List<InvoiceLineItem> items,  bool self,  int? propertyId,  int? estateId,  int? id,  String? currency,  String? paymentInstructions,  String? invoiceFooter)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( InvoiceModel invoice,  List<InvoiceLineItem> lines, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _InvoiceDetailModel() when $default != null:
-return $default(_that.rrn,_that.month,_that.estateName,_that.houseNumber,_that.houseCode,_that.date,_that.location,_that.propertyName,_that.invoiceAmount,_that.rentOwed,_that.paidAmount,_that.contactNo,_that.contactEmail,_that.status,_that.flag,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.message,_that.items,_that.self,_that.propertyId,_that.estateId,_that.id,_that.currency,_that.paymentInstructions,_that.invoiceFooter);case _:
+return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
   return orElse();
 
 }
@@ -200,10 +199,10 @@ return $default(_that.rrn,_that.month,_that.estateName,_that.houseNumber,_that.h
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? rrn,  String? month,  String? estateName,  String? houseNumber,  String? houseCode,  String? date,  String? location,  String? propertyName, @JsonKey(fromJson: parseDouble)  double invoiceAmount, @JsonKey(fromJson: parseDouble)  double rentOwed, @JsonKey(fromJson: parseDouble)  double paidAmount,  String? contactNo,  String? contactEmail,  String? status,  int flag,  String? tenantName,  String? tenantPhone,  String? tenantEmail,  String? message, @JsonKey(name: 'bills')  List<InvoiceLineItem> items,  bool self,  int? propertyId,  int? estateId,  int? id,  String? currency,  String? paymentInstructions,  String? invoiceFooter)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( InvoiceModel invoice,  List<InvoiceLineItem> lines, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceDetailModel():
-return $default(_that.rrn,_that.month,_that.estateName,_that.houseNumber,_that.houseCode,_that.date,_that.location,_that.propertyName,_that.invoiceAmount,_that.rentOwed,_that.paidAmount,_that.contactNo,_that.contactEmail,_that.status,_that.flag,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.message,_that.items,_that.self,_that.propertyId,_that.estateId,_that.id,_that.currency,_that.paymentInstructions,_that.invoiceFooter);case _:
+return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -220,10 +219,10 @@ return $default(_that.rrn,_that.month,_that.estateName,_that.houseNumber,_that.h
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? rrn,  String? month,  String? estateName,  String? houseNumber,  String? houseCode,  String? date,  String? location,  String? propertyName, @JsonKey(fromJson: parseDouble)  double invoiceAmount, @JsonKey(fromJson: parseDouble)  double rentOwed, @JsonKey(fromJson: parseDouble)  double paidAmount,  String? contactNo,  String? contactEmail,  String? status,  int flag,  String? tenantName,  String? tenantPhone,  String? tenantEmail,  String? message, @JsonKey(name: 'bills')  List<InvoiceLineItem> items,  bool self,  int? propertyId,  int? estateId,  int? id,  String? currency,  String? paymentInstructions,  String? invoiceFooter)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( InvoiceModel invoice,  List<InvoiceLineItem> lines, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)?  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceDetailModel() when $default != null:
-return $default(_that.rrn,_that.month,_that.estateName,_that.houseNumber,_that.houseCode,_that.date,_that.location,_that.propertyName,_that.invoiceAmount,_that.rentOwed,_that.paidAmount,_that.contactNo,_that.contactEmail,_that.status,_that.flag,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.message,_that.items,_that.self,_that.propertyId,_that.estateId,_that.id,_that.currency,_that.paymentInstructions,_that.invoiceFooter);case _:
+return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
   return null;
 
 }
@@ -235,42 +234,32 @@ return $default(_that.rrn,_that.month,_that.estateName,_that.houseNumber,_that.h
 @JsonSerializable()
 
 class _InvoiceDetailModel extends InvoiceDetailModel {
-  const _InvoiceDetailModel({this.rrn, this.month, this.estateName, this.houseNumber, this.houseCode, this.date, this.location, this.propertyName, @JsonKey(fromJson: parseDouble) this.invoiceAmount = 0, @JsonKey(fromJson: parseDouble) this.rentOwed = 0, @JsonKey(fromJson: parseDouble) this.paidAmount = 0, this.contactNo, this.contactEmail, this.status, this.flag = 0, this.tenantName, this.tenantPhone, this.tenantEmail, this.message, @JsonKey(name: 'bills') final  List<InvoiceLineItem> items = const [], this.self = false, this.propertyId, this.estateId, this.id, this.currency, this.paymentInstructions, this.invoiceFooter}): _items = items,super._();
+  const _InvoiceDetailModel({required this.invoice, final  List<InvoiceLineItem> lines = const [], @JsonKey(fromJson: parseDouble) this.broughtForward = 0, @JsonKey(fromJson: parseDouble) this.totalPayable = 0, this.voidReason, this.voidedBy, this.voidedOn, this.paymentInstructions, this.footer}): _lines = lines,super._();
   factory _InvoiceDetailModel.fromJson(Map<String, dynamic> json) => _$InvoiceDetailModelFromJson(json);
 
-@override final  String? rrn;
-@override final  String? month;
-@override final  String? estateName;
-@override final  String? houseNumber;
-@override final  String? houseCode;
-@override final  String? date;
-@override final  String? location;
-@override final  String? propertyName;
-@override@JsonKey(fromJson: parseDouble) final  double invoiceAmount;
-@override@JsonKey(fromJson: parseDouble) final  double rentOwed;
-@override@JsonKey(fromJson: parseDouble) final  double paidAmount;
-@override final  String? contactNo;
-@override final  String? contactEmail;
-@override final  String? status;
-@override@JsonKey() final  int flag;
-@override final  String? tenantName;
-@override final  String? tenantPhone;
-@override final  String? tenantEmail;
-@override final  String? message;
- final  List<InvoiceLineItem> _items;
-@override@JsonKey(name: 'bills') List<InvoiceLineItem> get items {
-  if (_items is EqualUnmodifiableListView) return _items;
+@override final  InvoiceModel invoice;
+ final  List<InvoiceLineItem> _lines;
+@override@JsonKey() List<InvoiceLineItem> get lines {
+  if (_lines is EqualUnmodifiableListView) return _lines;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_items);
+  return EqualUnmodifiableListView(_lines);
 }
 
-@override@JsonKey() final  bool self;
-@override final  int? propertyId;
-@override final  int? estateId;
-@override final  int? id;
-@override final  String? currency;
+/// Arrears carried into this invoice from earlier periods.
+///
+/// Inside [InvoiceModel.amount] and outside the sum of [lines], which is why it is stated
+/// separately: a detail screen that added the lines and expected the total would be short by
+/// exactly this, and would look like an arithmetic bug rather than a brought-forward balance.
+@override@JsonKey(fromJson: parseDouble) final  double broughtForward;
+/// What is actually due — the amount less what has been paid.
+@override@JsonKey(fromJson: parseDouble) final  double totalPayable;
+@override final  String? voidReason;
+@override final  String? voidedBy;
+@override final  String? voidedOn;
+/// How to pay, and the footer — both resolved server-side from the property and the estate, so
+/// a document the app renders says what the printed one says.
 @override final  String? paymentInstructions;
-@override final  String? invoiceFooter;
+@override final  String? footer;
 
 /// Create a copy of InvoiceDetailModel
 /// with the given fields replaced by the non-null parameter values.
@@ -285,16 +274,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceDetailModel&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.month, month) || other.month == month)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.date, date) || other.date == date)&&(identical(other.location, location) || other.location == location)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.invoiceAmount, invoiceAmount) || other.invoiceAmount == invoiceAmount)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.paidAmount, paidAmount) || other.paidAmount == paidAmount)&&(identical(other.contactNo, contactNo) || other.contactNo == contactNo)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail)&&(identical(other.status, status) || other.status == status)&&(identical(other.flag, flag) || other.flag == flag)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.tenantEmail, tenantEmail) || other.tenantEmail == tenantEmail)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.self, self) || other.self == self)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.id, id) || other.id == id)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.invoiceFooter, invoiceFooter) || other.invoiceFooter == invoiceFooter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceDetailModel&&(identical(other.invoice, invoice) || other.invoice == invoice)&&const DeepCollectionEquality().equals(other._lines, _lines)&&(identical(other.broughtForward, broughtForward) || other.broughtForward == broughtForward)&&(identical(other.totalPayable, totalPayable) || other.totalPayable == totalPayable)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.voidedBy, voidedBy) || other.voidedBy == voidedBy)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.footer, footer) || other.footer == footer));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,rrn,month,estateName,houseNumber,houseCode,date,location,propertyName,invoiceAmount,rentOwed,paidAmount,contactNo,contactEmail,status,flag,tenantName,tenantPhone,tenantEmail,message,const DeepCollectionEquality().hash(_items),self,propertyId,estateId,id,currency,paymentInstructions,invoiceFooter]);
+int get hashCode => Object.hash(runtimeType,invoice,const DeepCollectionEquality().hash(_lines),broughtForward,totalPayable,voidReason,voidedBy,voidedOn,paymentInstructions,footer);
 
 @override
 String toString() {
-  return 'InvoiceDetailModel(rrn: $rrn, month: $month, estateName: $estateName, houseNumber: $houseNumber, houseCode: $houseCode, date: $date, location: $location, propertyName: $propertyName, invoiceAmount: $invoiceAmount, rentOwed: $rentOwed, paidAmount: $paidAmount, contactNo: $contactNo, contactEmail: $contactEmail, status: $status, flag: $flag, tenantName: $tenantName, tenantPhone: $tenantPhone, tenantEmail: $tenantEmail, message: $message, items: $items, self: $self, propertyId: $propertyId, estateId: $estateId, id: $id, currency: $currency, paymentInstructions: $paymentInstructions, invoiceFooter: $invoiceFooter)';
+  return 'InvoiceDetailModel(invoice: $invoice, lines: $lines, broughtForward: $broughtForward, totalPayable: $totalPayable, voidReason: $voidReason, voidedBy: $voidedBy, voidedOn: $voidedOn, paymentInstructions: $paymentInstructions, footer: $footer)';
 }
 
 
@@ -305,11 +294,11 @@ abstract mixin class _$InvoiceDetailModelCopyWith<$Res> implements $InvoiceDetai
   factory _$InvoiceDetailModelCopyWith(_InvoiceDetailModel value, $Res Function(_InvoiceDetailModel) _then) = __$InvoiceDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? rrn, String? month, String? estateName, String? houseNumber, String? houseCode, String? date, String? location, String? propertyName,@JsonKey(fromJson: parseDouble) double invoiceAmount,@JsonKey(fromJson: parseDouble) double rentOwed,@JsonKey(fromJson: parseDouble) double paidAmount, String? contactNo, String? contactEmail, String? status, int flag, String? tenantName, String? tenantPhone, String? tenantEmail, String? message,@JsonKey(name: 'bills') List<InvoiceLineItem> items, bool self, int? propertyId, int? estateId, int? id, String? currency, String? paymentInstructions, String? invoiceFooter
+ InvoiceModel invoice, List<InvoiceLineItem> lines,@JsonKey(fromJson: parseDouble) double broughtForward,@JsonKey(fromJson: parseDouble) double totalPayable, String? voidReason, String? voidedBy, String? voidedOn, String? paymentInstructions, String? footer
 });
 
 
-
+@override $InvoiceModelCopyWith<$Res> get invoice;
 
 }
 /// @nodoc
@@ -322,47 +311,39 @@ class __$InvoiceDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? rrn = freezed,Object? month = freezed,Object? estateName = freezed,Object? houseNumber = freezed,Object? houseCode = freezed,Object? date = freezed,Object? location = freezed,Object? propertyName = freezed,Object? invoiceAmount = null,Object? rentOwed = null,Object? paidAmount = null,Object? contactNo = freezed,Object? contactEmail = freezed,Object? status = freezed,Object? flag = null,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? tenantEmail = freezed,Object? message = freezed,Object? items = null,Object? self = null,Object? propertyId = freezed,Object? estateId = freezed,Object? id = freezed,Object? currency = freezed,Object? paymentInstructions = freezed,Object? invoiceFooter = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? invoice = null,Object? lines = null,Object? broughtForward = null,Object? totalPayable = null,Object? voidReason = freezed,Object? voidedBy = freezed,Object? voidedOn = freezed,Object? paymentInstructions = freezed,Object? footer = freezed,}) {
   return _then(_InvoiceDetailModel(
-rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
-as String?,month: freezed == month ? _self.month : month // ignore: cast_nullable_to_non_nullable
-as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,date: freezed == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
-as String?,invoiceAmount: null == invoiceAmount ? _self.invoiceAmount : invoiceAmount // ignore: cast_nullable_to_non_nullable
-as double,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
-as double,paidAmount: null == paidAmount ? _self.paidAmount : paidAmount // ignore: cast_nullable_to_non_nullable
-as double,contactNo: freezed == contactNo ? _self.contactNo : contactNo // ignore: cast_nullable_to_non_nullable
-as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,flag: null == flag ? _self.flag : flag // ignore: cast_nullable_to_non_nullable
-as int,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
-as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
-as String?,tenantEmail: freezed == tenantEmail ? _self.tenantEmail : tenantEmail // ignore: cast_nullable_to_non_nullable
-as String?,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String?,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
-as List<InvoiceLineItem>,self: null == self ? _self.self : self // ignore: cast_nullable_to_non_nullable
-as bool,propertyId: freezed == propertyId ? _self.propertyId : propertyId // ignore: cast_nullable_to_non_nullable
-as int?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
-as int?,id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,currency: freezed == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+invoice: null == invoice ? _self.invoice : invoice // ignore: cast_nullable_to_non_nullable
+as InvoiceModel,lines: null == lines ? _self._lines : lines // ignore: cast_nullable_to_non_nullable
+as List<InvoiceLineItem>,broughtForward: null == broughtForward ? _self.broughtForward : broughtForward // ignore: cast_nullable_to_non_nullable
+as double,totalPayable: null == totalPayable ? _self.totalPayable : totalPayable // ignore: cast_nullable_to_non_nullable
+as double,voidReason: freezed == voidReason ? _self.voidReason : voidReason // ignore: cast_nullable_to_non_nullable
+as String?,voidedBy: freezed == voidedBy ? _self.voidedBy : voidedBy // ignore: cast_nullable_to_non_nullable
+as String?,voidedOn: freezed == voidedOn ? _self.voidedOn : voidedOn // ignore: cast_nullable_to_non_nullable
 as String?,paymentInstructions: freezed == paymentInstructions ? _self.paymentInstructions : paymentInstructions // ignore: cast_nullable_to_non_nullable
-as String?,invoiceFooter: freezed == invoiceFooter ? _self.invoiceFooter : invoiceFooter // ignore: cast_nullable_to_non_nullable
+as String?,footer: freezed == footer ? _self.footer : footer // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
 
-
+/// Create a copy of InvoiceDetailModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$InvoiceModelCopyWith<$Res> get invoice {
+  
+  return $InvoiceModelCopyWith<$Res>(_self.invoice, (value) {
+    return _then(_self.copyWith(invoice: value));
+  });
+}
 }
 
 
 /// @nodoc
 mixin _$InvoiceLineItem {
 
- String? get narration;@JsonKey(fromJson: parseDouble) double get value;
+/// `RENT`, `UTILITY`, `METERED`, `BROUGHT_FORWARD` — what sort of charge this is.
+ String? get kind; String? get description;@JsonKey(fromJson: parseDouble) double get quantity;@JsonKey(fromJson: parseDouble) double get unitAmount;@JsonKey(fromJson: parseDouble) double get amount;
 /// Create a copy of InvoiceLineItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -375,16 +356,16 @@ $InvoiceLineItemCopyWith<InvoiceLineItem> get copyWith => _$InvoiceLineItemCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceLineItem&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.value, value) || other.value == value));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceLineItem&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.description, description) || other.description == description)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.unitAmount, unitAmount) || other.unitAmount == unitAmount)&&(identical(other.amount, amount) || other.amount == amount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,narration,value);
+int get hashCode => Object.hash(runtimeType,kind,description,quantity,unitAmount,amount);
 
 @override
 String toString() {
-  return 'InvoiceLineItem(narration: $narration, value: $value)';
+  return 'InvoiceLineItem(kind: $kind, description: $description, quantity: $quantity, unitAmount: $unitAmount, amount: $amount)';
 }
 
 
@@ -395,7 +376,7 @@ abstract mixin class $InvoiceLineItemCopyWith<$Res>  {
   factory $InvoiceLineItemCopyWith(InvoiceLineItem value, $Res Function(InvoiceLineItem) _then) = _$InvoiceLineItemCopyWithImpl;
 @useResult
 $Res call({
- String? narration,@JsonKey(fromJson: parseDouble) double value
+ String? kind, String? description,@JsonKey(fromJson: parseDouble) double quantity,@JsonKey(fromJson: parseDouble) double unitAmount,@JsonKey(fromJson: parseDouble) double amount
 });
 
 
@@ -412,10 +393,13 @@ class _$InvoiceLineItemCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceLineItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? narration = freezed,Object? value = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? kind = freezed,Object? description = freezed,Object? quantity = null,Object? unitAmount = null,Object? amount = null,}) {
   return _then(_self.copyWith(
-narration: freezed == narration ? _self.narration : narration // ignore: cast_nullable_to_non_nullable
-as String?,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+kind: freezed == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as double,unitAmount: null == unitAmount ? _self.unitAmount : unitAmount // ignore: cast_nullable_to_non_nullable
+as double,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }
@@ -501,10 +485,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? narration, @JsonKey(fromJson: parseDouble)  double value)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? kind,  String? description, @JsonKey(fromJson: parseDouble)  double quantity, @JsonKey(fromJson: parseDouble)  double unitAmount, @JsonKey(fromJson: parseDouble)  double amount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _InvoiceLineItem() when $default != null:
-return $default(_that.narration,_that.value);case _:
+return $default(_that.kind,_that.description,_that.quantity,_that.unitAmount,_that.amount);case _:
   return orElse();
 
 }
@@ -522,10 +506,10 @@ return $default(_that.narration,_that.value);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? narration, @JsonKey(fromJson: parseDouble)  double value)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? kind,  String? description, @JsonKey(fromJson: parseDouble)  double quantity, @JsonKey(fromJson: parseDouble)  double unitAmount, @JsonKey(fromJson: parseDouble)  double amount)  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceLineItem():
-return $default(_that.narration,_that.value);case _:
+return $default(_that.kind,_that.description,_that.quantity,_that.unitAmount,_that.amount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -542,10 +526,10 @@ return $default(_that.narration,_that.value);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? narration, @JsonKey(fromJson: parseDouble)  double value)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? kind,  String? description, @JsonKey(fromJson: parseDouble)  double quantity, @JsonKey(fromJson: parseDouble)  double unitAmount, @JsonKey(fromJson: parseDouble)  double amount)?  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceLineItem() when $default != null:
-return $default(_that.narration,_that.value);case _:
+return $default(_that.kind,_that.description,_that.quantity,_that.unitAmount,_that.amount);case _:
   return null;
 
 }
@@ -557,11 +541,15 @@ return $default(_that.narration,_that.value);case _:
 @JsonSerializable()
 
 class _InvoiceLineItem extends InvoiceLineItem {
-  const _InvoiceLineItem({this.narration, @JsonKey(fromJson: parseDouble) this.value = 0}): super._();
+  const _InvoiceLineItem({this.kind, this.description, @JsonKey(fromJson: parseDouble) this.quantity = 0, @JsonKey(fromJson: parseDouble) this.unitAmount = 0, @JsonKey(fromJson: parseDouble) this.amount = 0}): super._();
   factory _InvoiceLineItem.fromJson(Map<String, dynamic> json) => _$InvoiceLineItemFromJson(json);
 
-@override final  String? narration;
-@override@JsonKey(fromJson: parseDouble) final  double value;
+/// `RENT`, `UTILITY`, `METERED`, `BROUGHT_FORWARD` — what sort of charge this is.
+@override final  String? kind;
+@override final  String? description;
+@override@JsonKey(fromJson: parseDouble) final  double quantity;
+@override@JsonKey(fromJson: parseDouble) final  double unitAmount;
+@override@JsonKey(fromJson: parseDouble) final  double amount;
 
 /// Create a copy of InvoiceLineItem
 /// with the given fields replaced by the non-null parameter values.
@@ -576,16 +564,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceLineItem&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.value, value) || other.value == value));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceLineItem&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.description, description) || other.description == description)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.unitAmount, unitAmount) || other.unitAmount == unitAmount)&&(identical(other.amount, amount) || other.amount == amount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,narration,value);
+int get hashCode => Object.hash(runtimeType,kind,description,quantity,unitAmount,amount);
 
 @override
 String toString() {
-  return 'InvoiceLineItem(narration: $narration, value: $value)';
+  return 'InvoiceLineItem(kind: $kind, description: $description, quantity: $quantity, unitAmount: $unitAmount, amount: $amount)';
 }
 
 
@@ -596,7 +584,7 @@ abstract mixin class _$InvoiceLineItemCopyWith<$Res> implements $InvoiceLineItem
   factory _$InvoiceLineItemCopyWith(_InvoiceLineItem value, $Res Function(_InvoiceLineItem) _then) = __$InvoiceLineItemCopyWithImpl;
 @override @useResult
 $Res call({
- String? narration,@JsonKey(fromJson: parseDouble) double value
+ String? kind, String? description,@JsonKey(fromJson: parseDouble) double quantity,@JsonKey(fromJson: parseDouble) double unitAmount,@JsonKey(fromJson: parseDouble) double amount
 });
 
 
@@ -613,10 +601,13 @@ class __$InvoiceLineItemCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceLineItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? narration = freezed,Object? value = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? kind = freezed,Object? description = freezed,Object? quantity = null,Object? unitAmount = null,Object? amount = null,}) {
   return _then(_InvoiceLineItem(
-narration: freezed == narration ? _self.narration : narration // ignore: cast_nullable_to_non_nullable
-as String?,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+kind: freezed == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as double,unitAmount: null == unitAmount ? _self.unitAmount : unitAmount // ignore: cast_nullable_to_non_nullable
+as double,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }

@@ -63,10 +63,10 @@ class InvoiceDetailScreen extends ConsumerWidget {
                         style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
                       ),
                       const SizedBox(height: 8),
-                      _InvoiceStatusBadge(flag: detail.flag),
+                      _InvoiceStatusBadge(status: detail.invoice.status, label: detail.invoice.statusLabel),
                       const SizedBox(height: 8),
                       HodiAmountText(
-                        amount: detail.invoiceAmount,
+                        amount: detail.invoice.amount,
                         style: HodiTextStyles.currencyLarge.copyWith(color: HodiColors.white),
                       ),
                     ],
@@ -76,7 +76,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
 
                 // Line items card
-                if (detail.items.isNotEmpty)
+                if (detail.lines.isNotEmpty)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -91,18 +91,18 @@ class InvoiceDetailScreen extends ConsumerWidget {
                         Text('Line Items', style: HodiTextStyles.heading3),
                         const SizedBox(height: 12),
                         const Divider(height: 1),
-                        ...detail.items.map((item) => Padding(
+                        ...detail.lines.map((item) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
-                                  item.narration ?? '-',
+                                  item.narration.isEmpty ? '-' : item.narration,
                                   style: HodiTextStyles.bodyMedium.copyWith(color: HodiColors.textDark),
                                 ),
                               ),
                               Text(
-                                'KES ${CurrencyFormatter.format(item.value)}',
+                                'KES ${CurrencyFormatter.format(item.amount)}',
                                 style: HodiTextStyles.currency.copyWith(fontSize: 14),
                               ),
                             ],
@@ -119,7 +119,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
                               ),
                               const Spacer(),
                               HodiAmountText(
-                                amount: detail.rentOwed,
+                                amount: detail.invoice.amount,
                                 style: HodiTextStyles.currency.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ],
@@ -159,7 +159,11 @@ class _BottomActions extends ConsumerWidget {
 
   const _BottomActions({required this.detail, required this.rrn});
 
-  bool get _canPay => detail.flag < 2 && detail.rentOwed > 0;
+  // Said in terms of what it means rather than of an integer: `flag < 2` happened to be right
+  // because UNPAID is 0 and PARTIAL is 1, and would have quietly become wrong the day a status was
+  // inserted between them. A voided invoice owes nothing whatever its amount says.
+  bool get _canPay =>
+      !detail.isPaid && !detail.isVoided && detail.balance > 0;
 
   void _openPaymentSheet(BuildContext context) {
     showModalBottomSheet(
@@ -228,12 +232,18 @@ class _BottomActions extends ConsumerWidget {
 }
 
 class _InvoiceStatusBadge extends StatelessWidget {
-  final int flag;
+  const _InvoiceStatusBadge({required this.status, this.label});
 
-  const _InvoiceStatusBadge({required this.flag});
+  final int status;
+
+  /// The server's own wording, which is what gets shown. The switch below is only a fallback for a
+  /// response that predates the field — the app used to name every status itself, so a status added
+  /// on the server read "Unpaid" here until somebody shipped a new build.
+  final String? label;
 
   String get _label {
-    switch (flag) {
+    if (label != null && label!.isNotEmpty) return label!;
+    switch (status) {
       case 2:
         return 'Paid';
       case 1:
@@ -248,11 +258,14 @@ class _InvoiceStatusBadge extends StatelessWidget {
   }
 
   BadgeType get _type {
-    switch (flag) {
+    switch (status) {
       case 2:
         return BadgeType.success;
       case 1:
         return BadgeType.warning;
+      case 4:
+      case 3:
+        return BadgeType.info;
       default:
         return BadgeType.error;
     }

@@ -197,7 +197,7 @@ class _InvoiceItem extends StatelessWidget {
               const Icon(Icons.home_outlined, size: 14, color: Color(0xFF9CA3AF)),
               const SizedBox(width: 4),
               Text(
-                invoice.houseName ?? invoice.houseCode ?? '-',
+                invoice.unitLabel.isEmpty ? '-' : invoice.unitLabel,
                 style: HodiTextStyles.bodySmall,
               ),
               const Spacer(),
@@ -208,7 +208,7 @@ class _InvoiceItem extends StatelessWidget {
           const SizedBox(height: 8),
           if (invoice.isPaid)
             HodiAmountText(
-              amount: invoice.rentPaid,
+              amount: invoice.paidAmount,
               style: HodiTextStyles.currency.copyWith(
                 fontSize: 15,
                 color: HodiColors.successStart,

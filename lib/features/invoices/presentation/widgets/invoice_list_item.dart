@@ -45,30 +45,30 @@ class InvoiceListItem extends StatelessWidget {
               const Icon(Icons.home_outlined, size: 14, color: Color(0xFF9CA3AF)),
               const SizedBox(width: 4),
               Text(
-                invoice.houseName ?? invoice.houseCode ?? '-',
+                invoice.unitLabel.isEmpty ? '-' : invoice.unitLabel,
                 style: HodiTextStyles.bodySmall,
               ),
               const Spacer(),
               Text(
-                invoice.monthName ?? '-',
+                invoice.periodLabel ?? '-',
                 style: HodiTextStyles.bodySmall,
               ),
             ],
           ),
-          if (invoice.property != null) ...[
+          if (invoice.propertyName != null) ...[
             const SizedBox(height: 4),
             Row(
               children: [
                 const Icon(Icons.apartment_outlined, size: 14, color: Color(0xFF9CA3AF)),
                 const SizedBox(width: 4),
-                Text(invoice.property!, style: HodiTextStyles.bodySmall),
+                Text(invoice.propertyName!, style: HodiTextStyles.bodySmall),
               ],
             ),
           ],
           const SizedBox(height: 8),
           if (invoice.isPaid)
             HodiAmountText(
-              amount: invoice.rentPaid,
+              amount: invoice.paidAmount,
               style: HodiTextStyles.currency.copyWith(
                 fontSize: 15,
                 color: HodiColors.successStart,
