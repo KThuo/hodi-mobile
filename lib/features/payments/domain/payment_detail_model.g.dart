@@ -8,67 +8,50 @@ part of 'payment_detail_model.dart';
 
 _PaymentDetailModel _$PaymentDetailModelFromJson(Map<String, dynamic> json) =>
     _PaymentDetailModel(
-      paymentRrn: json['rrn'] as String?,
-      invoiceRrn: json['invoiceRrn'] as String?,
-      month: json['month'] as String?,
-      estateName: json['estateName'] as String?,
-      houseNumber: json['houseNumber'] as String?,
-      date: json['date'] as String?,
-      location: json['location'] as String?,
-      propertyName: json['propertyName'] as String?,
-      invoiceAmount: json['invoiceAmount'] == null
-          ? 0
-          : parseDouble(json['invoiceAmount']),
-      paidAmount: json['paidAmount'] == null
-          ? 0
-          : parseDouble(json['paidAmount']),
-      rentOwed: json['rentOwed'] == null ? 0 : parseDouble(json['rentOwed']),
-      contactNo: json['contactNo'] as String?,
-      contactEmail: json['contactEmail'] as String?,
-      status: json['status'] as String?,
-      tenantName: json['tenantName'] as String?,
-      tenantPhone: json['tenantPhone'] as String?,
-      tenantEmail: json['tenantEmail'] as String?,
-      paidBy: json['paidBy'] as String?,
-      paymentType: json['paymentType'] as String?,
-      items:
-          (json['bills'] as List<dynamic>?)
-              ?.map((e) => PaymentLineItem.fromJson(e as Map<String, dynamic>))
+      payment: PaymentModel.fromJson(json['payment'] as Map<String, dynamic>),
+      allocations:
+          (json['allocations'] as List<dynamic>?)
+              ?.map(
+                (e) => PaymentAllocation.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           const [],
-      currency: json['currency'] as String?,
+      tenantPhone: json['tenantPhone'] as String?,
+      tenantEmail: json['tenantEmail'] as String?,
+      propertyLocation: json['propertyLocation'] as String?,
+      voidReason: json['voidReason'] as String?,
+      voidedBy: json['voidedBy'] as String?,
+      voidedOn: json['voidedOn'] as String?,
     );
 
 Map<String, dynamic> _$PaymentDetailModelToJson(_PaymentDetailModel instance) =>
     <String, dynamic>{
-      'rrn': instance.paymentRrn,
-      'invoiceRrn': instance.invoiceRrn,
-      'month': instance.month,
-      'estateName': instance.estateName,
-      'houseNumber': instance.houseNumber,
-      'date': instance.date,
-      'location': instance.location,
-      'propertyName': instance.propertyName,
-      'invoiceAmount': instance.invoiceAmount,
-      'paidAmount': instance.paidAmount,
-      'rentOwed': instance.rentOwed,
-      'contactNo': instance.contactNo,
-      'contactEmail': instance.contactEmail,
-      'status': instance.status,
-      'tenantName': instance.tenantName,
+      'payment': instance.payment,
+      'allocations': instance.allocations,
       'tenantPhone': instance.tenantPhone,
       'tenantEmail': instance.tenantEmail,
-      'paidBy': instance.paidBy,
-      'paymentType': instance.paymentType,
-      'bills': instance.items,
-      'currency': instance.currency,
+      'propertyLocation': instance.propertyLocation,
+      'voidReason': instance.voidReason,
+      'voidedBy': instance.voidedBy,
+      'voidedOn': instance.voidedOn,
     };
 
-_PaymentLineItem _$PaymentLineItemFromJson(Map<String, dynamic> json) =>
-    _PaymentLineItem(
-      narration: json['narration'] as String?,
-      value: json['value'] == null ? 0 : parseDouble(json['value']),
+_PaymentAllocation _$PaymentAllocationFromJson(Map<String, dynamic> json) =>
+    _PaymentAllocation(
+      invoiceId: json['invoiceId'] as String?,
+      invoiceRrn: json['invoiceRrn'] as String?,
+      periodLabel: json['periodLabel'] as String?,
+      invoiceAmount: json['invoiceAmount'] == null
+          ? 0
+          : parseDouble(json['invoiceAmount']),
+      amount: json['amount'] == null ? 0 : parseDouble(json['amount']),
     );
 
-Map<String, dynamic> _$PaymentLineItemToJson(_PaymentLineItem instance) =>
-    <String, dynamic>{'narration': instance.narration, 'value': instance.value};
+Map<String, dynamic> _$PaymentAllocationToJson(_PaymentAllocation instance) =>
+    <String, dynamic>{
+      'invoiceId': instance.invoiceId,
+      'invoiceRrn': instance.invoiceRrn,
+      'periodLabel': instance.periodLabel,
+      'invoiceAmount': instance.invoiceAmount,
+      'amount': instance.amount,
+    };

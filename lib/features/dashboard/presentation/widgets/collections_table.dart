@@ -30,10 +30,10 @@ class _CollectionsTableState extends State<CollectionsTable> {
     if (_searchTerm.isEmpty) return widget.payments;
     final term = _searchTerm.toLowerCase();
     return widget.payments.where((p) {
-      return (p.paymentRrn?.toLowerCase().contains(term) ?? false) ||
-          (p.houseName?.toLowerCase().contains(term) ?? false) ||
+      return (p.rrn?.toLowerCase().contains(term) ?? false) ||
+          (p.houseLabel?.toLowerCase().contains(term) ?? false) ||
           (p.tenantName?.toLowerCase().contains(term) ?? false) ||
-          (p.property?.toLowerCase().contains(term) ?? false);
+          (p.propertyName?.toLowerCase().contains(term) ?? false);
     }).toList();
   }
 
@@ -184,7 +184,7 @@ class _PaymentRow extends StatelessWidget {
             children: [
               Flexible(
                 child: Text(
-                  payment.paymentRrn ?? '-',
+                  payment.rrn ?? '-',
                   style: GoogleFonts.robotoMono(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -193,9 +193,14 @@ class _PaymentRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (payment.monthName != null)
+              // The channel, where the month used to be. A payment belongs to no billing period —
+              // the invoices it was allocated to do, and one receipt can cover several — so the
+              // month here was always the invoice's rather than the payment's. How the money
+              // arrived is a fact about the payment, and it is what somebody scanning a day's
+              // collections is checking.
+              if (payment.channel.isNotEmpty)
                 Text(
-                  payment.monthName!,
+                  payment.channel,
                   style: HodiTextStyles.bodySmall,
                 ),
             ],
@@ -207,7 +212,7 @@ class _PaymentRow extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  payment.houseName ?? '-',
+                  payment.houseLabel ?? '-',
                   style: HodiTextStyles.labelBold,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -221,9 +226,9 @@ class _PaymentRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              if (!isAdmin && payment.category != null)
+              if (!isAdmin && payment.categoryName != null)
                 Text(
-                  payment.category!,
+                  payment.categoryName!,
                   style: HodiTextStyles.bodySmall,
                 ),
             ],
@@ -231,11 +236,11 @@ class _PaymentRow extends StatelessWidget {
           const SizedBox(height: 6),
 
           // Property name
-          if (payment.property != null)
+          if (payment.propertyName != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: Text(
-                payment.property!,
+                payment.propertyName!,
                 style: HodiTextStyles.bodySmall,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -265,7 +270,7 @@ class _PaymentRow extends StatelessWidget {
                     Text('Paid: ', style: HodiTextStyles.bodySmall),
                     Flexible(
                       child: Text(
-                        'KES ${CurrencyFormatter.format(payment.rentPaid)}',
+                        'KES ${CurrencyFormatter.format(payment.amount)}',
                         style: HodiTextStyles.currencySmall.copyWith(color: HodiColors.successStart),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -276,12 +281,12 @@ class _PaymentRow extends StatelessWidget {
             ],
           ),
 
-          if (payment.paidOn != null) ...[
+          if (payment.receivedOn != null) ...[
             const SizedBox(height: 4),
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Paid on: ${payment.paidOn}',
+                'Paid on: ${payment.receivedOn}',
                 style: HodiTextStyles.bodySmall.copyWith(fontSize: 10),
               ),
             ),

@@ -172,8 +172,8 @@ class _TenantPaymentsTabState extends ConsumerState<TenantPaymentsTab> {
         return _PaymentItem(
           payment: payment,
           onTap: () {
-            if (payment.paymentRrn != null) {
-              context.push('/payments/${payment.paymentRrn}');
+            if (payment.rrn != null) {
+              context.push('/payments/${payment.rrn}');
             }
           },
         );
@@ -196,7 +196,7 @@ class _PaymentItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            payment.paymentRrn ?? '-',
+            payment.rrn ?? '-',
             style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -207,11 +207,11 @@ class _PaymentItem extends StatelessWidget {
               const Icon(Icons.home_outlined, size: 14, color: Color(0xFF9CA3AF)),
               const SizedBox(width: 4),
               Text(
-                payment.houseName ?? payment.houseCode ?? '-',
+                payment.unitLabel.isEmpty ? '-' : payment.unitLabel,
                 style: HodiTextStyles.bodySmall,
               ),
               const Spacer(),
-              Text(payment.paidOn ?? '-', style: HodiTextStyles.bodySmall),
+              Text(payment.receivedOn ?? '-', style: HodiTextStyles.bodySmall),
             ],
           ),
           const SizedBox(height: 8),
@@ -219,7 +219,7 @@ class _PaymentItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               HodiAmountText(
-                amount: payment.rentPaid,
+                amount: payment.amount,
                 style: HodiTextStyles.currency.copyWith(fontSize: 15),
               ),
               if (payment.paidBy != null)

@@ -1,33 +1,96 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../core/utils/json_parsers.dart';
+
 part 'payment_model.freezed.dart';
 part 'payment_model.g.dart';
 
+/// One receipt — `PaymentRow` on the server.
+///
+/// ## Money received, and where it went
+///
+/// Legacy carried `rentOwed` and `rentPaid` on a *payment*, which read as though a receipt had an
+/// invoice's fields. A payment has one figure of its own — [amount], what arrived — and then a
+/// question the invoice cannot answer: how much of it found an invoice to sit against.
+///
+/// That is [allocatedAmount] and [unallocated], and the pair matters. Money can arrive before the
+/// invoice it is for, or exceed it; the remainder is a credit standing on the tenancy rather than an
+/// error. A screen that showed only [amount] could not tell a receipt that settled something from
+/// one still waiting to.
 @freezed
 abstract class PaymentModel with _$PaymentModel {
   const PaymentModel._();
+
   const factory PaymentModel({
-    int? id,
-    String? paymentRrn,
-    String? invoiceRrn,
-    String? houseName,
-    String? houseCode,
-    String? estate,
-    String? property,
-    String? tenantName,
-    String? tenantPhone,
-    String? monthName,
-    @Default(0) double rentOwed,
-    @Default(0) double rentPaid,
-    String? paidBy,
-    String? paidOn,
+    /// Hashed and salted per user. Opaque.
+    String? id,
+
+    /// The receipt number, which is what a tenant quotes.
+    String? rrn,
     @Default(0) int status,
-    String? paymentRef,
-    String? phoneNo,
-    String? category,
-    String? houseType,
+    String? statusLabel,
+
+    /// `CASH`, `STK`, `TRANSFER` — the machine-readable channel.
+    String? method,
+
+    /// The channel in words, from the server, which is what gets shown.
+    String? methodLabel,
+
+    /// The payer's own reference — an M-PESA code, a cheque number, a slip.
+    String? reference,
+    String? tenantName,
+    String? paidBy,
+    String? payerPhone,
+    String? houseCode,
+    String? houseNumber,
+    String? houseLabel,
+    String? propertyName,
+    String? estateName,
+
+    /// What arrived.
+    @JsonKey(fromJson: parseDouble) @Default(0) double amount,
+
+    /// How much of it was put against invoices.
+    @JsonKey(fromJson: parseDouble) @Default(0) double allocatedAmount,
+
+    /// What is still standing as credit on the tenancy.
+    @JsonKey(fromJson: parseDouble) @Default(0) double unallocated,
+
+    /// How many invoices it was spread across. One payment can settle several months.
+    @Default(0) int invoiceCount,
+
+    /// The invoice it was aimed at, where it was aimed at one.
+    String? invoiceRrn,
+    String? receivedOn,
+    String? narration,
+    String? occupationId,
+    String? houseId,
+    String? voidReason,
+
+    /// The unit's category — "Two bedroom", "Shop". Shown to a tenant, who knows their unit by what
+    /// it is rather than by its code.
+    String? categoryName,
+
+    /// What the tenancy owed after this payment, and before it.
+    ///
+    /// Carried on the receipt because that is the question a tenant asks next, and answering it
+    /// from a balance fetched later would show what they owe *now* rather than what this payment
+    /// left them owing.
+    @JsonKey(fromJson: parseDouble) @Default(0) double rentOwed,
+    @JsonKey(fromJson: parseDouble) @Default(0) double rentOwedBefore,
   }) = _PaymentModel;
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) =>
       _$PaymentModelFromJson(json);
+
+  bool get isVoided => status == 4;
+
+  /// Money that arrived and has nowhere to be. Worth saying out loud on a row: it is not lost, but
+  /// somebody has to decide where it goes.
+  bool get hasCredit => unallocated > 0;
+
+  /// The unit as somebody would say it, falling back to the code.
+  String get unitLabel => houseLabel ?? houseCode ?? '';
+
+  String get channel => methodLabel ?? method ?? '';
 }

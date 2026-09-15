@@ -178,8 +178,8 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
         return PaymentListItem(
           payment: payment,
           onTap: () {
-            if (payment.paymentRrn != null) {
-              context.push('/payments/${payment.paymentRrn}');
+            if (payment.rrn != null) {
+              context.push('/payments/${payment.rrn}');
             }
           },
         );

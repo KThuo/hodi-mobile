@@ -55,18 +55,18 @@ class PaymentDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        detail.paymentRrn ?? rrn,
+                        detail.payment.rrn ?? rrn,
                         style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
                       ),
                       const SizedBox(height: 8),
                       HodiAmountText(
-                        amount: detail.totalAmount,
+                        amount: detail.payment.amount,
                         style: HodiTextStyles.currencyLarge.copyWith(color: HodiColors.white),
                       ),
-                      if (detail.paidBy != null) ...[
+                      if (detail.payment.paidBy != null) ...[
                         const SizedBox(height: 8),
                         Text(
-                          'Paid by: ${detail.paidBy}',
+                          'Paid by: ${detail.payment.paidBy}',
                           style: HodiTextStyles.bodySmall.copyWith(
                             color: HodiColors.white.withValues(alpha: 0.8),
                           ),
@@ -79,7 +79,7 @@ class PaymentDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
 
                 // Line items
-                if (detail.items.isNotEmpty)
+                if (detail.allocations.isNotEmpty)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -94,18 +94,35 @@ class PaymentDetailScreen extends ConsumerWidget {
                         Text('Payment Breakdown', style: HodiTextStyles.heading3),
                         const SizedBox(height: 12),
                         const Divider(height: 1),
-                        ...detail.items.map((item) => Padding(
+                        ...detail.allocations.map((item) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Row(
                             children: [
+                              // An allocation names the invoice it settled and the month that
+                              // invoice was for. Legacy printed a free-text narration here because
+                              // these used to be the invoice's charge lines rather than allocations
+                              // — a receipt that said "Rent" without saying which month's.
                               Expanded(
-                                child: Text(
-                                  item.narration ?? '-',
-                                  style: HodiTextStyles.bodyMedium.copyWith(color: HodiColors.textDark),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.periodLabel ?? item.invoiceRrn ?? '-',
+                                      style: HodiTextStyles.bodyMedium
+                                          .copyWith(color: HodiColors.textDark),
+                                    ),
+                                    if (item.invoiceRrn != null)
+                                      Text(
+                                        item.settlesIt
+                                            ? item.invoiceRrn!
+                                            : '${item.invoiceRrn!} · part payment',
+                                        style: HodiTextStyles.bodySmall,
+                                      ),
+                                  ],
                                 ),
                               ),
                               Text(
-                                'KES ${CurrencyFormatter.format(item.value)}',
+                                'KES ${CurrencyFormatter.format(item.amount)}',
                                 style: HodiTextStyles.currency.copyWith(fontSize: 14),
                               ),
                             ],
@@ -122,7 +139,7 @@ class PaymentDetailScreen extends ConsumerWidget {
                               ),
                               const Spacer(),
                               HodiAmountText(
-                                amount: detail.totalAmount,
+                                amount: detail.payment.amount,
                                 style: HodiTextStyles.currency.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ],

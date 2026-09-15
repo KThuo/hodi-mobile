@@ -33,9 +33,12 @@ class PaymentRepository {
         'page': page,
         'pageSize': pageSize,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
-        if (isTenant) 'self': 'true',
-        'startDate': ?startDate,
-        'endDate': ?endDate,
+        // Whose rows, read from the session rather than taken as an id. A tenant is scoped to
+        // their own regardless; this is for somebody who is both a landlord and a tenant.
+        if (isTenant) 'mine': true,
+        // Inclusive at both ends, and either may be omitted — `from` alone reads "since".
+        'from': ?startDate,
+        'to': ?endDate,
         'status': status,
         'estateId': ?estateId,
         'propertyId': ?propertyId,
@@ -54,10 +57,15 @@ class PaymentRepository {
     );
   }
 
+  /// The receipt as a PDF, rendered by the server.
+  ///
+  /// This fetched the JSON and saved it under a `.pdf` name, so the file arrived and would not open
+  /// — the same fault the invoice download had. The server renders one now, from the same
+  /// `PaymentDetail` the screen shows.
   Future<void> downloadReceiptPdf(String rrn) async {
     await _pdfDownloader.downloadAndOpen(
-      '${ApiConstants.paymentReceipt}/$rrn',
-      'receipt_$rrn.pdf',
+      '${ApiConstants.paymentReceipt}/$rrn/receipt.pdf',
+      'receipt-$rrn.pdf',
     );
   }
 }
