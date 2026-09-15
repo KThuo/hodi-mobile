@@ -9,7 +9,7 @@ usage() {
   cat <<'USAGE'
 Usage: ./scripts/build.sh [test|prod|local] [apk|appbundle] [url]
 
-  test   https://hodi-test.qnex.io
+  test   https://newhodi.qnex.io
   prod   https://hodi.qnex.io
   local  a backend you are running yourself — pass the URL as the third argument,
          or leave it out for the Android emulator's view of this machine.
@@ -48,7 +48,7 @@ fi
 
 case "$ENV" in
   prod)  API_BASE_URL="https://hodi.qnex.io" ;;
-  test)  API_BASE_URL="https://hodi-test.qnex.io" ;;
+  test)  API_BASE_URL="https://newhodi.qnex.io" ;;
   local) API_BASE_URL="http://10.0.2.2:8089" ;;
 esac
 

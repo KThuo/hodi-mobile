@@ -20,11 +20,15 @@ abstract class ApiConstants {
   static const String _env = String.fromEnvironment('ENV', defaultValue: 'test');
   // Prefer the URL injected by scripts/build.sh; fall back to the ENV-derived
   // default so `flutter run`/`flutter test` without defines still works.
+  //
+  // The test host is `newhodi`, not `hodi-test`. Both answer, which is what made this
+  // expensive: `hodi-test` is the legacy deployment, so a build aimed at it authenticates,
+  // then fails on the first call this app makes — a server error rather than a wrong address.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: _env == 'prod'
         ? 'https://hodi.qnex.io'
-        : 'https://hodi-test.qnex.io',
+        : 'https://newhodi.qnex.io',
   );
   static const String apiPrefix = '/api/v1';
 
