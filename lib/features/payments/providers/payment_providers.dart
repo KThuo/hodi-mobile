@@ -35,7 +35,10 @@ class PaymentListState {
     this.searchTerm,
     DateTime? startDate,
     DateTime? endDate,
-    this.statusFilter = '0',
+    // RECEIVED. Legacy numbered it 0 and voided 2; the rebuilt server uses 1 and 4, matching
+    // InvoiceStatus so that the same number means the same thing in both. Asking for 0 is asking
+    // for a status no payment has, which is why this list came back empty rather than wrong.
+    this.statusFilter = '1',
   })  : startDate = startDate ?? DateTime.now().subtract(const Duration(days: 90)),
         endDate = endDate ?? DateTime.now();
 

@@ -14,10 +14,17 @@ class MetreRepository {
 
   MetreRepository({required ApiClient apiClient}) : _apiClient = apiClient;
 
+  /// [read] is the screen's Read/Unread chip: true for meters already read this month, false for
+  /// the ones still owing a reading, null for all of them.
+  ///
+  /// The server asks the opposite question — `readingDue` — so the answer is inverted here rather
+  /// than at the screen, which should go on saying what it means. Legacy's parameter was called
+  /// `currentReading` and the rebuilt server has no such parameter: an unknown query parameter is
+  /// ignored, so both chips quietly returned the same unfiltered list.
   Future<ApiResponse<PagedResponse<MetreModel>>> getMetres({
     int page = 0,
     int pageSize = 20,
-    bool? currentReading,
+    bool? read,
     String? searchTerm,
     String? estateId,
     String? propertyId,
@@ -27,7 +34,7 @@ class MetreRepository {
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
-        'currentReading': ?currentReading,
+        if (read != null) 'readingDue': !read,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
         'estateId': ?estateId,
         'propertyId': ?propertyId,

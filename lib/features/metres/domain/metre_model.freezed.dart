@@ -15,7 +15,19 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MetreModel {
 
- String? get id; String? get metreNo; String? get billName; String? get houseName; String? get property; String? get estate; double get previousReading; double get currentReading; double get consumedUnits; double get charge; double get amount; int get status; String? get updatedOn; int? get imageStatus; bool get updatable; int? get month; int? get year; String? get monthName; String? get historyId;
+/// Hashed and salted per user. Opaque.
+ String? get id; String? get meterNo; String? get utilityChargeId;/// What is being metered — "Water", "Electricity".
+ String? get chargeName;/// What a unit of it is called — "m³", "kWh".
+ String? get unitLabel;/// Today's rate per unit, for the next reading. See the note above.
+@JsonKey(fromJson: parseDouble) double get rate; String? get houseId; String? get houseCode; String? get houseNumber;/// "WA03 (2nd Floor)" — the unit as somebody says it out loud.
+ String? get houseLabel; String? get propertyName; String? get estateName;@JsonKey(fromJson: parseDouble) double get currentReading;@JsonKey(fromJson: parseDouble) double get previousReading;@JsonKey(fromJson: parseDouble) double get consumedUnits;/// What the last reading was priced at, which is not always [rate].
+@JsonKey(fromJson: parseDouble) double get lastRate;@JsonKey(fromJson: parseDouble) double get lastAmount;/// "September 2026" — the billing month the last reading belongs to.
+ String? get lastReadPeriod; String? get lastReadOn;/// No reading yet for the current billing month.
+///
+/// Which is the same thing as "a reading may be taken now": the server refuses a second reading
+/// in a period it has already been read for, so a screen that offered the button anyway would be
+/// offering a rejection.
+ bool get readingDue; int get status; String? get deactivationReason;
 /// Create a copy of MetreModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +40,16 @@ $MetreModelCopyWith<MetreModel> get copyWith => _$MetreModelCopyWithImpl<MetreMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MetreModel&&(identical(other.id, id) || other.id == id)&&(identical(other.metreNo, metreNo) || other.metreNo == metreNo)&&(identical(other.billName, billName) || other.billName == billName)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.property, property) || other.property == property)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.previousReading, previousReading) || other.previousReading == previousReading)&&(identical(other.currentReading, currentReading) || other.currentReading == currentReading)&&(identical(other.consumedUnits, consumedUnits) || other.consumedUnits == consumedUnits)&&(identical(other.charge, charge) || other.charge == charge)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.status, status) || other.status == status)&&(identical(other.updatedOn, updatedOn) || other.updatedOn == updatedOn)&&(identical(other.imageStatus, imageStatus) || other.imageStatus == imageStatus)&&(identical(other.updatable, updatable) || other.updatable == updatable)&&(identical(other.month, month) || other.month == month)&&(identical(other.year, year) || other.year == year)&&(identical(other.monthName, monthName) || other.monthName == monthName)&&(identical(other.historyId, historyId) || other.historyId == historyId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MetreModel&&(identical(other.id, id) || other.id == id)&&(identical(other.meterNo, meterNo) || other.meterNo == meterNo)&&(identical(other.utilityChargeId, utilityChargeId) || other.utilityChargeId == utilityChargeId)&&(identical(other.chargeName, chargeName) || other.chargeName == chargeName)&&(identical(other.unitLabel, unitLabel) || other.unitLabel == unitLabel)&&(identical(other.rate, rate) || other.rate == rate)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.currentReading, currentReading) || other.currentReading == currentReading)&&(identical(other.previousReading, previousReading) || other.previousReading == previousReading)&&(identical(other.consumedUnits, consumedUnits) || other.consumedUnits == consumedUnits)&&(identical(other.lastRate, lastRate) || other.lastRate == lastRate)&&(identical(other.lastAmount, lastAmount) || other.lastAmount == lastAmount)&&(identical(other.lastReadPeriod, lastReadPeriod) || other.lastReadPeriod == lastReadPeriod)&&(identical(other.lastReadOn, lastReadOn) || other.lastReadOn == lastReadOn)&&(identical(other.readingDue, readingDue) || other.readingDue == readingDue)&&(identical(other.status, status) || other.status == status)&&(identical(other.deactivationReason, deactivationReason) || other.deactivationReason == deactivationReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,metreNo,billName,houseName,property,estate,previousReading,currentReading,consumedUnits,charge,amount,status,updatedOn,imageStatus,updatable,month,year,monthName,historyId]);
+int get hashCode => Object.hashAll([runtimeType,id,meterNo,utilityChargeId,chargeName,unitLabel,rate,houseId,houseCode,houseNumber,houseLabel,propertyName,estateName,currentReading,previousReading,consumedUnits,lastRate,lastAmount,lastReadPeriod,lastReadOn,readingDue,status,deactivationReason]);
 
 @override
 String toString() {
-  return 'MetreModel(id: $id, metreNo: $metreNo, billName: $billName, houseName: $houseName, property: $property, estate: $estate, previousReading: $previousReading, currentReading: $currentReading, consumedUnits: $consumedUnits, charge: $charge, amount: $amount, status: $status, updatedOn: $updatedOn, imageStatus: $imageStatus, updatable: $updatable, month: $month, year: $year, monthName: $monthName, historyId: $historyId)';
+  return 'MetreModel(id: $id, meterNo: $meterNo, utilityChargeId: $utilityChargeId, chargeName: $chargeName, unitLabel: $unitLabel, rate: $rate, houseId: $houseId, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, currentReading: $currentReading, previousReading: $previousReading, consumedUnits: $consumedUnits, lastRate: $lastRate, lastAmount: $lastAmount, lastReadPeriod: $lastReadPeriod, lastReadOn: $lastReadOn, readingDue: $readingDue, status: $status, deactivationReason: $deactivationReason)';
 }
 
 
@@ -48,7 +60,7 @@ abstract mixin class $MetreModelCopyWith<$Res>  {
   factory $MetreModelCopyWith(MetreModel value, $Res Function(MetreModel) _then) = _$MetreModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? metreNo, String? billName, String? houseName, String? property, String? estate, double previousReading, double currentReading, double consumedUnits, double charge, double amount, int status, String? updatedOn, int? imageStatus, bool updatable, int? month, int? year, String? monthName, String? historyId
+ String? id, String? meterNo, String? utilityChargeId, String? chargeName, String? unitLabel,@JsonKey(fromJson: parseDouble) double rate, String? houseId, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double currentReading,@JsonKey(fromJson: parseDouble) double previousReading,@JsonKey(fromJson: parseDouble) double consumedUnits,@JsonKey(fromJson: parseDouble) double lastRate,@JsonKey(fromJson: parseDouble) double lastAmount, String? lastReadPeriod, String? lastReadOn, bool readingDue, int status, String? deactivationReason
 });
 
 
@@ -65,27 +77,30 @@ class _$MetreModelCopyWithImpl<$Res>
 
 /// Create a copy of MetreModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? metreNo = freezed,Object? billName = freezed,Object? houseName = freezed,Object? property = freezed,Object? estate = freezed,Object? previousReading = null,Object? currentReading = null,Object? consumedUnits = null,Object? charge = null,Object? amount = null,Object? status = null,Object? updatedOn = freezed,Object? imageStatus = freezed,Object? updatable = null,Object? month = freezed,Object? year = freezed,Object? monthName = freezed,Object? historyId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? meterNo = freezed,Object? utilityChargeId = freezed,Object? chargeName = freezed,Object? unitLabel = freezed,Object? rate = null,Object? houseId = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? currentReading = null,Object? previousReading = null,Object? consumedUnits = null,Object? lastRate = null,Object? lastAmount = null,Object? lastReadPeriod = freezed,Object? lastReadOn = freezed,Object? readingDue = null,Object? status = null,Object? deactivationReason = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,metreNo: freezed == metreNo ? _self.metreNo : metreNo // ignore: cast_nullable_to_non_nullable
-as String?,billName: freezed == billName ? _self.billName : billName // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,previousReading: null == previousReading ? _self.previousReading : previousReading // ignore: cast_nullable_to_non_nullable
-as double,currentReading: null == currentReading ? _self.currentReading : currentReading // ignore: cast_nullable_to_non_nullable
+as String?,meterNo: freezed == meterNo ? _self.meterNo : meterNo // ignore: cast_nullable_to_non_nullable
+as String?,utilityChargeId: freezed == utilityChargeId ? _self.utilityChargeId : utilityChargeId // ignore: cast_nullable_to_non_nullable
+as String?,chargeName: freezed == chargeName ? _self.chargeName : chargeName // ignore: cast_nullable_to_non_nullable
+as String?,unitLabel: freezed == unitLabel ? _self.unitLabel : unitLabel // ignore: cast_nullable_to_non_nullable
+as String?,rate: null == rate ? _self.rate : rate // ignore: cast_nullable_to_non_nullable
+as double,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,currentReading: null == currentReading ? _self.currentReading : currentReading // ignore: cast_nullable_to_non_nullable
+as double,previousReading: null == previousReading ? _self.previousReading : previousReading // ignore: cast_nullable_to_non_nullable
 as double,consumedUnits: null == consumedUnits ? _self.consumedUnits : consumedUnits // ignore: cast_nullable_to_non_nullable
-as double,charge: null == charge ? _self.charge : charge // ignore: cast_nullable_to_non_nullable
-as double,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int,updatedOn: freezed == updatedOn ? _self.updatedOn : updatedOn // ignore: cast_nullable_to_non_nullable
-as String?,imageStatus: freezed == imageStatus ? _self.imageStatus : imageStatus // ignore: cast_nullable_to_non_nullable
-as int?,updatable: null == updatable ? _self.updatable : updatable // ignore: cast_nullable_to_non_nullable
-as bool,month: freezed == month ? _self.month : month // ignore: cast_nullable_to_non_nullable
-as int?,year: freezed == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
-as int?,monthName: freezed == monthName ? _self.monthName : monthName // ignore: cast_nullable_to_non_nullable
-as String?,historyId: freezed == historyId ? _self.historyId : historyId // ignore: cast_nullable_to_non_nullable
+as double,lastRate: null == lastRate ? _self.lastRate : lastRate // ignore: cast_nullable_to_non_nullable
+as double,lastAmount: null == lastAmount ? _self.lastAmount : lastAmount // ignore: cast_nullable_to_non_nullable
+as double,lastReadPeriod: freezed == lastReadPeriod ? _self.lastReadPeriod : lastReadPeriod // ignore: cast_nullable_to_non_nullable
+as String?,lastReadOn: freezed == lastReadOn ? _self.lastReadOn : lastReadOn // ignore: cast_nullable_to_non_nullable
+as String?,readingDue: null == readingDue ? _self.readingDue : readingDue // ignore: cast_nullable_to_non_nullable
+as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as int,deactivationReason: freezed == deactivationReason ? _self.deactivationReason : deactivationReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -171,10 +186,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? metreNo,  String? billName,  String? houseName,  String? property,  String? estate,  double previousReading,  double currentReading,  double consumedUnits,  double charge,  double amount,  int status,  String? updatedOn,  int? imageStatus,  bool updatable,  int? month,  int? year,  String? monthName,  String? historyId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? meterNo,  String? utilityChargeId,  String? chargeName,  String? unitLabel, @JsonKey(fromJson: parseDouble)  double rate,  String? houseId,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double currentReading, @JsonKey(fromJson: parseDouble)  double previousReading, @JsonKey(fromJson: parseDouble)  double consumedUnits, @JsonKey(fromJson: parseDouble)  double lastRate, @JsonKey(fromJson: parseDouble)  double lastAmount,  String? lastReadPeriod,  String? lastReadOn,  bool readingDue,  int status,  String? deactivationReason)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MetreModel() when $default != null:
-return $default(_that.id,_that.metreNo,_that.billName,_that.houseName,_that.property,_that.estate,_that.previousReading,_that.currentReading,_that.consumedUnits,_that.charge,_that.amount,_that.status,_that.updatedOn,_that.imageStatus,_that.updatable,_that.month,_that.year,_that.monthName,_that.historyId);case _:
+return $default(_that.id,_that.meterNo,_that.utilityChargeId,_that.chargeName,_that.unitLabel,_that.rate,_that.houseId,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.currentReading,_that.previousReading,_that.consumedUnits,_that.lastRate,_that.lastAmount,_that.lastReadPeriod,_that.lastReadOn,_that.readingDue,_that.status,_that.deactivationReason);case _:
   return orElse();
 
 }
@@ -192,10 +207,10 @@ return $default(_that.id,_that.metreNo,_that.billName,_that.houseName,_that.prop
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? metreNo,  String? billName,  String? houseName,  String? property,  String? estate,  double previousReading,  double currentReading,  double consumedUnits,  double charge,  double amount,  int status,  String? updatedOn,  int? imageStatus,  bool updatable,  int? month,  int? year,  String? monthName,  String? historyId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? meterNo,  String? utilityChargeId,  String? chargeName,  String? unitLabel, @JsonKey(fromJson: parseDouble)  double rate,  String? houseId,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double currentReading, @JsonKey(fromJson: parseDouble)  double previousReading, @JsonKey(fromJson: parseDouble)  double consumedUnits, @JsonKey(fromJson: parseDouble)  double lastRate, @JsonKey(fromJson: parseDouble)  double lastAmount,  String? lastReadPeriod,  String? lastReadOn,  bool readingDue,  int status,  String? deactivationReason)  $default,) {final _that = this;
 switch (_that) {
 case _MetreModel():
-return $default(_that.id,_that.metreNo,_that.billName,_that.houseName,_that.property,_that.estate,_that.previousReading,_that.currentReading,_that.consumedUnits,_that.charge,_that.amount,_that.status,_that.updatedOn,_that.imageStatus,_that.updatable,_that.month,_that.year,_that.monthName,_that.historyId);case _:
+return $default(_that.id,_that.meterNo,_that.utilityChargeId,_that.chargeName,_that.unitLabel,_that.rate,_that.houseId,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.currentReading,_that.previousReading,_that.consumedUnits,_that.lastRate,_that.lastAmount,_that.lastReadPeriod,_that.lastReadOn,_that.readingDue,_that.status,_that.deactivationReason);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +227,10 @@ return $default(_that.id,_that.metreNo,_that.billName,_that.houseName,_that.prop
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? metreNo,  String? billName,  String? houseName,  String? property,  String? estate,  double previousReading,  double currentReading,  double consumedUnits,  double charge,  double amount,  int status,  String? updatedOn,  int? imageStatus,  bool updatable,  int? month,  int? year,  String? monthName,  String? historyId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? meterNo,  String? utilityChargeId,  String? chargeName,  String? unitLabel, @JsonKey(fromJson: parseDouble)  double rate,  String? houseId,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double currentReading, @JsonKey(fromJson: parseDouble)  double previousReading, @JsonKey(fromJson: parseDouble)  double consumedUnits, @JsonKey(fromJson: parseDouble)  double lastRate, @JsonKey(fromJson: parseDouble)  double lastAmount,  String? lastReadPeriod,  String? lastReadOn,  bool readingDue,  int status,  String? deactivationReason)?  $default,) {final _that = this;
 switch (_that) {
 case _MetreModel() when $default != null:
-return $default(_that.id,_that.metreNo,_that.billName,_that.houseName,_that.property,_that.estate,_that.previousReading,_that.currentReading,_that.consumedUnits,_that.charge,_that.amount,_that.status,_that.updatedOn,_that.imageStatus,_that.updatable,_that.month,_that.year,_that.monthName,_that.historyId);case _:
+return $default(_that.id,_that.meterNo,_that.utilityChargeId,_that.chargeName,_that.unitLabel,_that.rate,_that.houseId,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.currentReading,_that.previousReading,_that.consumedUnits,_that.lastRate,_that.lastAmount,_that.lastReadPeriod,_that.lastReadOn,_that.readingDue,_that.status,_that.deactivationReason);case _:
   return null;
 
 }
@@ -227,28 +242,43 @@ return $default(_that.id,_that.metreNo,_that.billName,_that.houseName,_that.prop
 @JsonSerializable()
 
 class _MetreModel extends MetreModel {
-  const _MetreModel({this.id, this.metreNo, this.billName, this.houseName, this.property, this.estate, this.previousReading = 0, this.currentReading = 0, this.consumedUnits = 0, this.charge = 0, this.amount = 0, this.status = 1, this.updatedOn, this.imageStatus, this.updatable = false, this.month, this.year, this.monthName, this.historyId}): super._();
+  const _MetreModel({this.id, this.meterNo, this.utilityChargeId, this.chargeName, this.unitLabel, @JsonKey(fromJson: parseDouble) this.rate = 0, this.houseId, this.houseCode, this.houseNumber, this.houseLabel, this.propertyName, this.estateName, @JsonKey(fromJson: parseDouble) this.currentReading = 0, @JsonKey(fromJson: parseDouble) this.previousReading = 0, @JsonKey(fromJson: parseDouble) this.consumedUnits = 0, @JsonKey(fromJson: parseDouble) this.lastRate = 0, @JsonKey(fromJson: parseDouble) this.lastAmount = 0, this.lastReadPeriod, this.lastReadOn, this.readingDue = false, this.status = 1, this.deactivationReason}): super._();
   factory _MetreModel.fromJson(Map<String, dynamic> json) => _$MetreModelFromJson(json);
 
+/// Hashed and salted per user. Opaque.
 @override final  String? id;
-@override final  String? metreNo;
-@override final  String? billName;
-@override final  String? houseName;
-@override final  String? property;
-@override final  String? estate;
-@override@JsonKey() final  double previousReading;
-@override@JsonKey() final  double currentReading;
-@override@JsonKey() final  double consumedUnits;
-@override@JsonKey() final  double charge;
-@override@JsonKey() final  double amount;
+@override final  String? meterNo;
+@override final  String? utilityChargeId;
+/// What is being metered — "Water", "Electricity".
+@override final  String? chargeName;
+/// What a unit of it is called — "m³", "kWh".
+@override final  String? unitLabel;
+/// Today's rate per unit, for the next reading. See the note above.
+@override@JsonKey(fromJson: parseDouble) final  double rate;
+@override final  String? houseId;
+@override final  String? houseCode;
+@override final  String? houseNumber;
+/// "WA03 (2nd Floor)" — the unit as somebody says it out loud.
+@override final  String? houseLabel;
+@override final  String? propertyName;
+@override final  String? estateName;
+@override@JsonKey(fromJson: parseDouble) final  double currentReading;
+@override@JsonKey(fromJson: parseDouble) final  double previousReading;
+@override@JsonKey(fromJson: parseDouble) final  double consumedUnits;
+/// What the last reading was priced at, which is not always [rate].
+@override@JsonKey(fromJson: parseDouble) final  double lastRate;
+@override@JsonKey(fromJson: parseDouble) final  double lastAmount;
+/// "September 2026" — the billing month the last reading belongs to.
+@override final  String? lastReadPeriod;
+@override final  String? lastReadOn;
+/// No reading yet for the current billing month.
+///
+/// Which is the same thing as "a reading may be taken now": the server refuses a second reading
+/// in a period it has already been read for, so a screen that offered the button anyway would be
+/// offering a rejection.
+@override@JsonKey() final  bool readingDue;
 @override@JsonKey() final  int status;
-@override final  String? updatedOn;
-@override final  int? imageStatus;
-@override@JsonKey() final  bool updatable;
-@override final  int? month;
-@override final  int? year;
-@override final  String? monthName;
-@override final  String? historyId;
+@override final  String? deactivationReason;
 
 /// Create a copy of MetreModel
 /// with the given fields replaced by the non-null parameter values.
@@ -263,16 +293,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MetreModel&&(identical(other.id, id) || other.id == id)&&(identical(other.metreNo, metreNo) || other.metreNo == metreNo)&&(identical(other.billName, billName) || other.billName == billName)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.property, property) || other.property == property)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.previousReading, previousReading) || other.previousReading == previousReading)&&(identical(other.currentReading, currentReading) || other.currentReading == currentReading)&&(identical(other.consumedUnits, consumedUnits) || other.consumedUnits == consumedUnits)&&(identical(other.charge, charge) || other.charge == charge)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.status, status) || other.status == status)&&(identical(other.updatedOn, updatedOn) || other.updatedOn == updatedOn)&&(identical(other.imageStatus, imageStatus) || other.imageStatus == imageStatus)&&(identical(other.updatable, updatable) || other.updatable == updatable)&&(identical(other.month, month) || other.month == month)&&(identical(other.year, year) || other.year == year)&&(identical(other.monthName, monthName) || other.monthName == monthName)&&(identical(other.historyId, historyId) || other.historyId == historyId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MetreModel&&(identical(other.id, id) || other.id == id)&&(identical(other.meterNo, meterNo) || other.meterNo == meterNo)&&(identical(other.utilityChargeId, utilityChargeId) || other.utilityChargeId == utilityChargeId)&&(identical(other.chargeName, chargeName) || other.chargeName == chargeName)&&(identical(other.unitLabel, unitLabel) || other.unitLabel == unitLabel)&&(identical(other.rate, rate) || other.rate == rate)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.currentReading, currentReading) || other.currentReading == currentReading)&&(identical(other.previousReading, previousReading) || other.previousReading == previousReading)&&(identical(other.consumedUnits, consumedUnits) || other.consumedUnits == consumedUnits)&&(identical(other.lastRate, lastRate) || other.lastRate == lastRate)&&(identical(other.lastAmount, lastAmount) || other.lastAmount == lastAmount)&&(identical(other.lastReadPeriod, lastReadPeriod) || other.lastReadPeriod == lastReadPeriod)&&(identical(other.lastReadOn, lastReadOn) || other.lastReadOn == lastReadOn)&&(identical(other.readingDue, readingDue) || other.readingDue == readingDue)&&(identical(other.status, status) || other.status == status)&&(identical(other.deactivationReason, deactivationReason) || other.deactivationReason == deactivationReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,metreNo,billName,houseName,property,estate,previousReading,currentReading,consumedUnits,charge,amount,status,updatedOn,imageStatus,updatable,month,year,monthName,historyId]);
+int get hashCode => Object.hashAll([runtimeType,id,meterNo,utilityChargeId,chargeName,unitLabel,rate,houseId,houseCode,houseNumber,houseLabel,propertyName,estateName,currentReading,previousReading,consumedUnits,lastRate,lastAmount,lastReadPeriod,lastReadOn,readingDue,status,deactivationReason]);
 
 @override
 String toString() {
-  return 'MetreModel(id: $id, metreNo: $metreNo, billName: $billName, houseName: $houseName, property: $property, estate: $estate, previousReading: $previousReading, currentReading: $currentReading, consumedUnits: $consumedUnits, charge: $charge, amount: $amount, status: $status, updatedOn: $updatedOn, imageStatus: $imageStatus, updatable: $updatable, month: $month, year: $year, monthName: $monthName, historyId: $historyId)';
+  return 'MetreModel(id: $id, meterNo: $meterNo, utilityChargeId: $utilityChargeId, chargeName: $chargeName, unitLabel: $unitLabel, rate: $rate, houseId: $houseId, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, currentReading: $currentReading, previousReading: $previousReading, consumedUnits: $consumedUnits, lastRate: $lastRate, lastAmount: $lastAmount, lastReadPeriod: $lastReadPeriod, lastReadOn: $lastReadOn, readingDue: $readingDue, status: $status, deactivationReason: $deactivationReason)';
 }
 
 
@@ -283,7 +313,7 @@ abstract mixin class _$MetreModelCopyWith<$Res> implements $MetreModelCopyWith<$
   factory _$MetreModelCopyWith(_MetreModel value, $Res Function(_MetreModel) _then) = __$MetreModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? metreNo, String? billName, String? houseName, String? property, String? estate, double previousReading, double currentReading, double consumedUnits, double charge, double amount, int status, String? updatedOn, int? imageStatus, bool updatable, int? month, int? year, String? monthName, String? historyId
+ String? id, String? meterNo, String? utilityChargeId, String? chargeName, String? unitLabel,@JsonKey(fromJson: parseDouble) double rate, String? houseId, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double currentReading,@JsonKey(fromJson: parseDouble) double previousReading,@JsonKey(fromJson: parseDouble) double consumedUnits,@JsonKey(fromJson: parseDouble) double lastRate,@JsonKey(fromJson: parseDouble) double lastAmount, String? lastReadPeriod, String? lastReadOn, bool readingDue, int status, String? deactivationReason
 });
 
 
@@ -300,27 +330,30 @@ class __$MetreModelCopyWithImpl<$Res>
 
 /// Create a copy of MetreModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? metreNo = freezed,Object? billName = freezed,Object? houseName = freezed,Object? property = freezed,Object? estate = freezed,Object? previousReading = null,Object? currentReading = null,Object? consumedUnits = null,Object? charge = null,Object? amount = null,Object? status = null,Object? updatedOn = freezed,Object? imageStatus = freezed,Object? updatable = null,Object? month = freezed,Object? year = freezed,Object? monthName = freezed,Object? historyId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? meterNo = freezed,Object? utilityChargeId = freezed,Object? chargeName = freezed,Object? unitLabel = freezed,Object? rate = null,Object? houseId = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? currentReading = null,Object? previousReading = null,Object? consumedUnits = null,Object? lastRate = null,Object? lastAmount = null,Object? lastReadPeriod = freezed,Object? lastReadOn = freezed,Object? readingDue = null,Object? status = null,Object? deactivationReason = freezed,}) {
   return _then(_MetreModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,metreNo: freezed == metreNo ? _self.metreNo : metreNo // ignore: cast_nullable_to_non_nullable
-as String?,billName: freezed == billName ? _self.billName : billName // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,previousReading: null == previousReading ? _self.previousReading : previousReading // ignore: cast_nullable_to_non_nullable
-as double,currentReading: null == currentReading ? _self.currentReading : currentReading // ignore: cast_nullable_to_non_nullable
+as String?,meterNo: freezed == meterNo ? _self.meterNo : meterNo // ignore: cast_nullable_to_non_nullable
+as String?,utilityChargeId: freezed == utilityChargeId ? _self.utilityChargeId : utilityChargeId // ignore: cast_nullable_to_non_nullable
+as String?,chargeName: freezed == chargeName ? _self.chargeName : chargeName // ignore: cast_nullable_to_non_nullable
+as String?,unitLabel: freezed == unitLabel ? _self.unitLabel : unitLabel // ignore: cast_nullable_to_non_nullable
+as String?,rate: null == rate ? _self.rate : rate // ignore: cast_nullable_to_non_nullable
+as double,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,currentReading: null == currentReading ? _self.currentReading : currentReading // ignore: cast_nullable_to_non_nullable
+as double,previousReading: null == previousReading ? _self.previousReading : previousReading // ignore: cast_nullable_to_non_nullable
 as double,consumedUnits: null == consumedUnits ? _self.consumedUnits : consumedUnits // ignore: cast_nullable_to_non_nullable
-as double,charge: null == charge ? _self.charge : charge // ignore: cast_nullable_to_non_nullable
-as double,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int,updatedOn: freezed == updatedOn ? _self.updatedOn : updatedOn // ignore: cast_nullable_to_non_nullable
-as String?,imageStatus: freezed == imageStatus ? _self.imageStatus : imageStatus // ignore: cast_nullable_to_non_nullable
-as int?,updatable: null == updatable ? _self.updatable : updatable // ignore: cast_nullable_to_non_nullable
-as bool,month: freezed == month ? _self.month : month // ignore: cast_nullable_to_non_nullable
-as int?,year: freezed == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
-as int?,monthName: freezed == monthName ? _self.monthName : monthName // ignore: cast_nullable_to_non_nullable
-as String?,historyId: freezed == historyId ? _self.historyId : historyId // ignore: cast_nullable_to_non_nullable
+as double,lastRate: null == lastRate ? _self.lastRate : lastRate // ignore: cast_nullable_to_non_nullable
+as double,lastAmount: null == lastAmount ? _self.lastAmount : lastAmount // ignore: cast_nullable_to_non_nullable
+as double,lastReadPeriod: freezed == lastReadPeriod ? _self.lastReadPeriod : lastReadPeriod // ignore: cast_nullable_to_non_nullable
+as String?,lastReadOn: freezed == lastReadOn ? _self.lastReadOn : lastReadOn // ignore: cast_nullable_to_non_nullable
+as String?,readingDue: null == readingDue ? _self.readingDue : readingDue // ignore: cast_nullable_to_non_nullable
+as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as int,deactivationReason: freezed == deactivationReason ? _self.deactivationReason : deactivationReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

@@ -67,7 +67,7 @@ class MetreListNotifier extends Notifier<MetreListState> {
     final filters = ref.read(filterProvider);
     final response = await _repository.getMetres(
       page: page,
-      currentReading: state.currentReadingFilter,
+      read: state.currentReadingFilter,
       searchTerm: state.searchTerm,
       estateId: filters.selectedEstateId,
       propertyId: filters.selectedPropertyId,

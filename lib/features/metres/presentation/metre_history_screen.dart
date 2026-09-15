@@ -89,7 +89,7 @@ class _MetreHistoryScreenState extends ConsumerState<MetreHistoryScreen> {
     // Check if metre is active and updatable for FAB
     final metreListState = ref.watch(metreListProvider);
     final metre = metreListState.metres.where((m) => m.id == widget.metreId).firstOrNull;
-    final showFab = _canUpdateReading && metre != null && metre.isActive && metre.updatable;
+    final showFab = _canUpdateReading && metre != null && metre.isActive && metre.readingDue;
 
     return Scaffold(
       backgroundColor: HodiColors.background,

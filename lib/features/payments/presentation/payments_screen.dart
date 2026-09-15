@@ -122,15 +122,15 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   _FilterChip(
-                    label: 'Processed',
-                    isSelected: state.statusFilter == '0',
-                    onTap: () => ref.read(paymentListProvider.notifier).filterByStatus('0'),
+                    label: 'Received',
+                    isSelected: state.statusFilter == '1',
+                    onTap: () => ref.read(paymentListProvider.notifier).filterByStatus('1'),
                   ),
                   const SizedBox(width: 8),
                   _FilterChip(
                     label: 'Voided',
-                    isSelected: state.statusFilter == '2',
-                    onTap: () => ref.read(paymentListProvider.notifier).filterByStatus('2'),
+                    isSelected: state.statusFilter == '4',
+                    onTap: () => ref.read(paymentListProvider.notifier).filterByStatus('4'),
                   ),
                 ],
               ),

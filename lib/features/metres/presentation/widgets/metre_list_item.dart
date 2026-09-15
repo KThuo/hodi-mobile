@@ -22,7 +22,7 @@ class MetreListItem extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  metre.metreNo ?? '-',
+                  metre.meterNo ?? '-',
                   style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -41,7 +41,7 @@ class MetreListItem extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  metre.billName ?? '-',
+                  metre.chargeName ?? '-',
                   style: HodiTextStyles.bodySmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -55,7 +55,7 @@ class MetreListItem extends StatelessWidget {
               const Icon(Icons.home_outlined, size: 14, color: Color(0xFF9CA3AF)),
               const SizedBox(width: 4),
               Text(
-                metre.houseName ?? '-',
+                metre.unit,
                 style: HodiTextStyles.bodySmall,
               ),
               const Spacer(),
@@ -63,7 +63,7 @@ class MetreListItem extends StatelessWidget {
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  metre.property ?? '-',
+                  metre.propertyName ?? '-',
                   style: HodiTextStyles.bodySmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -88,7 +88,7 @@ class MetreListItem extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '${metre.consumedUnits} units',
+                metre.consumption,
                 style: HodiTextStyles.bodySmall,
               ),
             ],
@@ -98,12 +98,12 @@ class MetreListItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               HodiAmountText(
-                amount: metre.amount,
+                amount: metre.lastAmount,
                 style: HodiTextStyles.currency.copyWith(fontSize: 15),
               ),
-              if (metre.updatedOn != null)
+              if (metre.lastReadOnLabel != null)
                 Text(
-                  metre.updatedOn!,
+                  metre.lastReadOnLabel!,
                   style: HodiTextStyles.bodySmall,
                 ),
             ],

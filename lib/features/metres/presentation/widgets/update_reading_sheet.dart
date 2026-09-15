@@ -32,7 +32,7 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
   double get _newReading => double.tryParse(_readingController.text) ?? 0;
   double get _consumedUnits =>
       _newReading > widget.metre.currentReading ? _newReading - widget.metre.currentReading : 0;
-  double get _totalAmount => _consumedUnits * widget.metre.charge;
+  double get _totalAmount => _consumedUnits * widget.metre.rate;
 
   @override
   void dispose() {
@@ -187,7 +187,7 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
                 child: Text('Update Reading', style: HodiTextStyles.heading3),
               ),
               const SizedBox(height: 24),
-              _ReadOnlyField(label: 'Metre No', value: widget.metre.metreNo ?? '-'),
+              _ReadOnlyField(label: 'Metre No', value: widget.metre.meterNo ?? '-'),
               const SizedBox(height: 16),
               _ReadOnlyField(
                 label: 'Previous Reading',
@@ -196,7 +196,7 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
               const SizedBox(height: 16),
               _ReadOnlyField(
                 label: 'Charge/Unit',
-                value: widget.metre.charge.toString(),
+                value: widget.metre.rate.toString(),
               ),
               const SizedBox(height: 16),
               HodiTextField(
