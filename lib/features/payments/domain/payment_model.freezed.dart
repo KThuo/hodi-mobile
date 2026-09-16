@@ -19,7 +19,12 @@ mixin _$PaymentModel {
  String? get id;/// The receipt number, which is what a tenant quotes.
  String? get rrn; int get status; String? get statusLabel;/// `CASH`, `STK`, `TRANSFER` — the machine-readable channel.
  String? get method;/// The channel in words, from the server, which is what gets shown.
- String? get methodLabel;/// The payer's own reference — an M-PESA code, a cheque number, a slip.
+ String? get methodLabel;/// What a person calls how this money arrived — "Lipa na KCB", "Cash".
+///
+/// The configured account's own name where there was one, and the method's label otherwise.
+/// Not the same as [methodLabel]: a payer who queued at a bank counter says the bank's name,
+/// not "Bank transfer", and a receipt that argues with them is a receipt they will query.
+ String? get arrivedAs;/// The payer's own reference — an M-PESA code, a cheque number, a slip.
  String? get reference; String? get tenantName; String? get paidBy; String? get payerPhone; String? get houseCode; String? get houseNumber; String? get houseLabel; String? get propertyName; String? get estateName;/// What arrived.
 @JsonKey(fromJson: parseDouble) double get amount;/// How much of it was put against invoices.
 @JsonKey(fromJson: parseDouble) double get allocatedAmount;/// What is still standing as credit on the tenancy.
@@ -32,7 +37,8 @@ mixin _$PaymentModel {
 /// Carried on the receipt because that is the question a tenant asks next, and answering it
 /// from a balance fetched later would show what they owe *now* rather than what this payment
 /// left them owing.
-@JsonKey(fromJson: parseDouble) double get rentOwed;@JsonKey(fromJson: parseDouble) double get rentOwedBefore;
+/// Nullable, because "not recorded" is not "nothing owed" — see [parseDoubleNullable].
+@JsonKey(fromJson: parseDoubleNullable) double? get rentOwed;@JsonKey(fromJson: parseDoubleNullable) double? get rentOwedBefore;
 /// Create a copy of PaymentModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,16 +51,16 @@ $PaymentModelCopyWith<PaymentModel> get copyWith => _$PaymentModelCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.status, status) || other.status == status)&&(identical(other.statusLabel, statusLabel) || other.statusLabel == statusLabel)&&(identical(other.method, method) || other.method == method)&&(identical(other.methodLabel, methodLabel) || other.methodLabel == methodLabel)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.paidBy, paidBy) || other.paidBy == paidBy)&&(identical(other.payerPhone, payerPhone) || other.payerPhone == payerPhone)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.allocatedAmount, allocatedAmount) || other.allocatedAmount == allocatedAmount)&&(identical(other.unallocated, unallocated) || other.unallocated == unallocated)&&(identical(other.invoiceCount, invoiceCount) || other.invoiceCount == invoiceCount)&&(identical(other.invoiceRrn, invoiceRrn) || other.invoiceRrn == invoiceRrn)&&(identical(other.receivedOn, receivedOn) || other.receivedOn == receivedOn)&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.rentOwedBefore, rentOwedBefore) || other.rentOwedBefore == rentOwedBefore));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.status, status) || other.status == status)&&(identical(other.statusLabel, statusLabel) || other.statusLabel == statusLabel)&&(identical(other.method, method) || other.method == method)&&(identical(other.methodLabel, methodLabel) || other.methodLabel == methodLabel)&&(identical(other.arrivedAs, arrivedAs) || other.arrivedAs == arrivedAs)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.paidBy, paidBy) || other.paidBy == paidBy)&&(identical(other.payerPhone, payerPhone) || other.payerPhone == payerPhone)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.allocatedAmount, allocatedAmount) || other.allocatedAmount == allocatedAmount)&&(identical(other.unallocated, unallocated) || other.unallocated == unallocated)&&(identical(other.invoiceCount, invoiceCount) || other.invoiceCount == invoiceCount)&&(identical(other.invoiceRrn, invoiceRrn) || other.invoiceRrn == invoiceRrn)&&(identical(other.receivedOn, receivedOn) || other.receivedOn == receivedOn)&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.rentOwedBefore, rentOwedBefore) || other.rentOwedBefore == rentOwedBefore));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,rrn,status,statusLabel,method,methodLabel,reference,tenantName,paidBy,payerPhone,houseCode,houseNumber,houseLabel,propertyName,estateName,amount,allocatedAmount,unallocated,invoiceCount,invoiceRrn,receivedOn,narration,occupationId,houseId,voidReason,categoryName,rentOwed,rentOwedBefore]);
+int get hashCode => Object.hashAll([runtimeType,id,rrn,status,statusLabel,method,methodLabel,arrivedAs,reference,tenantName,paidBy,payerPhone,houseCode,houseNumber,houseLabel,propertyName,estateName,amount,allocatedAmount,unallocated,invoiceCount,invoiceRrn,receivedOn,narration,occupationId,houseId,voidReason,categoryName,rentOwed,rentOwedBefore]);
 
 @override
 String toString() {
-  return 'PaymentModel(id: $id, rrn: $rrn, status: $status, statusLabel: $statusLabel, method: $method, methodLabel: $methodLabel, reference: $reference, tenantName: $tenantName, paidBy: $paidBy, payerPhone: $payerPhone, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, amount: $amount, allocatedAmount: $allocatedAmount, unallocated: $unallocated, invoiceCount: $invoiceCount, invoiceRrn: $invoiceRrn, receivedOn: $receivedOn, narration: $narration, occupationId: $occupationId, houseId: $houseId, voidReason: $voidReason, categoryName: $categoryName, rentOwed: $rentOwed, rentOwedBefore: $rentOwedBefore)';
+  return 'PaymentModel(id: $id, rrn: $rrn, status: $status, statusLabel: $statusLabel, method: $method, methodLabel: $methodLabel, arrivedAs: $arrivedAs, reference: $reference, tenantName: $tenantName, paidBy: $paidBy, payerPhone: $payerPhone, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, amount: $amount, allocatedAmount: $allocatedAmount, unallocated: $unallocated, invoiceCount: $invoiceCount, invoiceRrn: $invoiceRrn, receivedOn: $receivedOn, narration: $narration, occupationId: $occupationId, houseId: $houseId, voidReason: $voidReason, categoryName: $categoryName, rentOwed: $rentOwed, rentOwedBefore: $rentOwedBefore)';
 }
 
 
@@ -65,7 +71,7 @@ abstract mixin class $PaymentModelCopyWith<$Res>  {
   factory $PaymentModelCopyWith(PaymentModel value, $Res Function(PaymentModel) _then) = _$PaymentModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? rrn, int status, String? statusLabel, String? method, String? methodLabel, String? reference, String? tenantName, String? paidBy, String? payerPhone, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double amount,@JsonKey(fromJson: parseDouble) double allocatedAmount,@JsonKey(fromJson: parseDouble) double unallocated, int invoiceCount, String? invoiceRrn, String? receivedOn, String? narration, String? occupationId, String? houseId, String? voidReason, String? categoryName,@JsonKey(fromJson: parseDouble) double rentOwed,@JsonKey(fromJson: parseDouble) double rentOwedBefore
+ String? id, String? rrn, int status, String? statusLabel, String? method, String? methodLabel, String? arrivedAs, String? reference, String? tenantName, String? paidBy, String? payerPhone, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double amount,@JsonKey(fromJson: parseDouble) double allocatedAmount,@JsonKey(fromJson: parseDouble) double unallocated, int invoiceCount, String? invoiceRrn, String? receivedOn, String? narration, String? occupationId, String? houseId, String? voidReason, String? categoryName,@JsonKey(fromJson: parseDoubleNullable) double? rentOwed,@JsonKey(fromJson: parseDoubleNullable) double? rentOwedBefore
 });
 
 
@@ -82,7 +88,7 @@ class _$PaymentModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? rrn = freezed,Object? status = null,Object? statusLabel = freezed,Object? method = freezed,Object? methodLabel = freezed,Object? reference = freezed,Object? tenantName = freezed,Object? paidBy = freezed,Object? payerPhone = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? amount = null,Object? allocatedAmount = null,Object? unallocated = null,Object? invoiceCount = null,Object? invoiceRrn = freezed,Object? receivedOn = freezed,Object? narration = freezed,Object? occupationId = freezed,Object? houseId = freezed,Object? voidReason = freezed,Object? categoryName = freezed,Object? rentOwed = null,Object? rentOwedBefore = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? rrn = freezed,Object? status = null,Object? statusLabel = freezed,Object? method = freezed,Object? methodLabel = freezed,Object? arrivedAs = freezed,Object? reference = freezed,Object? tenantName = freezed,Object? paidBy = freezed,Object? payerPhone = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? amount = null,Object? allocatedAmount = null,Object? unallocated = null,Object? invoiceCount = null,Object? invoiceRrn = freezed,Object? receivedOn = freezed,Object? narration = freezed,Object? occupationId = freezed,Object? houseId = freezed,Object? voidReason = freezed,Object? categoryName = freezed,Object? rentOwed = freezed,Object? rentOwedBefore = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
@@ -90,6 +96,7 @@ as String?,status: null == status ? _self.status : status // ignore: cast_nullab
 as int,statusLabel: freezed == statusLabel ? _self.statusLabel : statusLabel // ignore: cast_nullable_to_non_nullable
 as String?,method: freezed == method ? _self.method : method // ignore: cast_nullable_to_non_nullable
 as String?,methodLabel: freezed == methodLabel ? _self.methodLabel : methodLabel // ignore: cast_nullable_to_non_nullable
+as String?,arrivedAs: freezed == arrivedAs ? _self.arrivedAs : arrivedAs // ignore: cast_nullable_to_non_nullable
 as String?,reference: freezed == reference ? _self.reference : reference // ignore: cast_nullable_to_non_nullable
 as String?,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
 as String?,paidBy: freezed == paidBy ? _self.paidBy : paidBy // ignore: cast_nullable_to_non_nullable
@@ -110,9 +117,9 @@ as String?,occupationId: freezed == occupationId ? _self.occupationId : occupati
 as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
 as String?,voidReason: freezed == voidReason ? _self.voidReason : voidReason // ignore: cast_nullable_to_non_nullable
 as String?,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
-as String?,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
-as double,rentOwedBefore: null == rentOwedBefore ? _self.rentOwedBefore : rentOwedBefore // ignore: cast_nullable_to_non_nullable
-as double,
+as String?,rentOwed: freezed == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
+as double?,rentOwedBefore: freezed == rentOwedBefore ? _self.rentOwedBefore : rentOwedBefore // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 
@@ -197,10 +204,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? rrn,  int status,  String? statusLabel,  String? method,  String? methodLabel,  String? reference,  String? tenantName,  String? paidBy,  String? payerPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double allocatedAmount, @JsonKey(fromJson: parseDouble)  double unallocated,  int invoiceCount,  String? invoiceRrn,  String? receivedOn,  String? narration,  String? occupationId,  String? houseId,  String? voidReason,  String? categoryName, @JsonKey(fromJson: parseDouble)  double rentOwed, @JsonKey(fromJson: parseDouble)  double rentOwedBefore)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? rrn,  int status,  String? statusLabel,  String? method,  String? methodLabel,  String? arrivedAs,  String? reference,  String? tenantName,  String? paidBy,  String? payerPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double allocatedAmount, @JsonKey(fromJson: parseDouble)  double unallocated,  int invoiceCount,  String? invoiceRrn,  String? receivedOn,  String? narration,  String? occupationId,  String? houseId,  String? voidReason,  String? categoryName, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwed, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwedBefore)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PaymentModel() when $default != null:
-return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_that.methodLabel,_that.reference,_that.tenantName,_that.paidBy,_that.payerPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.allocatedAmount,_that.unallocated,_that.invoiceCount,_that.invoiceRrn,_that.receivedOn,_that.narration,_that.occupationId,_that.houseId,_that.voidReason,_that.categoryName,_that.rentOwed,_that.rentOwedBefore);case _:
+return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_that.methodLabel,_that.arrivedAs,_that.reference,_that.tenantName,_that.paidBy,_that.payerPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.allocatedAmount,_that.unallocated,_that.invoiceCount,_that.invoiceRrn,_that.receivedOn,_that.narration,_that.occupationId,_that.houseId,_that.voidReason,_that.categoryName,_that.rentOwed,_that.rentOwedBefore);case _:
   return orElse();
 
 }
@@ -218,10 +225,10 @@ return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? rrn,  int status,  String? statusLabel,  String? method,  String? methodLabel,  String? reference,  String? tenantName,  String? paidBy,  String? payerPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double allocatedAmount, @JsonKey(fromJson: parseDouble)  double unallocated,  int invoiceCount,  String? invoiceRrn,  String? receivedOn,  String? narration,  String? occupationId,  String? houseId,  String? voidReason,  String? categoryName, @JsonKey(fromJson: parseDouble)  double rentOwed, @JsonKey(fromJson: parseDouble)  double rentOwedBefore)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? rrn,  int status,  String? statusLabel,  String? method,  String? methodLabel,  String? arrivedAs,  String? reference,  String? tenantName,  String? paidBy,  String? payerPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double allocatedAmount, @JsonKey(fromJson: parseDouble)  double unallocated,  int invoiceCount,  String? invoiceRrn,  String? receivedOn,  String? narration,  String? occupationId,  String? houseId,  String? voidReason,  String? categoryName, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwed, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwedBefore)  $default,) {final _that = this;
 switch (_that) {
 case _PaymentModel():
-return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_that.methodLabel,_that.reference,_that.tenantName,_that.paidBy,_that.payerPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.allocatedAmount,_that.unallocated,_that.invoiceCount,_that.invoiceRrn,_that.receivedOn,_that.narration,_that.occupationId,_that.houseId,_that.voidReason,_that.categoryName,_that.rentOwed,_that.rentOwedBefore);case _:
+return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_that.methodLabel,_that.arrivedAs,_that.reference,_that.tenantName,_that.paidBy,_that.payerPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.allocatedAmount,_that.unallocated,_that.invoiceCount,_that.invoiceRrn,_that.receivedOn,_that.narration,_that.occupationId,_that.houseId,_that.voidReason,_that.categoryName,_that.rentOwed,_that.rentOwedBefore);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -238,10 +245,10 @@ return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? rrn,  int status,  String? statusLabel,  String? method,  String? methodLabel,  String? reference,  String? tenantName,  String? paidBy,  String? payerPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double allocatedAmount, @JsonKey(fromJson: parseDouble)  double unallocated,  int invoiceCount,  String? invoiceRrn,  String? receivedOn,  String? narration,  String? occupationId,  String? houseId,  String? voidReason,  String? categoryName, @JsonKey(fromJson: parseDouble)  double rentOwed, @JsonKey(fromJson: parseDouble)  double rentOwedBefore)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? rrn,  int status,  String? statusLabel,  String? method,  String? methodLabel,  String? arrivedAs,  String? reference,  String? tenantName,  String? paidBy,  String? payerPhone,  String? houseCode,  String? houseNumber,  String? houseLabel,  String? propertyName,  String? estateName, @JsonKey(fromJson: parseDouble)  double amount, @JsonKey(fromJson: parseDouble)  double allocatedAmount, @JsonKey(fromJson: parseDouble)  double unallocated,  int invoiceCount,  String? invoiceRrn,  String? receivedOn,  String? narration,  String? occupationId,  String? houseId,  String? voidReason,  String? categoryName, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwed, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwedBefore)?  $default,) {final _that = this;
 switch (_that) {
 case _PaymentModel() when $default != null:
-return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_that.methodLabel,_that.reference,_that.tenantName,_that.paidBy,_that.payerPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.allocatedAmount,_that.unallocated,_that.invoiceCount,_that.invoiceRrn,_that.receivedOn,_that.narration,_that.occupationId,_that.houseId,_that.voidReason,_that.categoryName,_that.rentOwed,_that.rentOwedBefore);case _:
+return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_that.methodLabel,_that.arrivedAs,_that.reference,_that.tenantName,_that.paidBy,_that.payerPhone,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyName,_that.estateName,_that.amount,_that.allocatedAmount,_that.unallocated,_that.invoiceCount,_that.invoiceRrn,_that.receivedOn,_that.narration,_that.occupationId,_that.houseId,_that.voidReason,_that.categoryName,_that.rentOwed,_that.rentOwedBefore);case _:
   return null;
 
 }
@@ -253,7 +260,7 @@ return $default(_that.id,_that.rrn,_that.status,_that.statusLabel,_that.method,_
 @JsonSerializable()
 
 class _PaymentModel extends PaymentModel {
-  const _PaymentModel({this.id, this.rrn, this.status = 0, this.statusLabel, this.method, this.methodLabel, this.reference, this.tenantName, this.paidBy, this.payerPhone, this.houseCode, this.houseNumber, this.houseLabel, this.propertyName, this.estateName, @JsonKey(fromJson: parseDouble) this.amount = 0, @JsonKey(fromJson: parseDouble) this.allocatedAmount = 0, @JsonKey(fromJson: parseDouble) this.unallocated = 0, this.invoiceCount = 0, this.invoiceRrn, this.receivedOn, this.narration, this.occupationId, this.houseId, this.voidReason, this.categoryName, @JsonKey(fromJson: parseDouble) this.rentOwed = 0, @JsonKey(fromJson: parseDouble) this.rentOwedBefore = 0}): super._();
+  const _PaymentModel({this.id, this.rrn, this.status = 0, this.statusLabel, this.method, this.methodLabel, this.arrivedAs, this.reference, this.tenantName, this.paidBy, this.payerPhone, this.houseCode, this.houseNumber, this.houseLabel, this.propertyName, this.estateName, @JsonKey(fromJson: parseDouble) this.amount = 0, @JsonKey(fromJson: parseDouble) this.allocatedAmount = 0, @JsonKey(fromJson: parseDouble) this.unallocated = 0, this.invoiceCount = 0, this.invoiceRrn, this.receivedOn, this.narration, this.occupationId, this.houseId, this.voidReason, this.categoryName, @JsonKey(fromJson: parseDoubleNullable) this.rentOwed, @JsonKey(fromJson: parseDoubleNullable) this.rentOwedBefore}): super._();
   factory _PaymentModel.fromJson(Map<String, dynamic> json) => _$PaymentModelFromJson(json);
 
 /// Hashed and salted per user. Opaque.
@@ -266,6 +273,12 @@ class _PaymentModel extends PaymentModel {
 @override final  String? method;
 /// The channel in words, from the server, which is what gets shown.
 @override final  String? methodLabel;
+/// What a person calls how this money arrived — "Lipa na KCB", "Cash".
+///
+/// The configured account's own name where there was one, and the method's label otherwise.
+/// Not the same as [methodLabel]: a payer who queued at a bank counter says the bank's name,
+/// not "Bank transfer", and a receipt that argues with them is a receipt they will query.
+@override final  String? arrivedAs;
 /// The payer's own reference — an M-PESA code, a cheque number, a slip.
 @override final  String? reference;
 @override final  String? tenantName;
@@ -299,8 +312,9 @@ class _PaymentModel extends PaymentModel {
 /// Carried on the receipt because that is the question a tenant asks next, and answering it
 /// from a balance fetched later would show what they owe *now* rather than what this payment
 /// left them owing.
-@override@JsonKey(fromJson: parseDouble) final  double rentOwed;
-@override@JsonKey(fromJson: parseDouble) final  double rentOwedBefore;
+/// Nullable, because "not recorded" is not "nothing owed" — see [parseDoubleNullable].
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? rentOwed;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? rentOwedBefore;
 
 /// Create a copy of PaymentModel
 /// with the given fields replaced by the non-null parameter values.
@@ -315,16 +329,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.status, status) || other.status == status)&&(identical(other.statusLabel, statusLabel) || other.statusLabel == statusLabel)&&(identical(other.method, method) || other.method == method)&&(identical(other.methodLabel, methodLabel) || other.methodLabel == methodLabel)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.paidBy, paidBy) || other.paidBy == paidBy)&&(identical(other.payerPhone, payerPhone) || other.payerPhone == payerPhone)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.allocatedAmount, allocatedAmount) || other.allocatedAmount == allocatedAmount)&&(identical(other.unallocated, unallocated) || other.unallocated == unallocated)&&(identical(other.invoiceCount, invoiceCount) || other.invoiceCount == invoiceCount)&&(identical(other.invoiceRrn, invoiceRrn) || other.invoiceRrn == invoiceRrn)&&(identical(other.receivedOn, receivedOn) || other.receivedOn == receivedOn)&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.rentOwedBefore, rentOwedBefore) || other.rentOwedBefore == rentOwedBefore));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.status, status) || other.status == status)&&(identical(other.statusLabel, statusLabel) || other.statusLabel == statusLabel)&&(identical(other.method, method) || other.method == method)&&(identical(other.methodLabel, methodLabel) || other.methodLabel == methodLabel)&&(identical(other.arrivedAs, arrivedAs) || other.arrivedAs == arrivedAs)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.paidBy, paidBy) || other.paidBy == paidBy)&&(identical(other.payerPhone, payerPhone) || other.payerPhone == payerPhone)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.allocatedAmount, allocatedAmount) || other.allocatedAmount == allocatedAmount)&&(identical(other.unallocated, unallocated) || other.unallocated == unallocated)&&(identical(other.invoiceCount, invoiceCount) || other.invoiceCount == invoiceCount)&&(identical(other.invoiceRrn, invoiceRrn) || other.invoiceRrn == invoiceRrn)&&(identical(other.receivedOn, receivedOn) || other.receivedOn == receivedOn)&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.rentOwedBefore, rentOwedBefore) || other.rentOwedBefore == rentOwedBefore));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,rrn,status,statusLabel,method,methodLabel,reference,tenantName,paidBy,payerPhone,houseCode,houseNumber,houseLabel,propertyName,estateName,amount,allocatedAmount,unallocated,invoiceCount,invoiceRrn,receivedOn,narration,occupationId,houseId,voidReason,categoryName,rentOwed,rentOwedBefore]);
+int get hashCode => Object.hashAll([runtimeType,id,rrn,status,statusLabel,method,methodLabel,arrivedAs,reference,tenantName,paidBy,payerPhone,houseCode,houseNumber,houseLabel,propertyName,estateName,amount,allocatedAmount,unallocated,invoiceCount,invoiceRrn,receivedOn,narration,occupationId,houseId,voidReason,categoryName,rentOwed,rentOwedBefore]);
 
 @override
 String toString() {
-  return 'PaymentModel(id: $id, rrn: $rrn, status: $status, statusLabel: $statusLabel, method: $method, methodLabel: $methodLabel, reference: $reference, tenantName: $tenantName, paidBy: $paidBy, payerPhone: $payerPhone, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, amount: $amount, allocatedAmount: $allocatedAmount, unallocated: $unallocated, invoiceCount: $invoiceCount, invoiceRrn: $invoiceRrn, receivedOn: $receivedOn, narration: $narration, occupationId: $occupationId, houseId: $houseId, voidReason: $voidReason, categoryName: $categoryName, rentOwed: $rentOwed, rentOwedBefore: $rentOwedBefore)';
+  return 'PaymentModel(id: $id, rrn: $rrn, status: $status, statusLabel: $statusLabel, method: $method, methodLabel: $methodLabel, arrivedAs: $arrivedAs, reference: $reference, tenantName: $tenantName, paidBy: $paidBy, payerPhone: $payerPhone, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyName: $propertyName, estateName: $estateName, amount: $amount, allocatedAmount: $allocatedAmount, unallocated: $unallocated, invoiceCount: $invoiceCount, invoiceRrn: $invoiceRrn, receivedOn: $receivedOn, narration: $narration, occupationId: $occupationId, houseId: $houseId, voidReason: $voidReason, categoryName: $categoryName, rentOwed: $rentOwed, rentOwedBefore: $rentOwedBefore)';
 }
 
 
@@ -335,7 +349,7 @@ abstract mixin class _$PaymentModelCopyWith<$Res> implements $PaymentModelCopyWi
   factory _$PaymentModelCopyWith(_PaymentModel value, $Res Function(_PaymentModel) _then) = __$PaymentModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? rrn, int status, String? statusLabel, String? method, String? methodLabel, String? reference, String? tenantName, String? paidBy, String? payerPhone, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double amount,@JsonKey(fromJson: parseDouble) double allocatedAmount,@JsonKey(fromJson: parseDouble) double unallocated, int invoiceCount, String? invoiceRrn, String? receivedOn, String? narration, String? occupationId, String? houseId, String? voidReason, String? categoryName,@JsonKey(fromJson: parseDouble) double rentOwed,@JsonKey(fromJson: parseDouble) double rentOwedBefore
+ String? id, String? rrn, int status, String? statusLabel, String? method, String? methodLabel, String? arrivedAs, String? reference, String? tenantName, String? paidBy, String? payerPhone, String? houseCode, String? houseNumber, String? houseLabel, String? propertyName, String? estateName,@JsonKey(fromJson: parseDouble) double amount,@JsonKey(fromJson: parseDouble) double allocatedAmount,@JsonKey(fromJson: parseDouble) double unallocated, int invoiceCount, String? invoiceRrn, String? receivedOn, String? narration, String? occupationId, String? houseId, String? voidReason, String? categoryName,@JsonKey(fromJson: parseDoubleNullable) double? rentOwed,@JsonKey(fromJson: parseDoubleNullable) double? rentOwedBefore
 });
 
 
@@ -352,7 +366,7 @@ class __$PaymentModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? rrn = freezed,Object? status = null,Object? statusLabel = freezed,Object? method = freezed,Object? methodLabel = freezed,Object? reference = freezed,Object? tenantName = freezed,Object? paidBy = freezed,Object? payerPhone = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? amount = null,Object? allocatedAmount = null,Object? unallocated = null,Object? invoiceCount = null,Object? invoiceRrn = freezed,Object? receivedOn = freezed,Object? narration = freezed,Object? occupationId = freezed,Object? houseId = freezed,Object? voidReason = freezed,Object? categoryName = freezed,Object? rentOwed = null,Object? rentOwedBefore = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? rrn = freezed,Object? status = null,Object? statusLabel = freezed,Object? method = freezed,Object? methodLabel = freezed,Object? arrivedAs = freezed,Object? reference = freezed,Object? tenantName = freezed,Object? paidBy = freezed,Object? payerPhone = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? amount = null,Object? allocatedAmount = null,Object? unallocated = null,Object? invoiceCount = null,Object? invoiceRrn = freezed,Object? receivedOn = freezed,Object? narration = freezed,Object? occupationId = freezed,Object? houseId = freezed,Object? voidReason = freezed,Object? categoryName = freezed,Object? rentOwed = freezed,Object? rentOwedBefore = freezed,}) {
   return _then(_PaymentModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
@@ -360,6 +374,7 @@ as String?,status: null == status ? _self.status : status // ignore: cast_nullab
 as int,statusLabel: freezed == statusLabel ? _self.statusLabel : statusLabel // ignore: cast_nullable_to_non_nullable
 as String?,method: freezed == method ? _self.method : method // ignore: cast_nullable_to_non_nullable
 as String?,methodLabel: freezed == methodLabel ? _self.methodLabel : methodLabel // ignore: cast_nullable_to_non_nullable
+as String?,arrivedAs: freezed == arrivedAs ? _self.arrivedAs : arrivedAs // ignore: cast_nullable_to_non_nullable
 as String?,reference: freezed == reference ? _self.reference : reference // ignore: cast_nullable_to_non_nullable
 as String?,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
 as String?,paidBy: freezed == paidBy ? _self.paidBy : paidBy // ignore: cast_nullable_to_non_nullable
@@ -380,9 +395,9 @@ as String?,occupationId: freezed == occupationId ? _self.occupationId : occupati
 as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
 as String?,voidReason: freezed == voidReason ? _self.voidReason : voidReason // ignore: cast_nullable_to_non_nullable
 as String?,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
-as String?,rentOwed: null == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
-as double,rentOwedBefore: null == rentOwedBefore ? _self.rentOwedBefore : rentOwedBefore // ignore: cast_nullable_to_non_nullable
-as double,
+as String?,rentOwed: freezed == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
+as double?,rentOwedBefore: freezed == rentOwedBefore ? _self.rentOwedBefore : rentOwedBefore // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 

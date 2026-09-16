@@ -249,19 +249,25 @@ class _PaymentRow extends StatelessWidget {
           // Amounts + date row
           Row(
             children: [
+              // Only where the server said. What the tenancy owed after a payment is not recorded
+              // on every one of them, and "Owed: KES 0.00" would read as settled rather than as
+              // unknown.
               Expanded(
-                child: Row(
-                  children: [
-                    Text('Owed: ', style: HodiTextStyles.bodySmall),
-                    Flexible(
-                      child: Text(
-                        'KES ${CurrencyFormatter.format(payment.rentOwed)}',
-                        style: HodiTextStyles.currencySmall.copyWith(color: HodiColors.warningStart),
-                        overflow: TextOverflow.ellipsis,
+                child: payment.rentOwed == null
+                    ? const SizedBox.shrink()
+                    : Row(
+                        children: [
+                          Text('Owed: ', style: HodiTextStyles.bodySmall),
+                          Flexible(
+                            child: Text(
+                              'KES ${CurrencyFormatter.format(payment.rentOwed!)}',
+                              style: HodiTextStyles.currencySmall
+                                  .copyWith(color: HodiColors.warningStart),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
               Expanded(
                 child: Row(

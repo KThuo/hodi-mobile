@@ -14,6 +14,7 @@ _PaymentModel _$PaymentModelFromJson(Map<String, dynamic> json) =>
       statusLabel: json['statusLabel'] as String?,
       method: json['method'] as String?,
       methodLabel: json['methodLabel'] as String?,
+      arrivedAs: json['arrivedAs'] as String?,
       reference: json['reference'] as String?,
       tenantName: json['tenantName'] as String?,
       paidBy: json['paidBy'] as String?,
@@ -38,10 +39,8 @@ _PaymentModel _$PaymentModelFromJson(Map<String, dynamic> json) =>
       houseId: json['houseId'] as String?,
       voidReason: json['voidReason'] as String?,
       categoryName: json['categoryName'] as String?,
-      rentOwed: json['rentOwed'] == null ? 0 : parseDouble(json['rentOwed']),
-      rentOwedBefore: json['rentOwedBefore'] == null
-          ? 0
-          : parseDouble(json['rentOwedBefore']),
+      rentOwed: parseDoubleNullable(json['rentOwed']),
+      rentOwedBefore: parseDoubleNullable(json['rentOwedBefore']),
     );
 
 Map<String, dynamic> _$PaymentModelToJson(_PaymentModel instance) =>
@@ -52,6 +51,7 @@ Map<String, dynamic> _$PaymentModelToJson(_PaymentModel instance) =>
       'statusLabel': instance.statusLabel,
       'method': instance.method,
       'methodLabel': instance.methodLabel,
+      'arrivedAs': instance.arrivedAs,
       'reference': instance.reference,
       'tenantName': instance.tenantName,
       'paidBy': instance.paidBy,

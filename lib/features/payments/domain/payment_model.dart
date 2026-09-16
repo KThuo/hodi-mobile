@@ -36,6 +36,13 @@ abstract class PaymentModel with _$PaymentModel {
     /// The channel in words, from the server, which is what gets shown.
     String? methodLabel,
 
+    /// What a person calls how this money arrived — "Lipa na KCB", "Cash".
+    ///
+    /// The configured account's own name where there was one, and the method's label otherwise.
+    /// Not the same as [methodLabel]: a payer who queued at a bank counter says the bank's name,
+    /// not "Bank transfer", and a receipt that argues with them is a receipt they will query.
+    String? arrivedAs,
+
     /// The payer's own reference — an M-PESA code, a cheque number, a slip.
     String? reference,
     String? tenantName,
@@ -76,8 +83,9 @@ abstract class PaymentModel with _$PaymentModel {
     /// Carried on the receipt because that is the question a tenant asks next, and answering it
     /// from a balance fetched later would show what they owe *now* rather than what this payment
     /// left them owing.
-    @JsonKey(fromJson: parseDouble) @Default(0) double rentOwed,
-    @JsonKey(fromJson: parseDouble) @Default(0) double rentOwedBefore,
+    /// Nullable, because "not recorded" is not "nothing owed" — see [parseDoubleNullable].
+    @JsonKey(fromJson: parseDoubleNullable) double? rentOwed,
+    @JsonKey(fromJson: parseDoubleNullable) double? rentOwedBefore,
   }) = _PaymentModel;
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) =>
@@ -92,5 +100,12 @@ abstract class PaymentModel with _$PaymentModel {
   /// The unit as somebody would say it, falling back to the code.
   String get unitLabel => houseLabel ?? houseCode ?? '';
 
-  String get channel => methodLabel ?? method ?? '';
+  String get channel => arrivedAs ?? methodLabel ?? method ?? '';
+
+  /// True once the server has said what the tenancy owed on either side of this payment.
+  ///
+  /// Both are nullable on the wire — an older payment may carry neither — and a receipt that
+  /// printed "Balance before: KES 0.00" where it simply does not know would be stating a fact it
+  /// has not got.
+  bool get showsTheArithmetic => rentOwedBefore != null || rentOwed != null;
 }

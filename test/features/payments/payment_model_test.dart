@@ -63,6 +63,36 @@ void main() {
       expect(p.rentOwed, 0);
     });
 
+    test('a balance nobody recorded is not a balance of nought', () {
+      // `rentOwed` and `rentOwedBefore` were `@Default(0)`, which cannot tell "settled" from "not
+      // recorded" — and a receipt printing "Balance before: KES 0.00" where the server said nothing
+      // is stating a fact nobody has. The screen asks this question before it draws either line.
+      final quiet = PaymentModel.fromJson(
+          {...row}..removeWhere((k, _) => k == 'rentOwed' || k == 'rentOwedBefore'));
+
+      expect(quiet.rentOwed, isNull);
+      expect(quiet.rentOwedBefore, isNull);
+      expect(quiet.showsTheArithmetic, isFalse);
+
+      // And a real nought still reads as one.
+      final settled = PaymentModel.fromJson({...row, 'rentOwed': 0});
+      expect(settled.rentOwed, 0);
+      expect(settled.showsTheArithmetic, isTrue);
+    });
+
+    test('the channel is what the payer would call it', () {
+      // `arrivedAs` is the configured account's own name — somebody who queued at a bank counter
+      // says the bank's name, not "Bank transfer", and a receipt that argues with them is one they
+      // will query.
+      final kcb = PaymentModel.fromJson({...row, 'arrivedAs': 'Lipa na KCB'});
+      expect(kcb.channel, 'Lipa na KCB');
+
+      // Falling back where the server did not say, rather than showing nothing.
+      final plain = PaymentModel.fromJson(
+          {...row, 'methodLabel': 'Bank transfer'}..remove('arrivedAs'));
+      expect(plain.channel, 'Bank transfer');
+    });
+
     test('a voided receipt says so', () {
       expect(PaymentModel.fromJson({...row, 'status': 4}).isVoided, isTrue);
       expect(PaymentModel.fromJson(row).isVoided, isFalse);
