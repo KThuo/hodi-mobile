@@ -240,9 +240,24 @@ class _Receipt extends StatelessWidget {
   Widget _theSum(BuildContext context) {
     final lines = <Widget>[];
 
+    /*
+     * The opening balance, dated — legacy's line, in legacy's place.
+     *
+     * Legacy's receipt reads "September Invoice Balance as at 27-08-2026 11:13 - HPABABLUF1PB ...
+     * 60.00", then "Amount Paid on 27-08-2026 11:13 (Coop STK Push REF: ...) ... 20.00", then
+     * "BALANCE DUE ... 40.00". The timestamp belongs to the opening figure: a balance "as at" a
+     * moment is one that was *observed* then, and it is the position this money was applied
+     * against. The closing figure is not an observation, it is the arithmetic on this page, so
+     * dating it would claim a second reading that never happened — and both would carry the same
+     * timestamp anyway, which is how you can tell only one of them wants it.
+     *
+     * As a sublabel because the row is a label and an amount on a handset, where the whole phrase
+     * on one line wraps and "Balance" does not.
+     */
     if (p.rentOwedBefore != null) {
       lines.add(_SumLine(
-        label: 'Balance before',
+        label: 'Balance',
+        sublabel: p.receivedOn == null ? null : 'as at ${_when(p.receivedOn)}',
         amount: p.rentOwedBefore!,
         muted: true,
       ));
@@ -291,16 +306,16 @@ class _Receipt extends StatelessWidget {
     }
 
     /*
-     * The closing balance, and the only place it is said.
+     * The result of that subtraction, under legacy's own label, and the only place it is said.
      *
      * This line used to be followed by a coloured strip reading "Still owed: KES x" — the same
-     * figure, one line below itself, in more words. The colour is doing that work now: an amount
-     * standing is warning-toned, a cleared account is success-toned and reads zero.
+     * figure, one line below itself, in more words. The colour does that work now: an amount
+     * standing is warning-toned, a cleared account is success-toned and reads nought.
      */
     if (p.rentOwed != null) {
       lines.add(const Divider(height: 20));
       lines.add(_SumLine(
-        label: 'Balance',
+        label: 'Balance due',
         amount: p.rentOwed!,
         bold: true,
         tone: p.rentOwed! > 0 ? HodiColors.warningEnd : HodiColors.successEnd,
