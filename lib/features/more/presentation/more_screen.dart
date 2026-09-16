@@ -432,12 +432,6 @@ class _AccountRow extends StatelessWidget {
                 ),
               ),
             ),
-            if (!isDestructive)
-              const Icon(
-                Icons.chevron_right,
-                size: 20,
-                color: HodiColors.textLight,
-              ),
           ],
         ),
       ),
@@ -583,11 +577,6 @@ class _MenuRow extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: HodiColors.textLight,
             ),
           ],
         ),
