@@ -10,6 +10,7 @@ import '../../../../core/widgets/hodi_text_field.dart';
 import '../../../../core/widgets/hodi_gradient_button.dart';
 import '../../domain/metre_model.dart';
 import '../../providers/metre_providers.dart';
+import 'reading_frame_screen.dart';
 
 class UpdateReadingSheet extends ConsumerStatefulWidget {
   final MetreModel metre;
@@ -41,21 +42,38 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
     super.dispose();
   }
 
+  /*
+   * Two different pictures, and they were the same one before.
+   *
+   * The photograph is the evidence: the whole meter, its number, where it is. That is what gets
+   * attached to the reading and what somebody looks at in six months to settle an argument.
+   *
+   * What is *recognised* is a band the person frames over the dials on the next screen. It used to
+   * be the whole photograph, and the recogniser would return the longest run of digits in it —
+   * which on a meter is as likely to be the serial number beside the dials as the reading itself.
+   * That is why the number that came back did not match the number being looked at.
+   *
+   * Framing is offered, not compelled. Backing out of it keeps the photograph and leaves the
+   * reading to be typed, which is what somebody does when the light is bad anyway.
+   */
   Future<void> _captureImage() async {
     final file = await ImageHelper.captureFromCamera();
-    if (file == null) return;
+    if (file == null || !mounted) return;
 
-    setState(() {
-      _capturedImage = file;
-      _isProcessingImage = true;
-    });
+    setState(() => _capturedImage = file);
+
+    final crop = await Navigator.of(context).push<File>(
+      MaterialPageRoute(
+        builder: (_) => ReadingFrameScreen(photo: file),
+        fullscreenDialog: true,
+      ),
+    );
+    if (!mounted || crop == null) return;
+
+    setState(() => _isProcessingImage = true);
 
     try {
-      // OCR only. The photograph used to be base64-encoded here in parallel and posted with the
-      // reading; there is nowhere to send it now, and encoding it was the expensive half — a third
-      // again on the wire and a third copy of the image in memory. The capture stays on screen so
-      // the dial can be checked against what was recognised, and is discarded with the sheet.
-      final ocrText = await OcrHelper.recognizeText(file);
+      final ocrText = await OcrHelper.recognizeText(crop);
 
       if (!mounted) return;
 
@@ -67,15 +85,20 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
           _readingController.text = reading;
           setState(() {});
         } else {
-          _showToast('Could not detect reading from image');
+          _showToast('No number in the frame. Try framing just the dials.');
         }
       } else {
-        _showToast('Could not detect reading from image');
+        _showToast('No number in the frame. Try framing just the dials.');
       }
     } catch (_) {
       if (!mounted) return;
       setState(() => _isProcessingImage = false);
       _showToast('Failed to process image');
+    } finally {
+      // The crop exists only to be read. The photograph is what is kept.
+      try {
+        await crop.delete();
+      } catch (_) {}
     }
   }
 
