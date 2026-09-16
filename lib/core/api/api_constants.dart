@@ -52,6 +52,23 @@ abstract class ApiConstants {
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   static const String login = '$apiPrefix/auth/login';
+
+  /*
+   * The PIN a handset signs in with.
+   *
+   * `loginWithPin` is public like `login` — it is how a session begins. The other three need one:
+   * setting a PIN costs the account password, and rotating it costs the current PIN. There is
+   * deliberately no endpoint that only checks a PIN, because that is a brute-force oracle with a
+   * friendly name.
+   */
+  static const String loginWithPin = '$apiPrefix/auth/login/pin';
+  static const String pin = '$apiPrefix/auth/pin';
+  static const String changePin = '$apiPrefix/auth/pin/change';
+  static const String removePin = '$apiPrefix/auth/pin/remove';
+  static const String pinnedHandsets = '$apiPrefix/auth/pin/handsets';
+
+  /// What this handset calls itself. Names the PIN row; never a credential on its own.
+  static const String deviceHeader = 'X-Device-Id';
   static const String refreshToken = '$apiPrefix/auth/refresh';
   static const String logout = '$apiPrefix/auth/logout';
   static const String me = '$apiPrefix/auth/me';

@@ -19,6 +19,8 @@ import '../../features/more/presentation/more_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
 import '../../features/tenants/presentation/tenant_detail_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/profile/presentation/set_pin_screen.dart';
+import '../../features/stays/presentation/stays_screen.dart';
 import '../../features/metres/presentation/metres_screen.dart';
 import '../../features/metres/presentation/metre_history_screen.dart';
 import '../../features/vacant_houses/presentation/vacant_houses_screen.dart';
@@ -49,7 +51,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authState.isAuthenticated;
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/forgot-password';
-      final isPublicRoute = state.matchedLocation.startsWith('/vacant-houses');
+      // The two public browse surfaces: somewhere to rent, and somewhere to stay. Neither needs an
+      // account, because somebody looking for one does not have an account yet.
+      final isPublicRoute = state.matchedLocation.startsWith('/vacant-houses') ||
+          state.matchedLocation.startsWith('/stays');
 
       if (!isAuthenticated && !isAuthRoute && !isPublicRoute) {
         return '/login';
@@ -80,6 +85,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // Public routes (no shell)
+      GoRoute(
+        path: '/stays',
+        name: RouteNames.stays,
+        builder: (context, state) => const StaysScreen(),
+      ),
       GoRoute(
         path: '/vacant-houses',
         name: RouteNames.vacantHouses,
@@ -254,6 +264,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'profile',
                     name: RouteNames.profile,
                     builder: (context, state) => const ProfileScreen(),
+                    routes: [
+                      GoRoute(
+                        // `extra` says whether a PIN already exists, which decides what proves the
+                        // change: the password for a first PIN, the current PIN for a rotation.
+                        path: 'pin',
+                        name: RouteNames.setPin,
+                        builder: (context, state) =>
+                            SetPinScreen(changing: state.extra == true),
+                      ),
+                    ],
                   ),
                 ],
               ),

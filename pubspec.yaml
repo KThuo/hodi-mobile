@@ -26,6 +26,10 @@ dependencies:
   # Biometric Authentication
   local_auth: ^3.0.0
 
+  # What this handset calls itself, for the PIN row that names it
+  device_info_plus: ^12.1.0
+  crypto: ^3.0.6
+
   # UI
   google_fonts: ^8.0.1
   shimmer: ^3.0.0

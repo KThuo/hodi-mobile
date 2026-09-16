@@ -8,12 +8,13 @@ import 'api_response.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
 import '../auth/data/auth_local_storage.dart';
+import '../device/device_id.dart';
 
 class ApiClient {
   late final Dio _dio;
   late final ErrorInterceptor _errorInterceptor;
 
-  ApiClient({required AuthLocalStorage storage}) {
+  ApiClient({required AuthLocalStorage storage, required DeviceId device}) {
     _errorInterceptor = ErrorInterceptor();
 
     _dio = Dio(BaseOptions(
@@ -27,7 +28,7 @@ class ApiClient {
     ));
 
     _dio.interceptors.addAll([
-      AuthInterceptor(storage),
+      AuthInterceptor(storage, device),
       _errorInterceptor,
       if (kDebugMode)
         LogInterceptor(
@@ -160,5 +161,5 @@ final authLocalStorageProvider = Provider<AuthLocalStorage>((ref) {
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   final storage = ref.watch(authLocalStorageProvider);
-  return ApiClient(storage: storage);
+  return ApiClient(storage: storage, device: ref.watch(deviceIdProvider));
 });

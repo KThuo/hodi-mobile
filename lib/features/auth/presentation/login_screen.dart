@@ -11,6 +11,7 @@ import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/theme/hodi_border_radius.dart';
 import '../../../core/widgets/hodi_gradient_button.dart';
 import '../../../core/widgets/hodi_text_field.dart';
+import '../../../core/widgets/pin_pad.dart';
 import '../../../core/utils/validators.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -27,11 +28,83 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscurePassword = true;
   bool _biometricTriggered = false;
 
+  /*
+   * Who signed in here last, and whether this handset holds a PIN for them.
+   *
+   * Null while the keystore is being read — not false. A first frame drawn from a guess would show
+   * the password field and then swap it for a keypad, which is the sort of flicker somebody reads
+   * as the app not knowing what it is doing.
+   */
+  String? _remembered;
+  bool _pinSet = false;
+  bool _readStorage = false;
+
+  /// Set when the person chooses the password over the PIN, or the server says the PIN is spent.
+  bool _passwordInstead = false;
+
+  String? _pinError;
+
   @override
   void initState() {
     super.initState();
+    _readRemembered();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _tryBiometricAuth();
+    });
+  }
+
+  Future<void> _readRemembered() async {
+    final repo = ref.read(authRepositoryProvider);
+    final username = await repo.rememberedUsername();
+    final pinSet = await repo.isPinSet();
+    if (!mounted) return;
+    setState(() {
+      _remembered = username;
+      _pinSet = pinSet && username != null && username.isNotEmpty;
+      _readStorage = true;
+      if (username != null) _usernameController.text = username;
+    });
+  }
+
+  /// Whether the keypad is what this screen should be showing.
+  bool get _askingForPin => _readStorage && _pinSet && !_passwordInstead;
+
+  Future<void> _submitPin(String pin) async {
+    setState(() => _pinError = null);
+    final result = await ref.read(authProvider.notifier).loginWithPin(pin);
+    if (!mounted) return;
+
+    if (result.signedIn) {
+      context.go('/home');
+      return;
+    }
+
+    /*
+     * Three outcomes, not two.
+     *
+     * "Wrong digits" means try again. "No PIN on this phone" and "switched off after too many
+     * tries" both mean this handset cannot offer a PIN any more — so the keypad goes away rather
+     * than leaving somebody tapping at something that can never work.
+     */
+    setState(() {
+      _pinError = result.message;
+      if (result.usePasswordInstead) {
+        _pinSet = false;
+        _passwordInstead = true;
+      }
+    });
+  }
+
+  /// "Not you?" — forgets the name and the PIN flag, and asks from scratch.
+  Future<void> _forgetMe() async {
+    await ref.read(authRepositoryProvider).forgetUsername();
+    if (!mounted) return;
+    setState(() {
+      _remembered = null;
+      _pinSet = false;
+      _passwordInstead = false;
+      _pinError = null;
+      _usernameController.clear();
     });
   }
 
@@ -71,79 +144,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .login(username, password);
 
     if (success && mounted) {
-      final authState = ref.read(authProvider);
-      if (authState.biometricAvailable && !authState.biometricEnabled) {
-        final shouldEnable = await _showBiometricEnrollmentDialog();
-        if (shouldEnable && mounted) {
-          await ref
-              .read(authProvider.notifier)
-              .enableBiometric(username, password);
-        }
-      }
-      if (mounted) {
-        context.go('/home');
-      }
+      /*
+       * The offer that used to be here asked whether to "enable biometric login", and accepting it
+       * stored the password in plain text to replay later. It is gone with the storage.
+       *
+       * What is worth offering instead is the PIN, which is a credential the server holds — and the
+       * place to offer it is the profile, beside the fingerprint switch, rather than in a dialog
+       * thrown at somebody the moment they have finished signing in.
+       */
+      context.go('/home');
     }
-  }
-
-  Future<bool> _showBiometricEnrollmentDialog() async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: HodiBorderRadius.card),
-            title: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: HodiColors.primaryStart.withValues(alpha: 0.1),
-                    borderRadius: HodiBorderRadius.small,
-                  ),
-                  child: Icon(
-                    Icons.fingerprint,
-                    color: HodiColors.primaryStart,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Enable Biometric Login',
-                    style: HodiTextStyles.heading3,
-                  ),
-                ),
-              ],
-            ),
-            content: Text(
-              'Would you like to use biometrics to sign in next time? '
-              'Your credentials will be stored securely on this device.',
-              style: HodiTextStyles.bodyMedium,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(
-                  'Not Now',
-                  style: HodiTextStyles.bodyMedium.copyWith(
-                    color: HodiColors.textMedium,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(
-                  'Enable',
-                  style: HodiTextStyles.bodyMedium.copyWith(
-                    color: HodiColors.primaryStart,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ) ??
-        false;
   }
 
   @override
@@ -257,8 +267,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
+                                // Says who is being asked, once this phone knows. A keypad with no
+                                // name on it is four dots and no way to tell whose account they open.
                                 Text(
-                                  'Sign in to your account',
+                                  _askingForPin
+                                      ? 'Enter your PIN, ${_remembered ?? ''}'.trimRight()
+                                      : 'Sign in to your account',
                                   style: HodiTextStyles.bodyMedium.copyWith(
                                     color: HodiColors.textMedium,
                                   ),
@@ -303,8 +317,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   const SizedBox(height: 16),
                                 ],
 
+                                // ── The PIN, where this handset holds one ──────
+                                if (_askingForPin) ...[
+                                  PinPad(
+                                    busy: authState.isLoading,
+                                    error: _pinError,
+                                    onCompleted: _submitPin,
+                                    onForgot: () =>
+                                        setState(() => _passwordInstead = true),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Center(
+                                    child: TextButton(
+                                      onPressed: _forgetMe,
+                                      child: Text(
+                                        'Not ${_remembered ?? 'you'}?',
+                                        style: HodiTextStyles.bodySmall.copyWith(
+                                          color: HodiColors.textLight,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+
                                 // Username
-                                HodiTextField(
+                                if (!_askingForPin) HodiTextField(
                                   controller: _usernameController,
                                   hintText: 'Username',
                                   prefixIcon: Icons.person_outline,
@@ -313,10 +350,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   validator: (v) =>
                                       Validators.required(v, 'Username'),
                                 ),
-                                const SizedBox(height: 16),
+                                if (!_askingForPin) const SizedBox(height: 16),
 
                                 // Password
-                                HodiTextField(
+                                if (!_askingForPin) HodiTextField(
                                   controller: _passwordController,
                                   hintText: 'Password',
                                   prefixIcon: Icons.lock_outline,
@@ -341,17 +378,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     },
                                   ),
                                 ),
-                                const SizedBox(height: 24),
+                                if (!_askingForPin) const SizedBox(height: 24),
 
                                 // Sign In button
-                                HodiGradientButton(
+                                if (!_askingForPin) HodiGradientButton(
                                   text: 'Sign In',
                                   onPressed: _handleLogin,
                                   isLoading: authState.isLoading,
                                 ),
 
                                 // Biometric button
-                                if (authState.biometricEnabled) ...[
+                                if (authState.biometricEnabled && !_askingForPin) ...[
                                   const SizedBox(height: 16),
                                   SizedBox(
                                     width: double.infinity,
@@ -412,18 +449,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Vacant houses link
-                    TextButton(
-                      onPressed: () => context.push('/vacant-houses'),
-                      child: Text(
-                        'Browse Vacant Houses',
-                        style: HodiTextStyles.bodyMedium.copyWith(
-                          color: HodiColors.white,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline,
-                          decorationColor: HodiColors.white,
+                    /*
+                     * The two public surfaces, in the same place the web puts them.
+                     *
+                     * Somewhere to rent and somewhere to stay are different questions with
+                     * different answers, and the one link that used to be here answered only the
+                     * first. Neither needs an account — which is the point: somebody looking for a
+                     * place to live does not have one yet, and asking them to sign up before they
+                     * can look is asking in the wrong order.
+                     */
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _PublicLink(
+                          label: 'To Let',
+                          onTap: () => context.push('/vacant-houses'),
                         ),
-                      ),
+                        Container(
+                          width: 1,
+                          height: 14,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          color: HodiColors.white.withValues(alpha: 0.4),
+                        ),
+                        _PublicLink(
+                          label: 'Stays',
+                          onTap: () => context.push('/stays'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -431,6 +483,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// One of the two public links under the sign-in card.
+class _PublicLink extends StatelessWidget {
+  const _PublicLink({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onTap,
+      child: Text(
+        label,
+        style: HodiTextStyles.bodyMedium.copyWith(
+          color: HodiColors.white,
+          fontWeight: FontWeight.w500,
+          decoration: TextDecoration.underline,
+          decorationColor: HodiColors.white,
+        ),
       ),
     );
   }

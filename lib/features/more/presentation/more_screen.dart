@@ -192,94 +192,21 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
     );
   }
 
+  /// Both switches live on the profile now; this is the quick one, kept where it was.
+  ///
+  /// It no longer asks for a password. It used to, because enabling "biometric login" meant storing
+  /// the password to replay later — the fingerprint proves the holder and guards the session that
+  /// is already here, and nothing about that needs a credential.
   Future<void> _handleBiometricToggle(bool enable) async {
-    if (enable) {
-      final credentials = await _showPasswordConfirmDialog();
-      if (credentials != null && mounted) {
-        await ref.read(authProvider.notifier).enableBiometric(
-              credentials.username,
-              credentials.password,
-            );
-      }
-    } else {
+    if (!enable) {
       await ref.read(authProvider.notifier).disableBiometric();
+      return;
     }
+    final result = await ref.read(authProvider.notifier).enableBiometric();
+    if (!mounted || result.proved || result.message == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.message!)));
   }
 
-  Future<({String username, String password})?> _showPasswordConfirmDialog() async {
-    final passwordController = TextEditingController();
-    final user = ref.read(authProvider).user;
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: HodiBorderRadius.card),
-        title: Text('Confirm Password', style: HodiTextStyles.heading3),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Enter your password to enable biometric login.',
-              style: HodiTextStyles.bodyMedium,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Password',
-                prefixIcon: const Icon(Icons.lock_outline, size: 20),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancel',
-              style: HodiTextStyles.bodyMedium
-                  .copyWith(color: HodiColors.textMedium),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              if (passwordController.text.isNotEmpty) {
-                Navigator.of(context).pop(true);
-              }
-            },
-            child: Text(
-              'Confirm',
-              style: HodiTextStyles.bodyMedium.copyWith(
-                color: HodiColors.primaryStart,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && user != null) {
-      final result = (
-        username: user.username,
-        password: passwordController.text,
-      );
-      passwordController.dispose();
-      return result;
-    }
-
-    passwordController.dispose();
-    return null;
-  }
 
   void _confirmLogout(BuildContext context, WidgetRef ref) {
     showDialog(

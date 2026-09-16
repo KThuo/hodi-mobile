@@ -5,6 +5,7 @@ abstract class RouteNames {
 
   // Public
   static const vacantHouses = 'vacant-houses';
+  static const stays = 'stays';
   static const vacantHouseDetail = 'vacant-house-detail';
 
   // Main
@@ -27,6 +28,7 @@ abstract class RouteNames {
   static const vacateNotices = 'vacate-notices';
   static const vacateNoticeDetail = 'vacate-notice-detail';
   static const profile = 'profile';
+  static const setPin = 'set-pin';
   static const changePassword = 'change-password';
   static const about = 'about';
   static const privacyPolicy = 'privacy-policy';

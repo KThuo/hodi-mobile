@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../api/api_client.dart';
 import '../../filters/filter_provider.dart';
+import '../../device/device_id.dart';
 import '../data/auth_repository.dart';
 import '../data/biometric_service.dart';
 import '../domain/user_model.dart';
@@ -8,7 +9,11 @@ import '../domain/user_model.dart';
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   final storage = ref.watch(authLocalStorageProvider);
-  return AuthRepository(apiClient: apiClient, storage: storage);
+  return AuthRepository(
+    apiClient: apiClient,
+    storage: storage,
+    device: ref.watch(deviceIdProvider),
+  );
 });
 
 final biometricServiceProvider = Provider<BiometricService>((ref) {
@@ -80,8 +85,12 @@ class AuthNotifier extends Notifier<AuthState> {
   BiometricService get _biometricService => ref.read(biometricServiceProvider);
 
   Future<void> checkAuth() async {
+    // Whatever an older build stored — the account password, in plain text — goes now, whether or
+    // not anything else here succeeds.
+    await ref.read(authLocalStorageProvider).clearLegacyCredentials();
+
     final biometricAvailable = await _biometricService.isDeviceSupported();
-    final biometricEnabled = await _biometricService.isBiometricLoginEnabled();
+    final biometricEnabled = await _biometricService.isEnabled();
 
     final isLoggedIn = await _repository.isLoggedIn();
     if (isLoggedIn) {
@@ -98,19 +107,16 @@ class AuthNotifier extends Notifier<AuthState> {
       }
     }
 
-    // Token missing or expired — check if biometric re-auth is possible
-    if (biometricEnabled) {
-      state = AuthState(
-        biometricAvailable: biometricAvailable,
-        biometricEnabled: true,
-        pendingBiometricVerification: true,
-      );
-      return;
-    }
-
+    /*
+     * No live session. The sign-in screen takes it from here.
+     *
+     * This used to try to re-mint one by replaying a stored password, which is why the password was
+     * being stored at all. It is not stored any more: what somebody has instead is the PIN — held
+     * by the server, offered by this handset — and the sign-in screen asks for it.
+     */
     state = AuthState(
       biometricAvailable: biometricAvailable,
-      biometricEnabled: false,
+      biometricEnabled: biometricEnabled,
     );
   }
 
@@ -135,6 +141,35 @@ class AuthNotifier extends Notifier<AuthState> {
       error: response.message.isNotEmpty ? response.message : 'Login failed',
     );
     return false;
+  }
+
+  /// Signs in with the PIN this handset holds.
+  Future<PinSignIn> loginWithPin(String pin) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final username = await _repository.rememberedUsername();
+    if (username == null || username.isEmpty) {
+      state = state.copyWith(isLoading: false);
+      return const PinSignIn.failed(
+        'This phone does not know whose account to open. Sign in with your username once.',
+        usePasswordInstead: true,
+      );
+    }
+
+    final result = await _repository.loginWithPin(username, pin);
+    if (result.signedIn) {
+      state = AuthState(
+        user: result.user,
+        isAuthenticated: true,
+        biometricAvailable: state.biometricAvailable,
+        biometricEnabled: state.biometricEnabled,
+      );
+      ref.read(filterProvider.notifier).loadFilters();
+      return result;
+    }
+
+    state = state.copyWith(isLoading: false, error: result.message);
+    return result;
   }
 
   Future<bool> authenticateWithBiometrics() async {
@@ -165,23 +200,14 @@ class AuthNotifier extends Notifier<AuthState> {
       }
     }
 
-    // Token expired — re-login with stored credentials
-    final credentials = await _biometricService.getStoredCredentials();
-    if (credentials == null) {
-      await _biometricService.disableBiometricLogin();
-      state = AuthState(
-        biometricAvailable: state.biometricAvailable,
-        biometricEnabled: false,
-        error: 'Stored credentials not found. Please sign in manually.',
-      );
-      return false;
-    }
-
-    final response = await _repository.login(
-      credentials.username,
-      credentials.password,
-    );
-
+    /*
+     * The fingerprint proved the holder. What it unlocks is the session already here.
+     *
+     * The refresh token is in the keystore either way; with this on, using it costs a fingerprint.
+     * That is the whole of what a biometric does — it never was a credential, and the old code
+     * replaying a stored password after the prompt is what made it look like one.
+     */
+    final response = await _repository.me();
     if (response.isSuccess && response.data != null) {
       state = AuthState(
         user: response.data,
@@ -193,23 +219,25 @@ class AuthNotifier extends Notifier<AuthState> {
       return true;
     }
 
-    // Stored credentials failed (password changed elsewhere)
-    await _biometricService.disableBiometricLogin();
+    // The refresh token is spent too. Nothing here can mint a session; the sign-in screen can.
     state = AuthState(
       biometricAvailable: state.biometricAvailable,
-      biometricEnabled: false,
-      error: 'Stored credentials are invalid. Please sign in manually.',
+      biometricEnabled: state.biometricEnabled,
+      error: 'That session has ended. Sign in again.',
     );
     return false;
   }
 
-  Future<void> enableBiometric(String username, String password) async {
-    await _biometricService.enableBiometricLogin(username, password);
-    state = state.copyWith(biometricEnabled: true);
+  /// Turning it on costs a successful prompt — a switch that claims a protection the reader cannot
+  /// provide is worse than no switch.
+  Future<BiometricResult> enableBiometric() async {
+    final result = await _biometricService.enable();
+    if (result.proved) state = state.copyWith(biometricEnabled: true);
+    return result;
   }
 
   Future<void> disableBiometric() async {
-    await _biometricService.disableBiometricLogin();
+    await _biometricService.disable();
     state = state.copyWith(biometricEnabled: false);
   }
 

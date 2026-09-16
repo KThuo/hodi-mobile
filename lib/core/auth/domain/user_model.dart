@@ -51,6 +51,13 @@ abstract class UserModel with _$UserModel {
 
     /// A new password is required before this account may do anything else.
     @Default(false) bool mustChangePassword,
+
+    /// Whether the handset that made this request can sign in with a PIN.
+    ///
+    /// Answered per device by the server, not remembered by the app: a PIN can be removed from
+    /// another phone or spend its five tries, and an app trusting its own memory would keep drawing
+    /// a keypad that cannot work.
+    @Default(false) bool pinSet,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
@@ -95,6 +102,7 @@ abstract class UserModel with _$UserModel {
       caretaker: json['caretaker'] == true,
       tenant: json['tenant'] == true,
       mustChangePassword: json['mustChangePassword'] == true,
+      pinSet: json['pinSet'] == true,
     );
   }
 

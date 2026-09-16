@@ -32,6 +32,7 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   caretaker: json['caretaker'] as bool? ?? false,
   tenant: json['tenant'] as bool? ?? false,
   mustChangePassword: json['mustChangePassword'] as bool? ?? false,
+  pinSet: json['pinSet'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
@@ -57,4 +58,5 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'caretaker': instance.caretaker,
       'tenant': instance.tenant,
       'mustChangePassword': instance.mustChangePassword,
+      'pinSet': instance.pinSet,
     };

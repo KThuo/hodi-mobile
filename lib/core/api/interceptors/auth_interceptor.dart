@@ -3,16 +3,18 @@ import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import '../api_constants.dart';
 import '../../auth/data/auth_local_storage.dart';
+import '../../device/device_id.dart';
 
 class AuthInterceptor extends QueuedInterceptor {
   final AuthLocalStorage _storage;
+  final DeviceId _device;
 
   /// Bare Dio instance for refresh calls — no interceptors to avoid recursion.
   late final Dio _refreshDio;
 
   static const _refreshBufferSeconds = 20;
 
-  AuthInterceptor(this._storage) {
+  AuthInterceptor(this._storage, this._device) {
     _refreshDio = Dio(BaseOptions(
       baseUrl: ApiConstants.baseUrl,
       connectTimeout: ApiConstants.connectTimeout,
@@ -49,6 +51,19 @@ class AuthInterceptor extends QueuedInterceptor {
     }
 
     options.headers[ApiConstants.clientHeader] = ApiConstants.clientMobile;
+
+    /*
+     * Which handset this is.
+     *
+     * On every request, not only the PIN ones: `/me` answers `pinSet` per device, and the sign-in
+     * screen draws a keypad or a password field from that answer. A request that forgot to say
+     * which phone it came from would be told there is no PIN here, and the keypad would quietly
+     * stop appearing.
+     *
+     * Not a credential, and the server does not treat it as one — what makes a PIN row trustworthy
+     * is that the account password created it.
+     */
+    options.headers[ApiConstants.deviceHeader] = await _device.get();
 
     handler.next(options);
   }

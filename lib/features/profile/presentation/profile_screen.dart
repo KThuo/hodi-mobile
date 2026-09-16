@@ -10,6 +10,7 @@ import '../../../core/widgets/hodi_app_bar.dart';
 import '../../../core/widgets/hodi_status_badge.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
+import 'widgets/sign_in_card.dart';
 import '../domain/profile_model.dart';
 import '../providers/profile_providers.dart';
 
@@ -36,6 +37,8 @@ class ProfileScreen extends ConsumerWidget {
                 _ProfileHeaderCard(profile: profile),
                 const SizedBox(height: 16),
                 _AccountDetailsCard(profile: profile),
+                const SizedBox(height: 16),
+                const SignInCard(),
                 const SizedBox(height: 16),
                 _DeleteAccountCard(
                   onDelete: () => _showDeleteAccountDialog(context, ref),
