@@ -242,7 +242,7 @@ class _Receipt extends StatelessWidget {
 
     if (p.rentOwedBefore != null) {
       lines.add(_SumLine(
-        label: 'Balance before this payment',
+        label: 'Balance before',
         amount: p.rentOwedBefore!,
         muted: true,
       ));
@@ -290,12 +290,20 @@ class _Receipt extends StatelessWidget {
       ));
     }
 
+    /*
+     * The closing balance, and the only place it is said.
+     *
+     * This line used to be followed by a coloured strip reading "Still owed: KES x" — the same
+     * figure, one line below itself, in more words. The colour is doing that work now: an amount
+     * standing is warning-toned, a cleared account is success-toned and reads zero.
+     */
     if (p.rentOwed != null) {
       lines.add(const Divider(height: 20));
       lines.add(_SumLine(
-        label: 'Balance after this payment',
+        label: 'Balance',
         amount: p.rentOwed!,
         bold: true,
+        tone: p.rentOwed! > 0 ? HodiColors.warningEnd : HodiColors.successEnd,
       ));
     }
 
@@ -321,36 +329,6 @@ class _Receipt extends StatelessWidget {
               ),
             ],
           ),
-          if (p.rentOwed != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: p.rentOwed! > 0 ? HodiColors.warningBg : HodiColors.successBg,
-                borderRadius: HodiBorderRadius.card,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    p.rentOwed! > 0
-                        ? Icons.account_balance_wallet_outlined
-                        : Icons.check_circle_outline,
-                    size: 16,
-                    color: p.rentOwed! > 0 ? HodiColors.warningEnd : HodiColors.successEnd,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      p.rentOwed! > 0
-                          ? 'Still owed: KES ${CurrencyFormatter.format(p.rentOwed!)}'
-                          : 'Account settled in full. Thank you.',
-                      style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textDark),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );
