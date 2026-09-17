@@ -1,33 +1,18 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/theme/hodi_border_radius.dart';
 import '../../../../core/theme/hodi_colors.dart';
 import '../../../../core/theme/hodi_text_styles.dart';
+import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/widgets/hodi_card.dart';
-import '../../../../core/widgets/hodi_status_badge.dart';
-import '../../../../core/widgets/hodi_amount_text.dart';
 import '../../domain/vacate_notice_model.dart';
 
 class VacateNoticeListItem extends StatelessWidget {
-  final VacateNoticeModel notice;
-  final VoidCallback? onTap;
-
   const VacateNoticeListItem({super.key, required this.notice, this.onTap});
 
-  BadgeType get _badgeType {
-    switch (notice.flag) {
-      case 'PENDING':
-        return BadgeType.warning;
-      case 'APPROVED':
-        return BadgeType.success;
-      case 'REJECTED':
-        return BadgeType.error;
-      case 'CANCELLED':
-        return BadgeType.info;
-      case 'PROCESSED':
-        return BadgeType.info;
-      default:
-        return BadgeType.info;
-    }
-  }
+  final VacateNoticeModel notice;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -36,86 +21,60 @@ class VacateNoticeListItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row: RRN + status badge
           Row(
             children: [
               Expanded(
                 child: Text(
-                  notice.rrn ?? '-',
-                  style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+                  notice.tenantName,
+                  style: HodiTextStyles.bodyLarge
+                      .copyWith(fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              HodiStatusBadge(
-                text: notice.flag ?? '-',
-                type: _badgeType,
-              ),
+              _StatusPill(notice: notice),
             ],
           ),
-          const SizedBox(height: 8),
-
-          // Tenant name + phone
+          const SizedBox(height: 2),
+          Text(
+            [
+              notice.reference,
+              if (notice.unit.isNotEmpty) notice.unit,
+              if (notice.propertyName != null) notice.propertyName!,
+            ].join(' · '),
+            style: HodiTextStyles.bodySmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.person_outline, size: 14, color: HodiColors.textLight),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  notice.tenantName ?? '-',
-                  style: HodiTextStyles.bodySmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Icon(
+                Icons.event_outlined,
+                size: 14,
+                color: notice.overdue ? HodiColors.errorStart : HodiColors.textLight,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                _leaving(notice),
+                style: HodiTextStyles.bodySmall.copyWith(
+                  fontSize: 11,
+                  color:
+                      notice.overdue ? HodiColors.errorStart : HodiColors.textMedium,
+                  fontWeight: notice.overdue ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
-              if (notice.tenantPhone != null)
-                Text(notice.tenantPhone!, style: HodiTextStyles.bodySmall),
-            ],
-          ),
-          const SizedBox(height: 4),
-
-          // House name
-          Row(
-            children: [
-              const Icon(Icons.home_outlined, size: 14, color: HodiColors.textLight),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  notice.houseName ?? notice.houseCode ?? '-',
-                  style: HodiTextStyles.bodySmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              if (notice.propertyName != null)
-                Text(notice.propertyName!, style: HodiTextStyles.bodySmall),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Bottom row: vacate date + settlement / net amount
-          Row(
-            children: [
-              if (notice.vacateDate != null) ...[
-                const Icon(Icons.event_outlined, size: 14, color: HodiColors.textLight),
-                const SizedBox(width: 4),
-                Text(
-                  notice.vacateDate!,
-                  style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textMedium),
-                ),
-              ],
               const Spacer(),
-              if (notice.settlementType != null) ...[
-                _SettlementChip(type: notice.settlementType!),
-                const SizedBox(width: 8),
-              ],
-              if (notice.netAmount != 0)
-                HodiAmountText(
-                  amount: notice.netAmount,
+              // Only where a settlement exists. Until then there is no figure, and a nought here
+              // would read as "nothing owed" rather than "not worked out yet".
+              if (notice.hasSettlement)
+                Text(
+                  '${notice.isRefund ? 'Refund' : 'Owes'} KES '
+                  '${CurrencyFormatter.format((notice.netAmount ?? 0).abs())}',
                   style: HodiTextStyles.currency.copyWith(
-                    fontSize: 14,
-                    color: notice.netAmount > 0
-                        ? HodiColors.successStart
+                    fontSize: 13,
+                    color: notice.isRefund
+                        ? HodiColors.successEnd
                         : HodiColors.errorStart,
                   ),
                 ),
@@ -125,41 +84,41 @@ class VacateNoticeListItem extends StatelessWidget {
       ),
     );
   }
+
+  static String _leaving(VacateNoticeModel n) {
+    final when = DateFormatter.parseApiDate(n.vacateDate);
+    final date = when == null ? 'no date' : DateFormatter.formatDate(when);
+    final days = n.daysToVacate;
+    if (days > 0) return '$date · in $days day${days == 1 ? '' : 's'}';
+    if (days == 0) return '$date · today';
+    return '$date · ${-days} day${days == -1 ? '' : 's'} ago';
+  }
 }
 
-class _SettlementChip extends StatelessWidget {
-  final String type;
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.notice});
 
-  const _SettlementChip({required this.type});
-
-  Color get _color {
-    switch (type) {
-      case 'REFUND':
-        return HodiColors.successStart;
-      case 'INVOICE':
-        return HodiColors.errorStart;
-      case 'BALANCED':
-        return HodiColors.secondary;
-      default:
-        return HodiColors.textMedium;
-    }
-  }
+  final VacateNoticeModel notice;
 
   @override
   Widget build(BuildContext context) {
+    final (bg, fg) = switch (notice.status) {
+      'PENDING' => (HodiColors.warningBg, HodiColors.warningEnd),
+      'APPROVED' => (HodiColors.successBg, HodiColors.successEnd),
+      'REJECTED' => (HodiColors.dangerBg, HodiColors.errorStart),
+      'CANCELLED' => (HodiColors.surfaceInset, HodiColors.textMedium),
+      _ => (HodiColors.surfaceInset, HodiColors.textMedium),
+    };
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: _color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: _color.withValues(alpha: 0.3)),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+      decoration: BoxDecoration(color: bg, borderRadius: HodiBorderRadius.full),
       child: Text(
-        type,
-        style: TextStyle(
+        notice.statusLabel,
+        style: HodiTextStyles.bodySmall.copyWith(
           fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: _color,
+          fontWeight: FontWeight.w700,
+          color: fg,
         ),
       ),
     );

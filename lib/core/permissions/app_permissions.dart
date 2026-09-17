@@ -131,7 +131,18 @@ abstract class AppPermissions {
   static const penaltyEdit = 'ROLE_PENALTY_EDIT';
 
   // ── Vacate notices ────────────────────────────────────────────────────────
+  //
+  // Raising and deciding both accept ROLE_TENANT_SELF alongside the staff authority, which is the
+  // shape of the feature: a tenant gives their own notice and may withdraw it, the office approves
+  // or refuses. [vacateDecide] is what tells the two apart on screen.
+  //
+  // SETTLE and PAY are named and gate nothing the app renders: working out a settlement and
+  // paying it out are desk work with a paper trail.
   static const vacateView = 'ROLE_VACATE_VIEW';
+  static const vacateNew = 'ROLE_VACATE_NEW';
+  static const vacateDecide = 'ROLE_VACATE_DECIDE';
+  static const vacateSettle = 'ROLE_VACATE_SETTLE';
+  static const vacatePay = 'ROLE_VACATE_PAY';
 
   /// Every authority this app names, for the test that checks them against the backend.
   static const all = <String>[
@@ -149,6 +160,6 @@ abstract class AppPermissions {
     penaltyView, penaltyApply, penaltyWaive, penaltyEdit,
     estateView,
     reportView,
-    vacateView,
+    vacateView, vacateNew, vacateDecide, vacateSettle, vacatePay,
   ];
 }

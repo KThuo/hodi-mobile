@@ -15,7 +15,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$VacateNoticeModel {
 
- String? get id; String? get rrn; String? get houseName; String? get houseCode; String? get houseNumber; String? get tenantName; String? get tenantPhone; String? get tenantEmail; String? get propertyName;@JsonKey(fromJson: parseIntNullable) int? get propertyId; String? get estateName;@JsonKey(fromJson: parseIntNullable) int? get estateId; String? get vacateDate; String? get reason; String? get flag;@JsonKey(fromJson: parseIntNullable) int? get status; String? get initiatedBy; String? get initiatedByName; String? get settlementType;@JsonKey(fromJson: parseDouble) double get netAmount;@JsonKey(fromJson: parseDouble) double get totalPaid; String? get createdOn;
+ String get id; String get reference; String? get occupationId; String? get houseId; String get houseCode; String? get houseNumber; String? get houseLabel; String? get propertyId; String? get propertyName; String? get estateId; String? get estateName; String? get tenantUserId; String get tenantName; String? get tenantPhone; String? get tenantEmail;/// Who gave the notice — the tenant, or the office on their behalf.
+ String? get raisedBy; String? get raisedByName; String? get vacateDate; String? get reason;/// `PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`.
+ String get status; String? get decidedByName; String? get decidedOn; String? get decisionNotes;// ── The settlement ─────────────────────────────────────────────────────
+@JsonKey(fromJson: parseDoubleNullable) double? get rentOwed;@JsonKey(fromJson: parseDoubleNullable) double? get refundableDeposit;@JsonKey(fromJson: parseDoubleNullable) double? get totalDeductions;/// Positive means money goes back to the tenant; negative means they still owe.
+@JsonKey(fromJson: parseDoubleNullable) double? get netAmount; String? get settlementType; bool get settled; String? get settledOn; String? get paymentStatus;@JsonKey(fromJson: parseDouble) double get totalPaid;@JsonKey(fromJson: parseDouble) double get balanceRemaining; bool get refundConfirmed; String? get refundReference; String? get unpaidHandling; String? get unpaidNotes;@JsonKey(fromJson: parseDoubleNullable) double? get unpaidAmount; bool get processed; String? get processedOn; String? get processedByName;/// Counted by the server. Negative means the date has passed.
+ int get daysToVacate;/// What happens next, in the server's words. The single most useful line on the screen, and
+/// the app does not try to work it out for itself.
+ String? get nextStep; String? get createdOn; String? get updatedOn;
 /// Create a copy of VacateNoticeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +35,16 @@ $VacateNoticeModelCopyWith<VacateNoticeModel> get copyWith => _$VacateNoticeMode
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacateNoticeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.tenantEmail, tenantEmail) || other.tenantEmail == tenantEmail)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.vacateDate, vacateDate) || other.vacateDate == vacateDate)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.flag, flag) || other.flag == flag)&&(identical(other.status, status) || other.status == status)&&(identical(other.initiatedBy, initiatedBy) || other.initiatedBy == initiatedBy)&&(identical(other.initiatedByName, initiatedByName) || other.initiatedByName == initiatedByName)&&(identical(other.settlementType, settlementType) || other.settlementType == settlementType)&&(identical(other.netAmount, netAmount) || other.netAmount == netAmount)&&(identical(other.totalPaid, totalPaid) || other.totalPaid == totalPaid)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacateNoticeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.tenantUserId, tenantUserId) || other.tenantUserId == tenantUserId)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.tenantEmail, tenantEmail) || other.tenantEmail == tenantEmail)&&(identical(other.raisedBy, raisedBy) || other.raisedBy == raisedBy)&&(identical(other.raisedByName, raisedByName) || other.raisedByName == raisedByName)&&(identical(other.vacateDate, vacateDate) || other.vacateDate == vacateDate)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.status, status) || other.status == status)&&(identical(other.decidedByName, decidedByName) || other.decidedByName == decidedByName)&&(identical(other.decidedOn, decidedOn) || other.decidedOn == decidedOn)&&(identical(other.decisionNotes, decisionNotes) || other.decisionNotes == decisionNotes)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.refundableDeposit, refundableDeposit) || other.refundableDeposit == refundableDeposit)&&(identical(other.totalDeductions, totalDeductions) || other.totalDeductions == totalDeductions)&&(identical(other.netAmount, netAmount) || other.netAmount == netAmount)&&(identical(other.settlementType, settlementType) || other.settlementType == settlementType)&&(identical(other.settled, settled) || other.settled == settled)&&(identical(other.settledOn, settledOn) || other.settledOn == settledOn)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.totalPaid, totalPaid) || other.totalPaid == totalPaid)&&(identical(other.balanceRemaining, balanceRemaining) || other.balanceRemaining == balanceRemaining)&&(identical(other.refundConfirmed, refundConfirmed) || other.refundConfirmed == refundConfirmed)&&(identical(other.refundReference, refundReference) || other.refundReference == refundReference)&&(identical(other.unpaidHandling, unpaidHandling) || other.unpaidHandling == unpaidHandling)&&(identical(other.unpaidNotes, unpaidNotes) || other.unpaidNotes == unpaidNotes)&&(identical(other.unpaidAmount, unpaidAmount) || other.unpaidAmount == unpaidAmount)&&(identical(other.processed, processed) || other.processed == processed)&&(identical(other.processedOn, processedOn) || other.processedOn == processedOn)&&(identical(other.processedByName, processedByName) || other.processedByName == processedByName)&&(identical(other.daysToVacate, daysToVacate) || other.daysToVacate == daysToVacate)&&(identical(other.nextStep, nextStep) || other.nextStep == nextStep)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn)&&(identical(other.updatedOn, updatedOn) || other.updatedOn == updatedOn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,rrn,houseName,houseCode,houseNumber,tenantName,tenantPhone,tenantEmail,propertyName,propertyId,estateName,estateId,vacateDate,reason,flag,status,initiatedBy,initiatedByName,settlementType,netAmount,totalPaid,createdOn]);
+int get hashCode => Object.hashAll([runtimeType,id,reference,occupationId,houseId,houseCode,houseNumber,houseLabel,propertyId,propertyName,estateId,estateName,tenantUserId,tenantName,tenantPhone,tenantEmail,raisedBy,raisedByName,vacateDate,reason,status,decidedByName,decidedOn,decisionNotes,rentOwed,refundableDeposit,totalDeductions,netAmount,settlementType,settled,settledOn,paymentStatus,totalPaid,balanceRemaining,refundConfirmed,refundReference,unpaidHandling,unpaidNotes,unpaidAmount,processed,processedOn,processedByName,daysToVacate,nextStep,createdOn,updatedOn]);
 
 @override
 String toString() {
-  return 'VacateNoticeModel(id: $id, rrn: $rrn, houseName: $houseName, houseCode: $houseCode, houseNumber: $houseNumber, tenantName: $tenantName, tenantPhone: $tenantPhone, tenantEmail: $tenantEmail, propertyName: $propertyName, propertyId: $propertyId, estateName: $estateName, estateId: $estateId, vacateDate: $vacateDate, reason: $reason, flag: $flag, status: $status, initiatedBy: $initiatedBy, initiatedByName: $initiatedByName, settlementType: $settlementType, netAmount: $netAmount, totalPaid: $totalPaid, createdOn: $createdOn)';
+  return 'VacateNoticeModel(id: $id, reference: $reference, occupationId: $occupationId, houseId: $houseId, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, tenantUserId: $tenantUserId, tenantName: $tenantName, tenantPhone: $tenantPhone, tenantEmail: $tenantEmail, raisedBy: $raisedBy, raisedByName: $raisedByName, vacateDate: $vacateDate, reason: $reason, status: $status, decidedByName: $decidedByName, decidedOn: $decidedOn, decisionNotes: $decisionNotes, rentOwed: $rentOwed, refundableDeposit: $refundableDeposit, totalDeductions: $totalDeductions, netAmount: $netAmount, settlementType: $settlementType, settled: $settled, settledOn: $settledOn, paymentStatus: $paymentStatus, totalPaid: $totalPaid, balanceRemaining: $balanceRemaining, refundConfirmed: $refundConfirmed, refundReference: $refundReference, unpaidHandling: $unpaidHandling, unpaidNotes: $unpaidNotes, unpaidAmount: $unpaidAmount, processed: $processed, processedOn: $processedOn, processedByName: $processedByName, daysToVacate: $daysToVacate, nextStep: $nextStep, createdOn: $createdOn, updatedOn: $updatedOn)';
 }
 
 
@@ -48,7 +55,7 @@ abstract mixin class $VacateNoticeModelCopyWith<$Res>  {
   factory $VacateNoticeModelCopyWith(VacateNoticeModel value, $Res Function(VacateNoticeModel) _then) = _$VacateNoticeModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? rrn, String? houseName, String? houseCode, String? houseNumber, String? tenantName, String? tenantPhone, String? tenantEmail, String? propertyName,@JsonKey(fromJson: parseIntNullable) int? propertyId, String? estateName,@JsonKey(fromJson: parseIntNullable) int? estateId, String? vacateDate, String? reason, String? flag,@JsonKey(fromJson: parseIntNullable) int? status, String? initiatedBy, String? initiatedByName, String? settlementType,@JsonKey(fromJson: parseDouble) double netAmount,@JsonKey(fromJson: parseDouble) double totalPaid, String? createdOn
+ String id, String reference, String? occupationId, String? houseId, String houseCode, String? houseNumber, String? houseLabel, String? propertyId, String? propertyName, String? estateId, String? estateName, String? tenantUserId, String tenantName, String? tenantPhone, String? tenantEmail, String? raisedBy, String? raisedByName, String? vacateDate, String? reason, String status, String? decidedByName, String? decidedOn, String? decisionNotes,@JsonKey(fromJson: parseDoubleNullable) double? rentOwed,@JsonKey(fromJson: parseDoubleNullable) double? refundableDeposit,@JsonKey(fromJson: parseDoubleNullable) double? totalDeductions,@JsonKey(fromJson: parseDoubleNullable) double? netAmount, String? settlementType, bool settled, String? settledOn, String? paymentStatus,@JsonKey(fromJson: parseDouble) double totalPaid,@JsonKey(fromJson: parseDouble) double balanceRemaining, bool refundConfirmed, String? refundReference, String? unpaidHandling, String? unpaidNotes,@JsonKey(fromJson: parseDoubleNullable) double? unpaidAmount, bool processed, String? processedOn, String? processedByName, int daysToVacate, String? nextStep, String? createdOn, String? updatedOn
 });
 
 
@@ -65,30 +72,53 @@ class _$VacateNoticeModelCopyWithImpl<$Res>
 
 /// Create a copy of VacateNoticeModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? tenantEmail = freezed,Object? propertyName = freezed,Object? propertyId = freezed,Object? estateName = freezed,Object? estateId = freezed,Object? vacateDate = freezed,Object? reason = freezed,Object? flag = freezed,Object? status = freezed,Object? initiatedBy = freezed,Object? initiatedByName = freezed,Object? settlementType = freezed,Object? netAmount = null,Object? totalPaid = null,Object? createdOn = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? reference = null,Object? occupationId = freezed,Object? houseId = freezed,Object? houseCode = null,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? tenantUserId = freezed,Object? tenantName = null,Object? tenantPhone = freezed,Object? tenantEmail = freezed,Object? raisedBy = freezed,Object? raisedByName = freezed,Object? vacateDate = freezed,Object? reason = freezed,Object? status = null,Object? decidedByName = freezed,Object? decidedOn = freezed,Object? decisionNotes = freezed,Object? rentOwed = freezed,Object? refundableDeposit = freezed,Object? totalDeductions = freezed,Object? netAmount = freezed,Object? settlementType = freezed,Object? settled = null,Object? settledOn = freezed,Object? paymentStatus = freezed,Object? totalPaid = null,Object? balanceRemaining = null,Object? refundConfirmed = null,Object? refundReference = freezed,Object? unpaidHandling = freezed,Object? unpaidNotes = freezed,Object? unpaidAmount = freezed,Object? processed = null,Object? processedOn = freezed,Object? processedByName = freezed,Object? daysToVacate = null,Object? nextStep = freezed,Object? createdOn = freezed,Object? updatedOn = freezed,}) {
   return _then(_self.copyWith(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
-as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
-as String?,tenantEmail: freezed == tenantEmail ? _self.tenantEmail : tenantEmail // ignore: cast_nullable_to_non_nullable
-as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,reference: null == reference ? _self.reference : reference // ignore: cast_nullable_to_non_nullable
+as String,occupationId: freezed == occupationId ? _self.occupationId : occupationId // ignore: cast_nullable_to_non_nullable
+as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
 as String?,propertyId: freezed == propertyId ? _self.propertyId : propertyId // ignore: cast_nullable_to_non_nullable
-as int?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
 as String?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
-as int?,vacateDate: freezed == vacateDate ? _self.vacateDate : vacateDate // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,tenantUserId: freezed == tenantUserId ? _self.tenantUserId : tenantUserId // ignore: cast_nullable_to_non_nullable
+as String?,tenantName: null == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
+as String,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
+as String?,tenantEmail: freezed == tenantEmail ? _self.tenantEmail : tenantEmail // ignore: cast_nullable_to_non_nullable
+as String?,raisedBy: freezed == raisedBy ? _self.raisedBy : raisedBy // ignore: cast_nullable_to_non_nullable
+as String?,raisedByName: freezed == raisedByName ? _self.raisedByName : raisedByName // ignore: cast_nullable_to_non_nullable
+as String?,vacateDate: freezed == vacateDate ? _self.vacateDate : vacateDate // ignore: cast_nullable_to_non_nullable
 as String?,reason: freezed == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
-as String?,flag: freezed == flag ? _self.flag : flag // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int?,initiatedBy: freezed == initiatedBy ? _self.initiatedBy : initiatedBy // ignore: cast_nullable_to_non_nullable
-as String?,initiatedByName: freezed == initiatedByName ? _self.initiatedByName : initiatedByName // ignore: cast_nullable_to_non_nullable
-as String?,settlementType: freezed == settlementType ? _self.settlementType : settlementType // ignore: cast_nullable_to_non_nullable
-as String?,netAmount: null == netAmount ? _self.netAmount : netAmount // ignore: cast_nullable_to_non_nullable
-as double,totalPaid: null == totalPaid ? _self.totalPaid : totalPaid // ignore: cast_nullable_to_non_nullable
-as double,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,decidedByName: freezed == decidedByName ? _self.decidedByName : decidedByName // ignore: cast_nullable_to_non_nullable
+as String?,decidedOn: freezed == decidedOn ? _self.decidedOn : decidedOn // ignore: cast_nullable_to_non_nullable
+as String?,decisionNotes: freezed == decisionNotes ? _self.decisionNotes : decisionNotes // ignore: cast_nullable_to_non_nullable
+as String?,rentOwed: freezed == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
+as double?,refundableDeposit: freezed == refundableDeposit ? _self.refundableDeposit : refundableDeposit // ignore: cast_nullable_to_non_nullable
+as double?,totalDeductions: freezed == totalDeductions ? _self.totalDeductions : totalDeductions // ignore: cast_nullable_to_non_nullable
+as double?,netAmount: freezed == netAmount ? _self.netAmount : netAmount // ignore: cast_nullable_to_non_nullable
+as double?,settlementType: freezed == settlementType ? _self.settlementType : settlementType // ignore: cast_nullable_to_non_nullable
+as String?,settled: null == settled ? _self.settled : settled // ignore: cast_nullable_to_non_nullable
+as bool,settledOn: freezed == settledOn ? _self.settledOn : settledOn // ignore: cast_nullable_to_non_nullable
+as String?,paymentStatus: freezed == paymentStatus ? _self.paymentStatus : paymentStatus // ignore: cast_nullable_to_non_nullable
+as String?,totalPaid: null == totalPaid ? _self.totalPaid : totalPaid // ignore: cast_nullable_to_non_nullable
+as double,balanceRemaining: null == balanceRemaining ? _self.balanceRemaining : balanceRemaining // ignore: cast_nullable_to_non_nullable
+as double,refundConfirmed: null == refundConfirmed ? _self.refundConfirmed : refundConfirmed // ignore: cast_nullable_to_non_nullable
+as bool,refundReference: freezed == refundReference ? _self.refundReference : refundReference // ignore: cast_nullable_to_non_nullable
+as String?,unpaidHandling: freezed == unpaidHandling ? _self.unpaidHandling : unpaidHandling // ignore: cast_nullable_to_non_nullable
+as String?,unpaidNotes: freezed == unpaidNotes ? _self.unpaidNotes : unpaidNotes // ignore: cast_nullable_to_non_nullable
+as String?,unpaidAmount: freezed == unpaidAmount ? _self.unpaidAmount : unpaidAmount // ignore: cast_nullable_to_non_nullable
+as double?,processed: null == processed ? _self.processed : processed // ignore: cast_nullable_to_non_nullable
+as bool,processedOn: freezed == processedOn ? _self.processedOn : processedOn // ignore: cast_nullable_to_non_nullable
+as String?,processedByName: freezed == processedByName ? _self.processedByName : processedByName // ignore: cast_nullable_to_non_nullable
+as String?,daysToVacate: null == daysToVacate ? _self.daysToVacate : daysToVacate // ignore: cast_nullable_to_non_nullable
+as int,nextStep: freezed == nextStep ? _self.nextStep : nextStep // ignore: cast_nullable_to_non_nullable
+as String?,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,updatedOn: freezed == updatedOn ? _self.updatedOn : updatedOn // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -174,10 +204,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? rrn,  String? houseName,  String? houseCode,  String? houseNumber,  String? tenantName,  String? tenantPhone,  String? tenantEmail,  String? propertyName, @JsonKey(fromJson: parseIntNullable)  int? propertyId,  String? estateName, @JsonKey(fromJson: parseIntNullable)  int? estateId,  String? vacateDate,  String? reason,  String? flag, @JsonKey(fromJson: parseIntNullable)  int? status,  String? initiatedBy,  String? initiatedByName,  String? settlementType, @JsonKey(fromJson: parseDouble)  double netAmount, @JsonKey(fromJson: parseDouble)  double totalPaid,  String? createdOn)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String reference,  String? occupationId,  String? houseId,  String houseCode,  String? houseNumber,  String? houseLabel,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? tenantUserId,  String tenantName,  String? tenantPhone,  String? tenantEmail,  String? raisedBy,  String? raisedByName,  String? vacateDate,  String? reason,  String status,  String? decidedByName,  String? decidedOn,  String? decisionNotes, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwed, @JsonKey(fromJson: parseDoubleNullable)  double? refundableDeposit, @JsonKey(fromJson: parseDoubleNullable)  double? totalDeductions, @JsonKey(fromJson: parseDoubleNullable)  double? netAmount,  String? settlementType,  bool settled,  String? settledOn,  String? paymentStatus, @JsonKey(fromJson: parseDouble)  double totalPaid, @JsonKey(fromJson: parseDouble)  double balanceRemaining,  bool refundConfirmed,  String? refundReference,  String? unpaidHandling,  String? unpaidNotes, @JsonKey(fromJson: parseDoubleNullable)  double? unpaidAmount,  bool processed,  String? processedOn,  String? processedByName,  int daysToVacate,  String? nextStep,  String? createdOn,  String? updatedOn)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VacateNoticeModel() when $default != null:
-return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.houseNumber,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.propertyName,_that.propertyId,_that.estateName,_that.estateId,_that.vacateDate,_that.reason,_that.flag,_that.status,_that.initiatedBy,_that.initiatedByName,_that.settlementType,_that.netAmount,_that.totalPaid,_that.createdOn);case _:
+return $default(_that.id,_that.reference,_that.occupationId,_that.houseId,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.tenantUserId,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.raisedBy,_that.raisedByName,_that.vacateDate,_that.reason,_that.status,_that.decidedByName,_that.decidedOn,_that.decisionNotes,_that.rentOwed,_that.refundableDeposit,_that.totalDeductions,_that.netAmount,_that.settlementType,_that.settled,_that.settledOn,_that.paymentStatus,_that.totalPaid,_that.balanceRemaining,_that.refundConfirmed,_that.refundReference,_that.unpaidHandling,_that.unpaidNotes,_that.unpaidAmount,_that.processed,_that.processedOn,_that.processedByName,_that.daysToVacate,_that.nextStep,_that.createdOn,_that.updatedOn);case _:
   return orElse();
 
 }
@@ -195,10 +225,10 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.houseNu
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? rrn,  String? houseName,  String? houseCode,  String? houseNumber,  String? tenantName,  String? tenantPhone,  String? tenantEmail,  String? propertyName, @JsonKey(fromJson: parseIntNullable)  int? propertyId,  String? estateName, @JsonKey(fromJson: parseIntNullable)  int? estateId,  String? vacateDate,  String? reason,  String? flag, @JsonKey(fromJson: parseIntNullable)  int? status,  String? initiatedBy,  String? initiatedByName,  String? settlementType, @JsonKey(fromJson: parseDouble)  double netAmount, @JsonKey(fromJson: parseDouble)  double totalPaid,  String? createdOn)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String reference,  String? occupationId,  String? houseId,  String houseCode,  String? houseNumber,  String? houseLabel,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? tenantUserId,  String tenantName,  String? tenantPhone,  String? tenantEmail,  String? raisedBy,  String? raisedByName,  String? vacateDate,  String? reason,  String status,  String? decidedByName,  String? decidedOn,  String? decisionNotes, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwed, @JsonKey(fromJson: parseDoubleNullable)  double? refundableDeposit, @JsonKey(fromJson: parseDoubleNullable)  double? totalDeductions, @JsonKey(fromJson: parseDoubleNullable)  double? netAmount,  String? settlementType,  bool settled,  String? settledOn,  String? paymentStatus, @JsonKey(fromJson: parseDouble)  double totalPaid, @JsonKey(fromJson: parseDouble)  double balanceRemaining,  bool refundConfirmed,  String? refundReference,  String? unpaidHandling,  String? unpaidNotes, @JsonKey(fromJson: parseDoubleNullable)  double? unpaidAmount,  bool processed,  String? processedOn,  String? processedByName,  int daysToVacate,  String? nextStep,  String? createdOn,  String? updatedOn)  $default,) {final _that = this;
 switch (_that) {
 case _VacateNoticeModel():
-return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.houseNumber,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.propertyName,_that.propertyId,_that.estateName,_that.estateId,_that.vacateDate,_that.reason,_that.flag,_that.status,_that.initiatedBy,_that.initiatedByName,_that.settlementType,_that.netAmount,_that.totalPaid,_that.createdOn);case _:
+return $default(_that.id,_that.reference,_that.occupationId,_that.houseId,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.tenantUserId,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.raisedBy,_that.raisedByName,_that.vacateDate,_that.reason,_that.status,_that.decidedByName,_that.decidedOn,_that.decisionNotes,_that.rentOwed,_that.refundableDeposit,_that.totalDeductions,_that.netAmount,_that.settlementType,_that.settled,_that.settledOn,_that.paymentStatus,_that.totalPaid,_that.balanceRemaining,_that.refundConfirmed,_that.refundReference,_that.unpaidHandling,_that.unpaidNotes,_that.unpaidAmount,_that.processed,_that.processedOn,_that.processedByName,_that.daysToVacate,_that.nextStep,_that.createdOn,_that.updatedOn);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -215,10 +245,10 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.houseNu
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? rrn,  String? houseName,  String? houseCode,  String? houseNumber,  String? tenantName,  String? tenantPhone,  String? tenantEmail,  String? propertyName, @JsonKey(fromJson: parseIntNullable)  int? propertyId,  String? estateName, @JsonKey(fromJson: parseIntNullable)  int? estateId,  String? vacateDate,  String? reason,  String? flag, @JsonKey(fromJson: parseIntNullable)  int? status,  String? initiatedBy,  String? initiatedByName,  String? settlementType, @JsonKey(fromJson: parseDouble)  double netAmount, @JsonKey(fromJson: parseDouble)  double totalPaid,  String? createdOn)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String reference,  String? occupationId,  String? houseId,  String houseCode,  String? houseNumber,  String? houseLabel,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? tenantUserId,  String tenantName,  String? tenantPhone,  String? tenantEmail,  String? raisedBy,  String? raisedByName,  String? vacateDate,  String? reason,  String status,  String? decidedByName,  String? decidedOn,  String? decisionNotes, @JsonKey(fromJson: parseDoubleNullable)  double? rentOwed, @JsonKey(fromJson: parseDoubleNullable)  double? refundableDeposit, @JsonKey(fromJson: parseDoubleNullable)  double? totalDeductions, @JsonKey(fromJson: parseDoubleNullable)  double? netAmount,  String? settlementType,  bool settled,  String? settledOn,  String? paymentStatus, @JsonKey(fromJson: parseDouble)  double totalPaid, @JsonKey(fromJson: parseDouble)  double balanceRemaining,  bool refundConfirmed,  String? refundReference,  String? unpaidHandling,  String? unpaidNotes, @JsonKey(fromJson: parseDoubleNullable)  double? unpaidAmount,  bool processed,  String? processedOn,  String? processedByName,  int daysToVacate,  String? nextStep,  String? createdOn,  String? updatedOn)?  $default,) {final _that = this;
 switch (_that) {
 case _VacateNoticeModel() when $default != null:
-return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.houseNumber,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.propertyName,_that.propertyId,_that.estateName,_that.estateId,_that.vacateDate,_that.reason,_that.flag,_that.status,_that.initiatedBy,_that.initiatedByName,_that.settlementType,_that.netAmount,_that.totalPaid,_that.createdOn);case _:
+return $default(_that.id,_that.reference,_that.occupationId,_that.houseId,_that.houseCode,_that.houseNumber,_that.houseLabel,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.tenantUserId,_that.tenantName,_that.tenantPhone,_that.tenantEmail,_that.raisedBy,_that.raisedByName,_that.vacateDate,_that.reason,_that.status,_that.decidedByName,_that.decidedOn,_that.decisionNotes,_that.rentOwed,_that.refundableDeposit,_that.totalDeductions,_that.netAmount,_that.settlementType,_that.settled,_that.settledOn,_that.paymentStatus,_that.totalPaid,_that.balanceRemaining,_that.refundConfirmed,_that.refundReference,_that.unpaidHandling,_that.unpaidNotes,_that.unpaidAmount,_that.processed,_that.processedOn,_that.processedByName,_that.daysToVacate,_that.nextStep,_that.createdOn,_that.updatedOn);case _:
   return null;
 
 }
@@ -230,31 +260,61 @@ return $default(_that.id,_that.rrn,_that.houseName,_that.houseCode,_that.houseNu
 @JsonSerializable()
 
 class _VacateNoticeModel extends VacateNoticeModel {
-  const _VacateNoticeModel({this.id, this.rrn, this.houseName, this.houseCode, this.houseNumber, this.tenantName, this.tenantPhone, this.tenantEmail, this.propertyName, @JsonKey(fromJson: parseIntNullable) this.propertyId, this.estateName, @JsonKey(fromJson: parseIntNullable) this.estateId, this.vacateDate, this.reason, this.flag, @JsonKey(fromJson: parseIntNullable) this.status, this.initiatedBy, this.initiatedByName, this.settlementType, @JsonKey(fromJson: parseDouble) this.netAmount = 0, @JsonKey(fromJson: parseDouble) this.totalPaid = 0, this.createdOn}): super._();
+  const _VacateNoticeModel({required this.id, required this.reference, this.occupationId, this.houseId, required this.houseCode, this.houseNumber, this.houseLabel, this.propertyId, this.propertyName, this.estateId, this.estateName, this.tenantUserId, required this.tenantName, this.tenantPhone, this.tenantEmail, this.raisedBy, this.raisedByName, this.vacateDate, this.reason, required this.status, this.decidedByName, this.decidedOn, this.decisionNotes, @JsonKey(fromJson: parseDoubleNullable) this.rentOwed, @JsonKey(fromJson: parseDoubleNullable) this.refundableDeposit, @JsonKey(fromJson: parseDoubleNullable) this.totalDeductions, @JsonKey(fromJson: parseDoubleNullable) this.netAmount, this.settlementType, this.settled = false, this.settledOn, this.paymentStatus, @JsonKey(fromJson: parseDouble) this.totalPaid = 0, @JsonKey(fromJson: parseDouble) this.balanceRemaining = 0, this.refundConfirmed = false, this.refundReference, this.unpaidHandling, this.unpaidNotes, @JsonKey(fromJson: parseDoubleNullable) this.unpaidAmount, this.processed = false, this.processedOn, this.processedByName, this.daysToVacate = 0, this.nextStep, this.createdOn, this.updatedOn}): super._();
   factory _VacateNoticeModel.fromJson(Map<String, dynamic> json) => _$VacateNoticeModelFromJson(json);
 
-@override final  String? id;
-@override final  String? rrn;
-@override final  String? houseName;
-@override final  String? houseCode;
+@override final  String id;
+@override final  String reference;
+@override final  String? occupationId;
+@override final  String? houseId;
+@override final  String houseCode;
 @override final  String? houseNumber;
-@override final  String? tenantName;
+@override final  String? houseLabel;
+@override final  String? propertyId;
+@override final  String? propertyName;
+@override final  String? estateId;
+@override final  String? estateName;
+@override final  String? tenantUserId;
+@override final  String tenantName;
 @override final  String? tenantPhone;
 @override final  String? tenantEmail;
-@override final  String? propertyName;
-@override@JsonKey(fromJson: parseIntNullable) final  int? propertyId;
-@override final  String? estateName;
-@override@JsonKey(fromJson: parseIntNullable) final  int? estateId;
+/// Who gave the notice — the tenant, or the office on their behalf.
+@override final  String? raisedBy;
+@override final  String? raisedByName;
 @override final  String? vacateDate;
 @override final  String? reason;
-@override final  String? flag;
-@override@JsonKey(fromJson: parseIntNullable) final  int? status;
-@override final  String? initiatedBy;
-@override final  String? initiatedByName;
+/// `PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`.
+@override final  String status;
+@override final  String? decidedByName;
+@override final  String? decidedOn;
+@override final  String? decisionNotes;
+// ── The settlement ─────────────────────────────────────────────────────
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? rentOwed;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? refundableDeposit;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? totalDeductions;
+/// Positive means money goes back to the tenant; negative means they still owe.
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? netAmount;
 @override final  String? settlementType;
-@override@JsonKey(fromJson: parseDouble) final  double netAmount;
+@override@JsonKey() final  bool settled;
+@override final  String? settledOn;
+@override final  String? paymentStatus;
 @override@JsonKey(fromJson: parseDouble) final  double totalPaid;
+@override@JsonKey(fromJson: parseDouble) final  double balanceRemaining;
+@override@JsonKey() final  bool refundConfirmed;
+@override final  String? refundReference;
+@override final  String? unpaidHandling;
+@override final  String? unpaidNotes;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? unpaidAmount;
+@override@JsonKey() final  bool processed;
+@override final  String? processedOn;
+@override final  String? processedByName;
+/// Counted by the server. Negative means the date has passed.
+@override@JsonKey() final  int daysToVacate;
+/// What happens next, in the server's words. The single most useful line on the screen, and
+/// the app does not try to work it out for itself.
+@override final  String? nextStep;
 @override final  String? createdOn;
+@override final  String? updatedOn;
 
 /// Create a copy of VacateNoticeModel
 /// with the given fields replaced by the non-null parameter values.
@@ -269,16 +329,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacateNoticeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.rrn, rrn) || other.rrn == rrn)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.tenantEmail, tenantEmail) || other.tenantEmail == tenantEmail)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.vacateDate, vacateDate) || other.vacateDate == vacateDate)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.flag, flag) || other.flag == flag)&&(identical(other.status, status) || other.status == status)&&(identical(other.initiatedBy, initiatedBy) || other.initiatedBy == initiatedBy)&&(identical(other.initiatedByName, initiatedByName) || other.initiatedByName == initiatedByName)&&(identical(other.settlementType, settlementType) || other.settlementType == settlementType)&&(identical(other.netAmount, netAmount) || other.netAmount == netAmount)&&(identical(other.totalPaid, totalPaid) || other.totalPaid == totalPaid)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacateNoticeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.tenantUserId, tenantUserId) || other.tenantUserId == tenantUserId)&&(identical(other.tenantName, tenantName) || other.tenantName == tenantName)&&(identical(other.tenantPhone, tenantPhone) || other.tenantPhone == tenantPhone)&&(identical(other.tenantEmail, tenantEmail) || other.tenantEmail == tenantEmail)&&(identical(other.raisedBy, raisedBy) || other.raisedBy == raisedBy)&&(identical(other.raisedByName, raisedByName) || other.raisedByName == raisedByName)&&(identical(other.vacateDate, vacateDate) || other.vacateDate == vacateDate)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.status, status) || other.status == status)&&(identical(other.decidedByName, decidedByName) || other.decidedByName == decidedByName)&&(identical(other.decidedOn, decidedOn) || other.decidedOn == decidedOn)&&(identical(other.decisionNotes, decisionNotes) || other.decisionNotes == decisionNotes)&&(identical(other.rentOwed, rentOwed) || other.rentOwed == rentOwed)&&(identical(other.refundableDeposit, refundableDeposit) || other.refundableDeposit == refundableDeposit)&&(identical(other.totalDeductions, totalDeductions) || other.totalDeductions == totalDeductions)&&(identical(other.netAmount, netAmount) || other.netAmount == netAmount)&&(identical(other.settlementType, settlementType) || other.settlementType == settlementType)&&(identical(other.settled, settled) || other.settled == settled)&&(identical(other.settledOn, settledOn) || other.settledOn == settledOn)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.totalPaid, totalPaid) || other.totalPaid == totalPaid)&&(identical(other.balanceRemaining, balanceRemaining) || other.balanceRemaining == balanceRemaining)&&(identical(other.refundConfirmed, refundConfirmed) || other.refundConfirmed == refundConfirmed)&&(identical(other.refundReference, refundReference) || other.refundReference == refundReference)&&(identical(other.unpaidHandling, unpaidHandling) || other.unpaidHandling == unpaidHandling)&&(identical(other.unpaidNotes, unpaidNotes) || other.unpaidNotes == unpaidNotes)&&(identical(other.unpaidAmount, unpaidAmount) || other.unpaidAmount == unpaidAmount)&&(identical(other.processed, processed) || other.processed == processed)&&(identical(other.processedOn, processedOn) || other.processedOn == processedOn)&&(identical(other.processedByName, processedByName) || other.processedByName == processedByName)&&(identical(other.daysToVacate, daysToVacate) || other.daysToVacate == daysToVacate)&&(identical(other.nextStep, nextStep) || other.nextStep == nextStep)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn)&&(identical(other.updatedOn, updatedOn) || other.updatedOn == updatedOn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,rrn,houseName,houseCode,houseNumber,tenantName,tenantPhone,tenantEmail,propertyName,propertyId,estateName,estateId,vacateDate,reason,flag,status,initiatedBy,initiatedByName,settlementType,netAmount,totalPaid,createdOn]);
+int get hashCode => Object.hashAll([runtimeType,id,reference,occupationId,houseId,houseCode,houseNumber,houseLabel,propertyId,propertyName,estateId,estateName,tenantUserId,tenantName,tenantPhone,tenantEmail,raisedBy,raisedByName,vacateDate,reason,status,decidedByName,decidedOn,decisionNotes,rentOwed,refundableDeposit,totalDeductions,netAmount,settlementType,settled,settledOn,paymentStatus,totalPaid,balanceRemaining,refundConfirmed,refundReference,unpaidHandling,unpaidNotes,unpaidAmount,processed,processedOn,processedByName,daysToVacate,nextStep,createdOn,updatedOn]);
 
 @override
 String toString() {
-  return 'VacateNoticeModel(id: $id, rrn: $rrn, houseName: $houseName, houseCode: $houseCode, houseNumber: $houseNumber, tenantName: $tenantName, tenantPhone: $tenantPhone, tenantEmail: $tenantEmail, propertyName: $propertyName, propertyId: $propertyId, estateName: $estateName, estateId: $estateId, vacateDate: $vacateDate, reason: $reason, flag: $flag, status: $status, initiatedBy: $initiatedBy, initiatedByName: $initiatedByName, settlementType: $settlementType, netAmount: $netAmount, totalPaid: $totalPaid, createdOn: $createdOn)';
+  return 'VacateNoticeModel(id: $id, reference: $reference, occupationId: $occupationId, houseId: $houseId, houseCode: $houseCode, houseNumber: $houseNumber, houseLabel: $houseLabel, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, tenantUserId: $tenantUserId, tenantName: $tenantName, tenantPhone: $tenantPhone, tenantEmail: $tenantEmail, raisedBy: $raisedBy, raisedByName: $raisedByName, vacateDate: $vacateDate, reason: $reason, status: $status, decidedByName: $decidedByName, decidedOn: $decidedOn, decisionNotes: $decisionNotes, rentOwed: $rentOwed, refundableDeposit: $refundableDeposit, totalDeductions: $totalDeductions, netAmount: $netAmount, settlementType: $settlementType, settled: $settled, settledOn: $settledOn, paymentStatus: $paymentStatus, totalPaid: $totalPaid, balanceRemaining: $balanceRemaining, refundConfirmed: $refundConfirmed, refundReference: $refundReference, unpaidHandling: $unpaidHandling, unpaidNotes: $unpaidNotes, unpaidAmount: $unpaidAmount, processed: $processed, processedOn: $processedOn, processedByName: $processedByName, daysToVacate: $daysToVacate, nextStep: $nextStep, createdOn: $createdOn, updatedOn: $updatedOn)';
 }
 
 
@@ -289,7 +349,7 @@ abstract mixin class _$VacateNoticeModelCopyWith<$Res> implements $VacateNoticeM
   factory _$VacateNoticeModelCopyWith(_VacateNoticeModel value, $Res Function(_VacateNoticeModel) _then) = __$VacateNoticeModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? rrn, String? houseName, String? houseCode, String? houseNumber, String? tenantName, String? tenantPhone, String? tenantEmail, String? propertyName,@JsonKey(fromJson: parseIntNullable) int? propertyId, String? estateName,@JsonKey(fromJson: parseIntNullable) int? estateId, String? vacateDate, String? reason, String? flag,@JsonKey(fromJson: parseIntNullable) int? status, String? initiatedBy, String? initiatedByName, String? settlementType,@JsonKey(fromJson: parseDouble) double netAmount,@JsonKey(fromJson: parseDouble) double totalPaid, String? createdOn
+ String id, String reference, String? occupationId, String? houseId, String houseCode, String? houseNumber, String? houseLabel, String? propertyId, String? propertyName, String? estateId, String? estateName, String? tenantUserId, String tenantName, String? tenantPhone, String? tenantEmail, String? raisedBy, String? raisedByName, String? vacateDate, String? reason, String status, String? decidedByName, String? decidedOn, String? decisionNotes,@JsonKey(fromJson: parseDoubleNullable) double? rentOwed,@JsonKey(fromJson: parseDoubleNullable) double? refundableDeposit,@JsonKey(fromJson: parseDoubleNullable) double? totalDeductions,@JsonKey(fromJson: parseDoubleNullable) double? netAmount, String? settlementType, bool settled, String? settledOn, String? paymentStatus,@JsonKey(fromJson: parseDouble) double totalPaid,@JsonKey(fromJson: parseDouble) double balanceRemaining, bool refundConfirmed, String? refundReference, String? unpaidHandling, String? unpaidNotes,@JsonKey(fromJson: parseDoubleNullable) double? unpaidAmount, bool processed, String? processedOn, String? processedByName, int daysToVacate, String? nextStep, String? createdOn, String? updatedOn
 });
 
 
@@ -306,30 +366,53 @@ class __$VacateNoticeModelCopyWithImpl<$Res>
 
 /// Create a copy of VacateNoticeModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? rrn = freezed,Object? houseName = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? tenantName = freezed,Object? tenantPhone = freezed,Object? tenantEmail = freezed,Object? propertyName = freezed,Object? propertyId = freezed,Object? estateName = freezed,Object? estateId = freezed,Object? vacateDate = freezed,Object? reason = freezed,Object? flag = freezed,Object? status = freezed,Object? initiatedBy = freezed,Object? initiatedByName = freezed,Object? settlementType = freezed,Object? netAmount = null,Object? totalPaid = null,Object? createdOn = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? reference = null,Object? occupationId = freezed,Object? houseId = freezed,Object? houseCode = null,Object? houseNumber = freezed,Object? houseLabel = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? tenantUserId = freezed,Object? tenantName = null,Object? tenantPhone = freezed,Object? tenantEmail = freezed,Object? raisedBy = freezed,Object? raisedByName = freezed,Object? vacateDate = freezed,Object? reason = freezed,Object? status = null,Object? decidedByName = freezed,Object? decidedOn = freezed,Object? decisionNotes = freezed,Object? rentOwed = freezed,Object? refundableDeposit = freezed,Object? totalDeductions = freezed,Object? netAmount = freezed,Object? settlementType = freezed,Object? settled = null,Object? settledOn = freezed,Object? paymentStatus = freezed,Object? totalPaid = null,Object? balanceRemaining = null,Object? refundConfirmed = null,Object? refundReference = freezed,Object? unpaidHandling = freezed,Object? unpaidNotes = freezed,Object? unpaidAmount = freezed,Object? processed = null,Object? processedOn = freezed,Object? processedByName = freezed,Object? daysToVacate = null,Object? nextStep = freezed,Object? createdOn = freezed,Object? updatedOn = freezed,}) {
   return _then(_VacateNoticeModel(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,rrn: freezed == rrn ? _self.rrn : rrn // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,tenantName: freezed == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
-as String?,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
-as String?,tenantEmail: freezed == tenantEmail ? _self.tenantEmail : tenantEmail // ignore: cast_nullable_to_non_nullable
-as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,reference: null == reference ? _self.reference : reference // ignore: cast_nullable_to_non_nullable
+as String,occupationId: freezed == occupationId ? _self.occupationId : occupationId // ignore: cast_nullable_to_non_nullable
+as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
 as String?,propertyId: freezed == propertyId ? _self.propertyId : propertyId // ignore: cast_nullable_to_non_nullable
-as int?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
 as String?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
-as int?,vacateDate: freezed == vacateDate ? _self.vacateDate : vacateDate // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,tenantUserId: freezed == tenantUserId ? _self.tenantUserId : tenantUserId // ignore: cast_nullable_to_non_nullable
+as String?,tenantName: null == tenantName ? _self.tenantName : tenantName // ignore: cast_nullable_to_non_nullable
+as String,tenantPhone: freezed == tenantPhone ? _self.tenantPhone : tenantPhone // ignore: cast_nullable_to_non_nullable
+as String?,tenantEmail: freezed == tenantEmail ? _self.tenantEmail : tenantEmail // ignore: cast_nullable_to_non_nullable
+as String?,raisedBy: freezed == raisedBy ? _self.raisedBy : raisedBy // ignore: cast_nullable_to_non_nullable
+as String?,raisedByName: freezed == raisedByName ? _self.raisedByName : raisedByName // ignore: cast_nullable_to_non_nullable
+as String?,vacateDate: freezed == vacateDate ? _self.vacateDate : vacateDate // ignore: cast_nullable_to_non_nullable
 as String?,reason: freezed == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
-as String?,flag: freezed == flag ? _self.flag : flag // ignore: cast_nullable_to_non_nullable
-as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int?,initiatedBy: freezed == initiatedBy ? _self.initiatedBy : initiatedBy // ignore: cast_nullable_to_non_nullable
-as String?,initiatedByName: freezed == initiatedByName ? _self.initiatedByName : initiatedByName // ignore: cast_nullable_to_non_nullable
-as String?,settlementType: freezed == settlementType ? _self.settlementType : settlementType // ignore: cast_nullable_to_non_nullable
-as String?,netAmount: null == netAmount ? _self.netAmount : netAmount // ignore: cast_nullable_to_non_nullable
-as double,totalPaid: null == totalPaid ? _self.totalPaid : totalPaid // ignore: cast_nullable_to_non_nullable
-as double,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,decidedByName: freezed == decidedByName ? _self.decidedByName : decidedByName // ignore: cast_nullable_to_non_nullable
+as String?,decidedOn: freezed == decidedOn ? _self.decidedOn : decidedOn // ignore: cast_nullable_to_non_nullable
+as String?,decisionNotes: freezed == decisionNotes ? _self.decisionNotes : decisionNotes // ignore: cast_nullable_to_non_nullable
+as String?,rentOwed: freezed == rentOwed ? _self.rentOwed : rentOwed // ignore: cast_nullable_to_non_nullable
+as double?,refundableDeposit: freezed == refundableDeposit ? _self.refundableDeposit : refundableDeposit // ignore: cast_nullable_to_non_nullable
+as double?,totalDeductions: freezed == totalDeductions ? _self.totalDeductions : totalDeductions // ignore: cast_nullable_to_non_nullable
+as double?,netAmount: freezed == netAmount ? _self.netAmount : netAmount // ignore: cast_nullable_to_non_nullable
+as double?,settlementType: freezed == settlementType ? _self.settlementType : settlementType // ignore: cast_nullable_to_non_nullable
+as String?,settled: null == settled ? _self.settled : settled // ignore: cast_nullable_to_non_nullable
+as bool,settledOn: freezed == settledOn ? _self.settledOn : settledOn // ignore: cast_nullable_to_non_nullable
+as String?,paymentStatus: freezed == paymentStatus ? _self.paymentStatus : paymentStatus // ignore: cast_nullable_to_non_nullable
+as String?,totalPaid: null == totalPaid ? _self.totalPaid : totalPaid // ignore: cast_nullable_to_non_nullable
+as double,balanceRemaining: null == balanceRemaining ? _self.balanceRemaining : balanceRemaining // ignore: cast_nullable_to_non_nullable
+as double,refundConfirmed: null == refundConfirmed ? _self.refundConfirmed : refundConfirmed // ignore: cast_nullable_to_non_nullable
+as bool,refundReference: freezed == refundReference ? _self.refundReference : refundReference // ignore: cast_nullable_to_non_nullable
+as String?,unpaidHandling: freezed == unpaidHandling ? _self.unpaidHandling : unpaidHandling // ignore: cast_nullable_to_non_nullable
+as String?,unpaidNotes: freezed == unpaidNotes ? _self.unpaidNotes : unpaidNotes // ignore: cast_nullable_to_non_nullable
+as String?,unpaidAmount: freezed == unpaidAmount ? _self.unpaidAmount : unpaidAmount // ignore: cast_nullable_to_non_nullable
+as double?,processed: null == processed ? _self.processed : processed // ignore: cast_nullable_to_non_nullable
+as bool,processedOn: freezed == processedOn ? _self.processedOn : processedOn // ignore: cast_nullable_to_non_nullable
+as String?,processedByName: freezed == processedByName ? _self.processedByName : processedByName // ignore: cast_nullable_to_non_nullable
+as String?,daysToVacate: null == daysToVacate ? _self.daysToVacate : daysToVacate // ignore: cast_nullable_to_non_nullable
+as int,nextStep: freezed == nextStep ? _self.nextStep : nextStep // ignore: cast_nullable_to_non_nullable
+as String?,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,updatedOn: freezed == updatedOn ? _self.updatedOn : updatedOn // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

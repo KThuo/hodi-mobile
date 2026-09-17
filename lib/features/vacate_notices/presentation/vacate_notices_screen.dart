@@ -121,11 +121,7 @@ class _VacateNoticesScreenState extends ConsumerState<VacateNoticesScreen> {
         final notice = state.notices[index];
         return VacateNoticeListItem(
           notice: notice,
-          onTap: () {
-            if (notice.id != null) {
-              context.push('/more/vacate-notices/${notice.id}');
-            }
-          },
+          onTap: () => context.push('/more/vacate-notices/${notice.id}'),
         );
       },
     );

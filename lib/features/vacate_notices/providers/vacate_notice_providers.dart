@@ -1,16 +1,41 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/api/api_client.dart';
+import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/filters/filter_provider.dart';
+import '../../../core/permissions/app_permissions.dart';
+import '../../../core/utils/pdf_downloader.dart';
 import '../data/vacate_notice_repository.dart';
-import '../domain/vacate_notice_model.dart';
 import '../domain/vacate_notice_detail_model.dart';
+import '../domain/vacate_notice_model.dart';
 
 final vacateNoticeRepositoryProvider = Provider<VacateNoticeRepository>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return VacateNoticeRepository(apiClient: apiClient);
+  return VacateNoticeRepository(
+    apiClient: ref.watch(apiClientProvider),
+    pdfDownloader: ref.watch(pdfDownloaderProvider),
+  );
 });
 
-// --- Vacate Notice List ---
+/// Who is looking at this, which decides what they may do with it.
+///
+/// A tenant may withdraw their own notice; the office approves or refuses. Both are `/decision`,
+/// with a different action, and `ROLE_VACATE_DECIDE` is what tells them apart.
+final canDecideVacateProvider = Provider<bool>((ref) {
+  final user = ref.watch(authProvider).user;
+  return user?.hasPermission(AppPermissions.vacateDecide) ?? false;
+});
+
+/// Which notices to show. Opens on what needs an answer.
+enum VacateFilter {
+  pending('PENDING', 'Awaiting'),
+  approved('APPROVED', 'Approved'),
+  all(null, 'All');
+
+  const VacateFilter(this.code, this.label);
+
+  final String? code;
+  final String label;
+}
 
 class VacateNoticeListState {
   final List<VacateNoticeModel> notices;
@@ -19,16 +44,16 @@ class VacateNoticeListState {
   final int currentPage;
   final String? error;
   final String? searchTerm;
-  final String? statusFilter;
+  final VacateFilter filter;
 
-  VacateNoticeListState({
+  const VacateNoticeListState({
     this.notices = const [],
     this.isLoading = false,
     this.hasMore = true,
     this.currentPage = 0,
     this.error,
     this.searchTerm,
-    this.statusFilter,
+    this.filter = VacateFilter.pending,
   });
 
   VacateNoticeListState copyWith({
@@ -38,7 +63,7 @@ class VacateNoticeListState {
     int? currentPage,
     String? error,
     String? searchTerm,
-    String? Function()? statusFilter,
+    VacateFilter? filter,
   }) {
     return VacateNoticeListState(
       notices: notices ?? this.notices,
@@ -47,7 +72,7 @@ class VacateNoticeListState {
       currentPage: currentPage ?? this.currentPage,
       error: error,
       searchTerm: searchTerm ?? this.searchTerm,
-      statusFilter: statusFilter != null ? statusFilter() : this.statusFilter,
+      filter: filter ?? this.filter,
     );
   }
 }
@@ -56,17 +81,18 @@ class VacateNoticeListNotifier extends Notifier<VacateNoticeListState> {
   @override
   VacateNoticeListState build() {
     Future.microtask(() => _fetchPage(0));
-    return VacateNoticeListState(isLoading: true);
+    return const VacateNoticeListState(isLoading: true);
   }
 
-  VacateNoticeRepository get _repository => ref.read(vacateNoticeRepositoryProvider);
+  VacateNoticeRepository get _repository =>
+      ref.read(vacateNoticeRepositoryProvider);
 
   Future<void> _fetchPage(int page) async {
     final filters = ref.read(filterProvider);
     final response = await _repository.getVacateNotices(
       page: page,
-      status: state.statusFilter,
       searchTerm: state.searchTerm,
+      status: state.filter.code,
       estateId: filters.selectedEstateId,
       propertyId: filters.selectedPropertyId,
     );
@@ -80,10 +106,7 @@ class VacateNoticeListNotifier extends Notifier<VacateNoticeListState> {
         currentPage: page,
       );
     } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message,
-      );
+      state = state.copyWith(isLoading: false, error: response.message);
     }
   }
 
@@ -99,19 +122,21 @@ class VacateNoticeListNotifier extends Notifier<VacateNoticeListState> {
   }
 
   Future<void> search(String term) async {
-    state = VacateNoticeListState(
+    state = state.copyWith(
+      notices: const [],
       isLoading: true,
       searchTerm: term,
-      statusFilter: state.statusFilter,
+      currentPage: 0,
     );
     await _fetchPage(0);
   }
 
-  Future<void> filterByStatus(String? status) async {
-    state = VacateNoticeListState(
+  Future<void> setFilter(VacateFilter filter) async {
+    state = state.copyWith(
+      notices: const [],
       isLoading: true,
-      searchTerm: state.searchTerm,
-      statusFilter: status,
+      filter: filter,
+      currentPage: 0,
     );
     await _fetchPage(0);
   }
@@ -122,15 +147,14 @@ final vacateNoticeListProvider =
   VacateNoticeListNotifier.new,
 );
 
-// --- Vacate Notice Detail ---
-
-final vacateNoticeDetailProvider =
-    FutureProvider.autoDispose.family<VacateNoticeDetailModel?, String>((ref, id) async {
-  final repo = ref.watch(vacateNoticeRepositoryProvider);
-  final response = await repo.getVacateNoticeDetail(id);
-  if (response.isEstateOverdue) return null;
+final vacateNoticeDetailProvider = FutureProvider.autoDispose
+    .family<VacateNoticeDetailModel?, String>((ref, id) async {
+  final response =
+      await ref.watch(vacateNoticeRepositoryProvider).getVacateNoticeDetail(id);
   if (!response.isSuccess) {
-    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load notice details');
+    throw Exception(response.message.isNotEmpty
+        ? response.message
+        : 'That notice could not be loaded.');
   }
   return response.data;
 });
