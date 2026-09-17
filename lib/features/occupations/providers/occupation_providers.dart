@@ -1,8 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
-import '../../../core/auth/providers/auth_provider.dart';
-import '../../../core/filters/filter_provider.dart';
-import '../../../core/permissions/app_permissions.dart';
 import '../../invoices/domain/invoice_model.dart';
 import '../../invoices/providers/invoice_providers.dart';
 import '../../payments/domain/payment_model.dart';
@@ -75,11 +72,15 @@ class OccupationListState {
   }
 }
 
-/// "My houses".
+/// "My houses" — the caller's own tenancies, and nobody else's.
 ///
-/// `mine` is sent only for somebody who is a tenant and nothing else. One person is often both a
-/// landlord and a tenant, and a superadmin is answered with everything — so staff get the estate's
-/// tenancies through the same list, narrowed by the estate and property filters they already have.
+/// `mine: true` on every request, unconditionally. It used to be sent only for somebody who holds
+/// no `ROLE_TENANT_VIEW`, on the reasoning that staff could reuse the list; that made a screen
+/// titled "My Houses" show the whole estate to anybody who is both a landlord and a tenant, and
+/// everything to a superadmin. The title is the specification here.
+///
+/// Whose rows `mine` means is read from the session and never from a parameter, so this narrows
+/// the answer and cannot be made to widen it.
 class OccupationListNotifier extends Notifier<OccupationListState> {
   @override
   OccupationListState build() {
@@ -89,21 +90,13 @@ class OccupationListNotifier extends Notifier<OccupationListState> {
 
   OccupationRepository get _repository => ref.read(occupationRepositoryProvider);
 
-  bool get _tenantOnly {
-    final user = ref.read(authProvider).user;
-    if (user == null) return false;
-    return !user.hasPermission(AppPermissions.tenantView) &&
-        user.hasPermission(AppPermissions.tenantSelf);
-  }
-
   Future<void> _fetchPage(int page) async {
-    final filters = ref.read(filterProvider);
+    // No estate or property filter. They narrow within a scope this list has already narrowed to
+    // one person, so the only thing they can do here is hide one of somebody's own houses.
     final response = await _repository.getOccupations(
       page: page,
-      mine: _tenantOnly,
+      mine: true,
       searchTerm: state.searchTerm,
-      estateId: filters.selectedEstateId,
-      propertyId: filters.selectedPropertyId,
     );
 
     if (response.isSuccess && response.data != null) {

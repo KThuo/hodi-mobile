@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/filters/filter_button.dart';
-import '../../../core/filters/filter_provider.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/widgets/hodi_search_bar.dart';
@@ -17,9 +15,14 @@ import 'widgets/occupation_list_item.dart';
 /// This was a dead end: a tenant saw the unit they occupy and could go no further. Each row now
 /// opens the tenancy — what is owed, the invoices behind it, and the payments made against them.
 ///
-/// It reads `/occupations`, which is a different endpoint from the Houses list beside it in the
-/// menu. That one is `/units` and needs `ROLE_HOUSE_VIEW`; a tenant does not hold it, and the
-/// single row that used to serve both audiences sent them to a door the server keeps shut.
+/// It reads `/occupations` with `mine: true`, which is a different endpoint from the Houses list
+/// beside it in the menu. That one is `/units` and needs `ROLE_HOUSE_VIEW`; a tenant does not hold
+/// it, and the single row that used to serve both audiences sent them to a door the server keeps
+/// shut.
+///
+/// No estate or property filter in the bar. The list is already one person's, so a filter can only
+/// hide one of their own houses — and somebody who is both a landlord and a tenant browses the
+/// estate from Houses, which is where those filters belong.
 class MyHousesScreen extends ConsumerStatefulWidget {
   const MyHousesScreen({super.key});
 
@@ -53,12 +56,6 @@ class _MyHousesScreenState extends ConsumerState<MyHousesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(filterProvider, (previous, next) {
-      if (previous?.selectedEstateId != next.selectedEstateId ||
-          previous?.selectedPropertyId != next.selectedPropertyId) {
-        ref.read(occupationListProvider.notifier).refresh();
-      }
-    });
     final state = ref.watch(occupationListProvider);
 
     return Scaffold(
@@ -68,7 +65,6 @@ class _MyHousesScreenState extends ConsumerState<MyHousesScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        actions: const [FilterButton()],
       ),
       body: RefreshIndicator(
         color: HodiColors.primaryStart,
