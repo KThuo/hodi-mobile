@@ -15,7 +15,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProfileModel {
 
- int? get id; String? get fullNames; String? get firstName; String? get lastName; String? get email; String? get phone; String? get userGroup; String? get usertype; String? get estate; String? get passwordExpiry; String? get photoUrl;
+ String? get id; String? get username; String? get fullName; String? get firstName; String? get email; String? get phone;/// The code authority checks are written against — ADMIN, CARETAKER, TENANT.
+ String? get userType;/// The same thing in words — "Estate Admin", not "ADMIN". The header showed the code until
+/// the rebuild, which labelled everybody in shouting capitals with a string meant for a
+/// switch statement.
+ String? get userTypeName; String? get estateName; String? get bankName; String? get bankLogoUrl;/// The group, which is what actually decides what somebody can do. Shown beside the role
+/// because the role alone answers the wrong question: two estate admins in different groups
+/// hold different permissions.
+ String? get userGroupName; String? get estateId; String? get bankId; List<String> get authorities; bool get superadmin; bool get bankadmin; bool get admin; bool get caretaker; bool get tenant; bool get mustChangePassword; bool get pinSet;
 /// Create a copy of ProfileModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +35,16 @@ $ProfileModelCopyWith<ProfileModel> get copyWith => _$ProfileModelCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fullNames, fullNames) || other.fullNames == fullNames)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.userGroup, userGroup) || other.userGroup == userGroup)&&(identical(other.usertype, usertype) || other.usertype == usertype)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.passwordExpiry, passwordExpiry) || other.passwordExpiry == passwordExpiry)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileModel&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.userType, userType) || other.userType == userType)&&(identical(other.userTypeName, userTypeName) || other.userTypeName == userTypeName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.bankName, bankName) || other.bankName == bankName)&&(identical(other.bankLogoUrl, bankLogoUrl) || other.bankLogoUrl == bankLogoUrl)&&(identical(other.userGroupName, userGroupName) || other.userGroupName == userGroupName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.bankId, bankId) || other.bankId == bankId)&&const DeepCollectionEquality().equals(other.authorities, authorities)&&(identical(other.superadmin, superadmin) || other.superadmin == superadmin)&&(identical(other.bankadmin, bankadmin) || other.bankadmin == bankadmin)&&(identical(other.admin, admin) || other.admin == admin)&&(identical(other.caretaker, caretaker) || other.caretaker == caretaker)&&(identical(other.tenant, tenant) || other.tenant == tenant)&&(identical(other.mustChangePassword, mustChangePassword) || other.mustChangePassword == mustChangePassword)&&(identical(other.pinSet, pinSet) || other.pinSet == pinSet));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fullNames,firstName,lastName,email,phone,userGroup,usertype,estate,passwordExpiry,photoUrl);
+int get hashCode => Object.hashAll([runtimeType,id,username,fullName,firstName,email,phone,userType,userTypeName,estateName,bankName,bankLogoUrl,userGroupName,estateId,bankId,const DeepCollectionEquality().hash(authorities),superadmin,bankadmin,admin,caretaker,tenant,mustChangePassword,pinSet]);
 
 @override
 String toString() {
-  return 'ProfileModel(id: $id, fullNames: $fullNames, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, userGroup: $userGroup, usertype: $usertype, estate: $estate, passwordExpiry: $passwordExpiry, photoUrl: $photoUrl)';
+  return 'ProfileModel(id: $id, username: $username, fullName: $fullName, firstName: $firstName, email: $email, phone: $phone, userType: $userType, userTypeName: $userTypeName, estateName: $estateName, bankName: $bankName, bankLogoUrl: $bankLogoUrl, userGroupName: $userGroupName, estateId: $estateId, bankId: $bankId, authorities: $authorities, superadmin: $superadmin, bankadmin: $bankadmin, admin: $admin, caretaker: $caretaker, tenant: $tenant, mustChangePassword: $mustChangePassword, pinSet: $pinSet)';
 }
 
 
@@ -48,7 +55,7 @@ abstract mixin class $ProfileModelCopyWith<$Res>  {
   factory $ProfileModelCopyWith(ProfileModel value, $Res Function(ProfileModel) _then) = _$ProfileModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String? fullNames, String? firstName, String? lastName, String? email, String? phone, String? userGroup, String? usertype, String? estate, String? passwordExpiry, String? photoUrl
+ String? id, String? username, String? fullName, String? firstName, String? email, String? phone, String? userType, String? userTypeName, String? estateName, String? bankName, String? bankLogoUrl, String? userGroupName, String? estateId, String? bankId, List<String> authorities, bool superadmin, bool bankadmin, bool admin, bool caretaker, bool tenant, bool mustChangePassword, bool pinSet
 });
 
 
@@ -65,20 +72,31 @@ class _$ProfileModelCopyWithImpl<$Res>
 
 /// Create a copy of ProfileModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? fullNames = freezed,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? phone = freezed,Object? userGroup = freezed,Object? usertype = freezed,Object? estate = freezed,Object? passwordExpiry = freezed,Object? photoUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? username = freezed,Object? fullName = freezed,Object? firstName = freezed,Object? email = freezed,Object? phone = freezed,Object? userType = freezed,Object? userTypeName = freezed,Object? estateName = freezed,Object? bankName = freezed,Object? bankLogoUrl = freezed,Object? userGroupName = freezed,Object? estateId = freezed,Object? bankId = freezed,Object? authorities = null,Object? superadmin = null,Object? bankadmin = null,Object? admin = null,Object? caretaker = null,Object? tenant = null,Object? mustChangePassword = null,Object? pinSet = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,fullNames: freezed == fullNames ? _self.fullNames : fullNames // ignore: cast_nullable_to_non_nullable
+as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String?,fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String?,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,userGroup: freezed == userGroup ? _self.userGroup : userGroup // ignore: cast_nullable_to_non_nullable
-as String?,usertype: freezed == usertype ? _self.usertype : usertype // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,passwordExpiry: freezed == passwordExpiry ? _self.passwordExpiry : passwordExpiry // ignore: cast_nullable_to_non_nullable
-as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,userType: freezed == userType ? _self.userType : userType // ignore: cast_nullable_to_non_nullable
+as String?,userTypeName: freezed == userTypeName ? _self.userTypeName : userTypeName // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,bankName: freezed == bankName ? _self.bankName : bankName // ignore: cast_nullable_to_non_nullable
+as String?,bankLogoUrl: freezed == bankLogoUrl ? _self.bankLogoUrl : bankLogoUrl // ignore: cast_nullable_to_non_nullable
+as String?,userGroupName: freezed == userGroupName ? _self.userGroupName : userGroupName // ignore: cast_nullable_to_non_nullable
+as String?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
+as String?,bankId: freezed == bankId ? _self.bankId : bankId // ignore: cast_nullable_to_non_nullable
+as String?,authorities: null == authorities ? _self.authorities : authorities // ignore: cast_nullable_to_non_nullable
+as List<String>,superadmin: null == superadmin ? _self.superadmin : superadmin // ignore: cast_nullable_to_non_nullable
+as bool,bankadmin: null == bankadmin ? _self.bankadmin : bankadmin // ignore: cast_nullable_to_non_nullable
+as bool,admin: null == admin ? _self.admin : admin // ignore: cast_nullable_to_non_nullable
+as bool,caretaker: null == caretaker ? _self.caretaker : caretaker // ignore: cast_nullable_to_non_nullable
+as bool,tenant: null == tenant ? _self.tenant : tenant // ignore: cast_nullable_to_non_nullable
+as bool,mustChangePassword: null == mustChangePassword ? _self.mustChangePassword : mustChangePassword // ignore: cast_nullable_to_non_nullable
+as bool,pinSet: null == pinSet ? _self.pinSet : pinSet // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -163,10 +181,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? fullNames,  String? firstName,  String? lastName,  String? email,  String? phone,  String? userGroup,  String? usertype,  String? estate,  String? passwordExpiry,  String? photoUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? username,  String? fullName,  String? firstName,  String? email,  String? phone,  String? userType,  String? userTypeName,  String? estateName,  String? bankName,  String? bankLogoUrl,  String? userGroupName,  String? estateId,  String? bankId,  List<String> authorities,  bool superadmin,  bool bankadmin,  bool admin,  bool caretaker,  bool tenant,  bool mustChangePassword,  bool pinSet)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProfileModel() when $default != null:
-return $default(_that.id,_that.fullNames,_that.firstName,_that.lastName,_that.email,_that.phone,_that.userGroup,_that.usertype,_that.estate,_that.passwordExpiry,_that.photoUrl);case _:
+return $default(_that.id,_that.username,_that.fullName,_that.firstName,_that.email,_that.phone,_that.userType,_that.userTypeName,_that.estateName,_that.bankName,_that.bankLogoUrl,_that.userGroupName,_that.estateId,_that.bankId,_that.authorities,_that.superadmin,_that.bankadmin,_that.admin,_that.caretaker,_that.tenant,_that.mustChangePassword,_that.pinSet);case _:
   return orElse();
 
 }
@@ -184,10 +202,10 @@ return $default(_that.id,_that.fullNames,_that.firstName,_that.lastName,_that.em
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? fullNames,  String? firstName,  String? lastName,  String? email,  String? phone,  String? userGroup,  String? usertype,  String? estate,  String? passwordExpiry,  String? photoUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? username,  String? fullName,  String? firstName,  String? email,  String? phone,  String? userType,  String? userTypeName,  String? estateName,  String? bankName,  String? bankLogoUrl,  String? userGroupName,  String? estateId,  String? bankId,  List<String> authorities,  bool superadmin,  bool bankadmin,  bool admin,  bool caretaker,  bool tenant,  bool mustChangePassword,  bool pinSet)  $default,) {final _that = this;
 switch (_that) {
 case _ProfileModel():
-return $default(_that.id,_that.fullNames,_that.firstName,_that.lastName,_that.email,_that.phone,_that.userGroup,_that.usertype,_that.estate,_that.passwordExpiry,_that.photoUrl);case _:
+return $default(_that.id,_that.username,_that.fullName,_that.firstName,_that.email,_that.phone,_that.userType,_that.userTypeName,_that.estateName,_that.bankName,_that.bankLogoUrl,_that.userGroupName,_that.estateId,_that.bankId,_that.authorities,_that.superadmin,_that.bankadmin,_that.admin,_that.caretaker,_that.tenant,_that.mustChangePassword,_that.pinSet);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +222,10 @@ return $default(_that.id,_that.fullNames,_that.firstName,_that.lastName,_that.em
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? fullNames,  String? firstName,  String? lastName,  String? email,  String? phone,  String? userGroup,  String? usertype,  String? estate,  String? passwordExpiry,  String? photoUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? username,  String? fullName,  String? firstName,  String? email,  String? phone,  String? userType,  String? userTypeName,  String? estateName,  String? bankName,  String? bankLogoUrl,  String? userGroupName,  String? estateId,  String? bankId,  List<String> authorities,  bool superadmin,  bool bankadmin,  bool admin,  bool caretaker,  bool tenant,  bool mustChangePassword,  bool pinSet)?  $default,) {final _that = this;
 switch (_that) {
 case _ProfileModel() when $default != null:
-return $default(_that.id,_that.fullNames,_that.firstName,_that.lastName,_that.email,_that.phone,_that.userGroup,_that.usertype,_that.estate,_that.passwordExpiry,_that.photoUrl);case _:
+return $default(_that.id,_that.username,_that.fullName,_that.firstName,_that.email,_that.phone,_that.userType,_that.userTypeName,_that.estateName,_that.bankName,_that.bankLogoUrl,_that.userGroupName,_that.estateId,_that.bankId,_that.authorities,_that.superadmin,_that.bankadmin,_that.admin,_that.caretaker,_that.tenant,_that.mustChangePassword,_that.pinSet);case _:
   return null;
 
 }
@@ -219,20 +237,44 @@ return $default(_that.id,_that.fullNames,_that.firstName,_that.lastName,_that.em
 @JsonSerializable()
 
 class _ProfileModel extends ProfileModel {
-  const _ProfileModel({this.id, this.fullNames, this.firstName, this.lastName, this.email, this.phone, this.userGroup, this.usertype, this.estate, this.passwordExpiry, this.photoUrl}): super._();
+  const _ProfileModel({this.id, this.username, this.fullName, this.firstName, this.email, this.phone, this.userType, this.userTypeName, this.estateName, this.bankName, this.bankLogoUrl, this.userGroupName, this.estateId, this.bankId, final  List<String> authorities = const <String>[], this.superadmin = false, this.bankadmin = false, this.admin = false, this.caretaker = false, this.tenant = false, this.mustChangePassword = false, this.pinSet = false}): _authorities = authorities,super._();
   factory _ProfileModel.fromJson(Map<String, dynamic> json) => _$ProfileModelFromJson(json);
 
-@override final  int? id;
-@override final  String? fullNames;
+@override final  String? id;
+@override final  String? username;
+@override final  String? fullName;
 @override final  String? firstName;
-@override final  String? lastName;
 @override final  String? email;
 @override final  String? phone;
-@override final  String? userGroup;
-@override final  String? usertype;
-@override final  String? estate;
-@override final  String? passwordExpiry;
-@override final  String? photoUrl;
+/// The code authority checks are written against — ADMIN, CARETAKER, TENANT.
+@override final  String? userType;
+/// The same thing in words — "Estate Admin", not "ADMIN". The header showed the code until
+/// the rebuild, which labelled everybody in shouting capitals with a string meant for a
+/// switch statement.
+@override final  String? userTypeName;
+@override final  String? estateName;
+@override final  String? bankName;
+@override final  String? bankLogoUrl;
+/// The group, which is what actually decides what somebody can do. Shown beside the role
+/// because the role alone answers the wrong question: two estate admins in different groups
+/// hold different permissions.
+@override final  String? userGroupName;
+@override final  String? estateId;
+@override final  String? bankId;
+ final  List<String> _authorities;
+@override@JsonKey() List<String> get authorities {
+  if (_authorities is EqualUnmodifiableListView) return _authorities;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_authorities);
+}
+
+@override@JsonKey() final  bool superadmin;
+@override@JsonKey() final  bool bankadmin;
+@override@JsonKey() final  bool admin;
+@override@JsonKey() final  bool caretaker;
+@override@JsonKey() final  bool tenant;
+@override@JsonKey() final  bool mustChangePassword;
+@override@JsonKey() final  bool pinSet;
 
 /// Create a copy of ProfileModel
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +289,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fullNames, fullNames) || other.fullNames == fullNames)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.userGroup, userGroup) || other.userGroup == userGroup)&&(identical(other.usertype, usertype) || other.usertype == usertype)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.passwordExpiry, passwordExpiry) || other.passwordExpiry == passwordExpiry)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileModel&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.userType, userType) || other.userType == userType)&&(identical(other.userTypeName, userTypeName) || other.userTypeName == userTypeName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.bankName, bankName) || other.bankName == bankName)&&(identical(other.bankLogoUrl, bankLogoUrl) || other.bankLogoUrl == bankLogoUrl)&&(identical(other.userGroupName, userGroupName) || other.userGroupName == userGroupName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.bankId, bankId) || other.bankId == bankId)&&const DeepCollectionEquality().equals(other._authorities, _authorities)&&(identical(other.superadmin, superadmin) || other.superadmin == superadmin)&&(identical(other.bankadmin, bankadmin) || other.bankadmin == bankadmin)&&(identical(other.admin, admin) || other.admin == admin)&&(identical(other.caretaker, caretaker) || other.caretaker == caretaker)&&(identical(other.tenant, tenant) || other.tenant == tenant)&&(identical(other.mustChangePassword, mustChangePassword) || other.mustChangePassword == mustChangePassword)&&(identical(other.pinSet, pinSet) || other.pinSet == pinSet));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fullNames,firstName,lastName,email,phone,userGroup,usertype,estate,passwordExpiry,photoUrl);
+int get hashCode => Object.hashAll([runtimeType,id,username,fullName,firstName,email,phone,userType,userTypeName,estateName,bankName,bankLogoUrl,userGroupName,estateId,bankId,const DeepCollectionEquality().hash(_authorities),superadmin,bankadmin,admin,caretaker,tenant,mustChangePassword,pinSet]);
 
 @override
 String toString() {
-  return 'ProfileModel(id: $id, fullNames: $fullNames, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, userGroup: $userGroup, usertype: $usertype, estate: $estate, passwordExpiry: $passwordExpiry, photoUrl: $photoUrl)';
+  return 'ProfileModel(id: $id, username: $username, fullName: $fullName, firstName: $firstName, email: $email, phone: $phone, userType: $userType, userTypeName: $userTypeName, estateName: $estateName, bankName: $bankName, bankLogoUrl: $bankLogoUrl, userGroupName: $userGroupName, estateId: $estateId, bankId: $bankId, authorities: $authorities, superadmin: $superadmin, bankadmin: $bankadmin, admin: $admin, caretaker: $caretaker, tenant: $tenant, mustChangePassword: $mustChangePassword, pinSet: $pinSet)';
 }
 
 
@@ -267,7 +309,7 @@ abstract mixin class _$ProfileModelCopyWith<$Res> implements $ProfileModelCopyWi
   factory _$ProfileModelCopyWith(_ProfileModel value, $Res Function(_ProfileModel) _then) = __$ProfileModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String? fullNames, String? firstName, String? lastName, String? email, String? phone, String? userGroup, String? usertype, String? estate, String? passwordExpiry, String? photoUrl
+ String? id, String? username, String? fullName, String? firstName, String? email, String? phone, String? userType, String? userTypeName, String? estateName, String? bankName, String? bankLogoUrl, String? userGroupName, String? estateId, String? bankId, List<String> authorities, bool superadmin, bool bankadmin, bool admin, bool caretaker, bool tenant, bool mustChangePassword, bool pinSet
 });
 
 
@@ -284,20 +326,31 @@ class __$ProfileModelCopyWithImpl<$Res>
 
 /// Create a copy of ProfileModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? fullNames = freezed,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? phone = freezed,Object? userGroup = freezed,Object? usertype = freezed,Object? estate = freezed,Object? passwordExpiry = freezed,Object? photoUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? username = freezed,Object? fullName = freezed,Object? firstName = freezed,Object? email = freezed,Object? phone = freezed,Object? userType = freezed,Object? userTypeName = freezed,Object? estateName = freezed,Object? bankName = freezed,Object? bankLogoUrl = freezed,Object? userGroupName = freezed,Object? estateId = freezed,Object? bankId = freezed,Object? authorities = null,Object? superadmin = null,Object? bankadmin = null,Object? admin = null,Object? caretaker = null,Object? tenant = null,Object? mustChangePassword = null,Object? pinSet = null,}) {
   return _then(_ProfileModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,fullNames: freezed == fullNames ? _self.fullNames : fullNames // ignore: cast_nullable_to_non_nullable
+as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String?,fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String?,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,userGroup: freezed == userGroup ? _self.userGroup : userGroup // ignore: cast_nullable_to_non_nullable
-as String?,usertype: freezed == usertype ? _self.usertype : usertype // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,passwordExpiry: freezed == passwordExpiry ? _self.passwordExpiry : passwordExpiry // ignore: cast_nullable_to_non_nullable
-as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,userType: freezed == userType ? _self.userType : userType // ignore: cast_nullable_to_non_nullable
+as String?,userTypeName: freezed == userTypeName ? _self.userTypeName : userTypeName // ignore: cast_nullable_to_non_nullable
+as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
+as String?,bankName: freezed == bankName ? _self.bankName : bankName // ignore: cast_nullable_to_non_nullable
+as String?,bankLogoUrl: freezed == bankLogoUrl ? _self.bankLogoUrl : bankLogoUrl // ignore: cast_nullable_to_non_nullable
+as String?,userGroupName: freezed == userGroupName ? _self.userGroupName : userGroupName // ignore: cast_nullable_to_non_nullable
+as String?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
+as String?,bankId: freezed == bankId ? _self.bankId : bankId // ignore: cast_nullable_to_non_nullable
+as String?,authorities: null == authorities ? _self._authorities : authorities // ignore: cast_nullable_to_non_nullable
+as List<String>,superadmin: null == superadmin ? _self.superadmin : superadmin // ignore: cast_nullable_to_non_nullable
+as bool,bankadmin: null == bankadmin ? _self.bankadmin : bankadmin // ignore: cast_nullable_to_non_nullable
+as bool,admin: null == admin ? _self.admin : admin // ignore: cast_nullable_to_non_nullable
+as bool,caretaker: null == caretaker ? _self.caretaker : caretaker // ignore: cast_nullable_to_non_nullable
+as bool,tenant: null == tenant ? _self.tenant : tenant // ignore: cast_nullable_to_non_nullable
+as bool,mustChangePassword: null == mustChangePassword ? _self.mustChangePassword : mustChangePassword // ignore: cast_nullable_to_non_nullable
+as bool,pinSet: null == pinSet ? _self.pinSet : pinSet // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

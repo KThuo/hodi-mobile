@@ -172,14 +172,14 @@ class _ProfileHeaderCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            profile.fullNames ?? 'User',
+            profile.displayName,
             style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
             textAlign: TextAlign.center,
           ),
-          if (profile.usertype != null) ...[
+          if (profile.userType != null) ...[
             const SizedBox(height: 10),
             HodiStatusBadge(
-              text: profile.usertype!,
+              text: profile.roleLabel,
               type: BadgeType.info,
             ),
           ],
@@ -198,9 +198,10 @@ class _AccountDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTenant = profile.usertype?.toLowerCase() == 'tenant';
-    final isSuperadmin = profile.usertype?.toLowerCase() == 'superadmin';
-    final showEstate = !isTenant && !isSuperadmin;
+    // Booleans the server sends, rather than a string match on the role code. The old test
+    // compared against 'tenant' and 'superadmin' in lower case, which quietly stopped matching
+    // the moment the code was sent as TENANT.
+    final showEstate = !profile.tenant && !profile.superadmin;
 
     return Container(
       width: double.infinity,
@@ -231,17 +232,20 @@ class _AccountDetailsCard extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(height: 1, color: HodiColors.divider),
           const SizedBox(height: 16),
-          _DetailRow(icon: Icons.person_outline, label: 'Full Name', value: profile.fullNames ?? 'N/A'),
+          _DetailRow(icon: Icons.person_outline, label: 'Full Name', value: profile.displayName),
           _DetailRow(icon: Icons.email_outlined, label: 'Email', value: profile.email ?? 'N/A'),
           _DetailRow(icon: Icons.phone_outlined, label: 'Phone', value: profile.phone ?? 'N/A'),
-          _DetailRow(icon: Icons.group_outlined, label: 'User Group', value: profile.userGroup ?? 'N/A'),
-          _DetailRow(icon: Icons.badge_outlined, label: 'User Type', value: profile.usertype ?? 'N/A'),
+          _DetailRow(icon: Icons.group_outlined, label: 'User Group', value: profile.userGroupName ?? 'N/A'),
+          _DetailRow(icon: Icons.badge_outlined, label: 'User Type', value: profile.roleLabel),
           if (showEstate)
-            _DetailRow(icon: Icons.domain_outlined, label: 'Estate', value: profile.estate ?? 'N/A'),
+            _DetailRow(icon: Icons.domain_outlined, label: 'Estate', value: profile.estateName ?? 'N/A'),
+          // No password-expiry row. The server sends no date: expiry is folded into
+          // mustChangePassword at sign-in, and the app acts on that rather than printing a
+          // deadline beside it. The row read "N/A" on every account.
           _DetailRow(
-            icon: Icons.calendar_today_outlined,
-            label: 'Password Expiry',
-            value: profile.passwordExpiry ?? 'N/A',
+            icon: Icons.badge_outlined,
+            label: 'Username',
+            value: profile.username ?? 'N/A',
             isLast: true,
           ),
         ],
