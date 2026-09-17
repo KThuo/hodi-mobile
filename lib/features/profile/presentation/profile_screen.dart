@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_text_styles.dart';
@@ -40,6 +41,8 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 const SignInCard(),
                 const SizedBox(height: 16),
+                const _ChangePasswordCard(),
+                const SizedBox(height: 16),
                 _DeleteAccountCard(
                   onDelete: () => _showDeleteAccountDialog(context, ref),
                 ),
@@ -62,6 +65,71 @@ class ProfileScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => _DeleteAccountDialog(ref: ref),
+    );
+  }
+}
+
+/// The password, which is the credential everything else hangs off.
+///
+/// Below the PIN and the fingerprint deliberately: those two are what somebody uses daily, and
+/// this is the one they change once a year. It leads to the same screen the server forces people
+/// onto when it answers `004` — one screen, chosen or compelled.
+class _ChangePasswordCard extends StatelessWidget {
+  const _ChangePasswordCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: HodiColors.cardBackground,
+        borderRadius: HodiBorderRadius.card,
+        boxShadow: HodiShadows.cardLight,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: HodiBorderRadius.card,
+        child: InkWell(
+          borderRadius: HodiBorderRadius.card,
+          onTap: () => context.push('/change-password'),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: HodiColors.primaryStart.withValues(alpha: 0.1),
+                    borderRadius: HodiBorderRadius.small,
+                  ),
+                  // Not const: the brand colour is resolved from the server at start-up.
+                  child: Icon(Icons.password_outlined,
+                      color: HodiColors.primaryStart, size: 19),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Change password',
+                        style: HodiTextStyles.bodyLarge
+                            .copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Signs you in everywhere. Your PIN is unaffected.',
+                        style: HodiTextStyles.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -55,6 +55,11 @@ class _HodiAppState extends ConsumerState<HodiApp> with WidgetsBindingObserver {
           ref.read(authProvider.notifier).sessionExpired();
         } else if (error.status == '002') {
           _showErrorDialog(error.message);
+        } else if (error.status == '004') {
+          // Not a dialogue. Every call answers with this until the password is changed, so a
+          // dialogue would be dismissed and immediately raised again by the next request. The
+          // router holds the app on the change-password screen instead.
+          ref.read(authProvider.notifier).passwordChangeRequired();
         }
       });
     });

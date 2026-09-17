@@ -156,6 +156,41 @@ class AuthRepository {
     );
   }
 
+  /// Changes the account password.
+  ///
+  /// The current one is required, and the confirmation is sent rather than only checked here: the
+  /// server compares them too and answers on the `confirmPassword` field, so a mistyped
+  /// confirmation reads the same whichever side notices it first.
+  ///
+  /// No new token pair comes back, deliberately. The access token in hand stays valid for its
+  /// remaining minutes — nothing about it was compromised — and the must-change gate stops firing
+  /// as soon as the next refresh carries the cleared flag.
+  Future<ApiResponse<void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    return _apiClient.post<void>(
+      ApiConstants.changePassword,
+      data: {
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+        'confirmPassword': confirmPassword,
+      },
+    );
+  }
+
+  /// What the server will accept as a password.
+  ///
+  /// Asked for rather than assumed. A screen listing rules it invented disagrees with the server
+  /// the first time either changes, and the person retyping is the one who finds out.
+  Future<ApiResponse<PasswordPolicy>> passwordPolicy() async {
+    return _apiClient.get<PasswordPolicy>(
+      ApiConstants.passwordPolicy,
+      fromJsonT: (data) => PasswordPolicy.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
   Future<ApiResponse<void>> forgotPassword(String email) async {
     return _apiClient.post<void>(
       ApiConstants.forgotPassword,
@@ -234,4 +269,32 @@ class PinSignIn {
 
   /// The PIN is not a way in on this handset any more. Show the password field.
   final bool usePasswordInstead;
+}
+
+/// The server's password rules, as the server states them.
+class PasswordPolicy {
+  final int minLength;
+  final int maxLength;
+  final int historyDepth;
+  final int expiryDays;
+
+  /// Written out in full by the server, so the screen shows sentences somebody can act on rather
+  /// than a regular expression nobody can read.
+  final List<String> rules;
+
+  const PasswordPolicy({
+    this.minLength = 8,
+    this.maxLength = 64,
+    this.historyDepth = 0,
+    this.expiryDays = 0,
+    this.rules = const [],
+  });
+
+  factory PasswordPolicy.fromJson(Map<String, dynamic> json) => PasswordPolicy(
+        minLength: (json['minLength'] as num?)?.toInt() ?? 8,
+        maxLength: (json['maxLength'] as num?)?.toInt() ?? 64,
+        historyDepth: (json['historyDepth'] as num?)?.toInt() ?? 0,
+        expiryDays: (json['expiryDays'] as num?)?.toInt() ?? 0,
+        rules: (json['rules'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      );
 }

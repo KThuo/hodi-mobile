@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../api/api_client.dart';
+import '../../api/api_response.dart';
 import '../../filters/filter_provider.dart';
 import '../../device/device_id.dart';
 import '../data/auth_repository.dart';
@@ -30,6 +31,14 @@ class AuthState {
   final bool biometricEnabled;
   final bool pendingBiometricVerification;
 
+  /// The account cannot do anything else until its password is changed.
+  ///
+  /// Set from the profile's own flag at sign-in, and again by the `004` every other call answers
+  /// with. Two sources because they arrive at different moments: the flag is in the sign-in
+  /// response, and the status is what an already-open session discovers when somebody else sets
+  /// the flag on it. The router reads this and holds the app on the change-password screen.
+  final bool mustChangePassword;
+
   /// Whether the stored session has been looked at yet.
   ///
   /// True only for the first state, and false everywhere else — which is why it defaults to false
@@ -50,6 +59,7 @@ class AuthState {
     this.biometricAvailable = false,
     this.biometricEnabled = false,
     this.pendingBiometricVerification = false,
+    this.mustChangePassword = false,
     this.restoring = false,
   });
 
@@ -62,6 +72,7 @@ class AuthState {
     bool? biometricAvailable,
     bool? biometricEnabled,
     bool? pendingBiometricVerification,
+    bool? mustChangePassword,
   }) {
     return AuthState(
       user: user ?? this.user,
@@ -72,6 +83,7 @@ class AuthState {
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       pendingBiometricVerification:
           pendingBiometricVerification ?? this.pendingBiometricVerification,
+      mustChangePassword: mustChangePassword ?? this.mustChangePassword,
       restoring: restoring ?? this.restoring,
     );
   }
@@ -101,6 +113,7 @@ class AuthNotifier extends Notifier<AuthState> {
           isAuthenticated: true,
           biometricAvailable: biometricAvailable,
           biometricEnabled: biometricEnabled,
+          mustChangePassword: user.mustChangePassword,
         );
         ref.read(filterProvider.notifier).loadFilters();
         return;
@@ -131,6 +144,7 @@ class AuthNotifier extends Notifier<AuthState> {
         isAuthenticated: true,
         biometricAvailable: state.biometricAvailable,
         biometricEnabled: state.biometricEnabled,
+        mustChangePassword: response.data!.mustChangePassword,
       );
       ref.read(filterProvider.notifier).loadFilters();
       return true;
@@ -163,6 +177,7 @@ class AuthNotifier extends Notifier<AuthState> {
         isAuthenticated: true,
         biometricAvailable: state.biometricAvailable,
         biometricEnabled: state.biometricEnabled,
+        mustChangePassword: result.user?.mustChangePassword ?? false,
       );
       ref.read(filterProvider.notifier).loadFilters();
       return result;
@@ -194,6 +209,7 @@ class AuthNotifier extends Notifier<AuthState> {
           isAuthenticated: true,
           biometricAvailable: state.biometricAvailable,
           biometricEnabled: state.biometricEnabled,
+          mustChangePassword: user.mustChangePassword,
         );
         ref.read(filterProvider.notifier).loadFilters();
         return true;
@@ -214,6 +230,7 @@ class AuthNotifier extends Notifier<AuthState> {
         isAuthenticated: true,
         biometricAvailable: state.biometricAvailable,
         biometricEnabled: true,
+        mustChangePassword: response.data!.mustChangePassword,
       );
       ref.read(filterProvider.notifier).loadFilters();
       return true;
@@ -280,6 +297,41 @@ class AuthNotifier extends Notifier<AuthState> {
         biometricAvailable: biometricAvailable,
       );
     }
+  }
+
+  /// Raised by the `004` every call answers with while the flag is set.
+  ///
+  /// Idempotent on purpose: several requests in flight will each come back with it, and the first
+  /// one is enough. Setting it repeatedly would rebuild the router on every reply.
+  void passwordChangeRequired() {
+    if (state.mustChangePassword) return;
+    state = state.copyWith(mustChangePassword: true);
+  }
+
+  /// Changes the password and lets the app back in.
+  ///
+  /// `me()` afterwards rather than trusting the success: the flag lives on the profile, and
+  /// re-reading it is what clears it here from the same place that set it. If that read fails the
+  /// flag is cleared anyway — the server has accepted the new password, and holding somebody on
+  /// the screen after it succeeded would be the worse of the two errors.
+  Future<ApiResponse<void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    final response = await _repository.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmPassword: confirmPassword,
+    );
+    if (!response.isSuccess) return response;
+
+    final refreshed = await _repository.me();
+    state = state.copyWith(
+      user: refreshed.isSuccess ? refreshed.data : state.user,
+      mustChangePassword: false,
+    );
+    return response;
   }
 
   void clearError() {

@@ -20,6 +20,7 @@ import '../../features/tenants/presentation/tenants_screen.dart';
 import '../../features/tenants/presentation/tenant_detail_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/profile/presentation/set_pin_screen.dart';
+import '../../features/profile/presentation/change_password_screen.dart';
 import '../../features/stays/presentation/stays_screen.dart';
 import '../../features/metres/presentation/metres_screen.dart';
 import '../../features/metres/presentation/metre_history_screen.dart';
@@ -67,6 +68,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/home';
       }
 
+      /*
+       * A password the server will not let anybody past.
+       *
+       * Held here rather than shown as a message, because the refusal is not about one screen —
+       * every call answers `004` until the password changes, so whatever somebody navigates to
+       * renders an error. The old behaviour was exactly that: a generic failure on an arbitrary
+       * screen, with no way forward and no way out, and signing out and back in reproduced it.
+       */
+      if (isAuthenticated &&
+          authState.mustChangePassword &&
+          state.matchedLocation != '/change-password') {
+        return '/change-password';
+      }
+
       return null;
     },
     routes: [
@@ -85,6 +100,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/forgot-password',
         name: RouteNames.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+
+      // Outside the shell on purpose. While the password must change there is nowhere else to
+      // go, and a bottom bar offering five tabs that all fail is an invitation to try them.
+      GoRoute(
+        path: '/change-password',
+        name: RouteNames.changePassword,
+        builder: (context, state) => const ChangePasswordScreen(),
       ),
 
       // Public routes (no shell)
