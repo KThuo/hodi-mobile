@@ -33,7 +33,16 @@ abstract class InvoiceDetailModel with _$InvoiceDetailModel {
     /// exactly this, and would look like an arithmetic bug rather than a brought-forward balance.
     @JsonKey(fromJson: parseDouble) @Default(0) double broughtForward,
 
-    /// What is actually due — the amount less what has been paid.
+    /// **The figure the tenant is asked for, which is the face value — not what is left.**
+    ///
+    /// `Invoice.totalPayable()` on the server is `return amount;`, and its comment says why:
+    /// arrears are a line on this invoice and already inside the amount, so the amount and the
+    /// total must not be two different answers to "what does this tenant owe".
+    ///
+    /// It is emphatically **not** amount-less-paid, which is what this was documented as and read
+    /// as. [balance] used it, so every screen asking what was still owed got the original total
+    /// back — the payment sheet opened prefilled with the whole invoice for a tenant who had paid
+    /// most of it.
     @JsonKey(fromJson: parseDouble) @Default(0) double totalPayable,
     String? voidReason,
     String? voidedBy,
@@ -54,8 +63,11 @@ abstract class InvoiceDetailModel with _$InvoiceDetailModel {
 
   bool get isVoided => invoice.isVoided;
 
-  /// What is still owed. [totalPayable] where the server sent one, the row's own figure otherwise.
-  double get balance => totalPayable != 0 ? totalPayable : invoice.outstanding;
+  /// What is still owed — `amount - paidAmount`, floored at nought by the server.
+  ///
+  /// Not [totalPayable]: see the note there. This preferred it whenever it was non-zero, which is
+  /// always for a real invoice, so the fallback to `outstanding` never once ran.
+  double get balance => invoice.outstanding;
 }
 
 /// One line on the document.
