@@ -17,6 +17,7 @@ import '../../features/properties/presentation/properties_screen.dart';
 import '../../features/properties/presentation/property_detail_screen.dart';
 import '../../features/more/presentation/more_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/visitors/presentation/visitors_screen.dart';
 import '../../features/maintenance/presentation/maintenance_screen.dart';
 import '../../features/maintenance/presentation/maintenance_detail_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
@@ -321,6 +322,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                         },
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: 'visitors',
+                    name: RouteNames.visitors,
+                    builder: (context, state) => const VisitorsScreen(),
                   ),
                   GoRoute(
                     path: 'maintenance',

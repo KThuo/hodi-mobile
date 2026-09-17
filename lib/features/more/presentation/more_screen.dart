@@ -82,6 +82,13 @@ const _moduleItems = <_MenuItem>[
     permissions: [AppPermissions.maintView],
     route: '/more/maintenance',
   ),
+  // A tenant holds VIEW and DECIDE here; a gate holds NEW. Either is reason to show the row.
+  _MenuItem(
+    label: 'Visitors',
+    icon: Icons.meeting_room_outlined,
+    permissions: [AppPermissions.visitView],
+    route: '/more/visitors',
+  ),
   _MenuItem(
     label: 'Vacate Notices',
     icon: Icons.description,
