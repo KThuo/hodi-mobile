@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
-import '../../../core/filters/filter_provider.dart';
 import '../data/tenant_repository.dart';
 import '../domain/tenant_model.dart';
 import '../domain/tenant_detail_model.dart';
+import '../../invoices/domain/invoice_model.dart';
+import '../../payments/domain/payment_model.dart';
 
 final tenantRepositoryProvider = Provider<TenantRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -58,12 +59,12 @@ class TenantListNotifier extends Notifier<TenantListState> {
   TenantRepository get _repository => ref.read(tenantRepositoryProvider);
 
   Future<void> _fetchPage(int page) async {
-    final filters = ref.read(filterProvider);
+    // No estate or property filter: `/tenants` has neither. The tenancy scope decides what comes
+    // back, from the caller's identity, and the two parameters that used to be sent here were
+    // simply ignored — which reads as a filter that does nothing.
     final response = await _repository.getTenants(
       page: page,
       searchTerm: state.searchTerm,
-      estateId: filters.selectedEstateId,
-      propertyId: filters.selectedPropertyId,
     );
 
     if (response.isSuccess && response.data != null) {
@@ -119,14 +120,34 @@ final tenantDetailProvider =
   return response.data;
 });
 
-// --- Tenant Units (reuses TenantModel, fetches occupations for a specific userId) ---
-
-final tenantUnitsProvider =
-    FutureProvider.autoDispose.family<List<TenantModel>, String>((ref, userId) async {
-  final repo = ref.watch(tenantRepositoryProvider);
-  final response = await repo.getTenants(userId: userId, pageSize: 100);
+/// What this tenant pays, and what they have paid.
+///
+/// Both filter on `tenantUserId`, which is the parameter these endpoints actually have. They were
+/// filtering on `userId` — a parameter neither has — and an unknown query parameter is ignored, so
+/// both lists came back unfiltered: every invoice and every payment in scope, shown under one
+/// tenant's name. That did not fail, it answered with somebody else's rows.
+final tenantInvoicesProvider = FutureProvider.autoDispose
+    .family<List<InvoiceModel>, String>((ref, tenantUserId) async {
+  final response = await ref
+      .watch(tenantRepositoryProvider)
+      .getTenantInvoices(tenantUserId: tenantUserId, pageSize: 50);
   if (!response.isSuccess) {
-    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load units');
+    throw Exception(response.message.isNotEmpty
+        ? response.message
+        : 'Those invoices could not be loaded.');
   }
-  return response.data?.content ?? [];
+  return response.data?.content ?? const [];
+});
+
+final tenantPaymentsProvider = FutureProvider.autoDispose
+    .family<List<PaymentModel>, String>((ref, tenantUserId) async {
+  final response = await ref
+      .watch(tenantRepositoryProvider)
+      .getTenantPayments(tenantUserId: tenantUserId, pageSize: 50);
+  if (!response.isSuccess) {
+    throw Exception(response.message.isNotEmpty
+        ? response.message
+        : 'Those payments could not be loaded.');
+  }
+  return response.data?.content ?? const [];
 });

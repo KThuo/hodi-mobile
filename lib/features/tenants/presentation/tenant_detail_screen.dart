@@ -1,151 +1,241 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/hodi_colors.dart';
-import '../../../core/theme/hodi_text_styles.dart';
+
 import '../../../core/theme/hodi_border_radius.dart';
-import '../../../core/theme/hodi_shadows.dart';
+import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_gradients.dart';
+import '../../../core/theme/hodi_shadows.dart';
+import '../../../core/theme/hodi_text_styles.dart';
+import '../../../core/utils/contact_actions.dart';
+import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/hodi_app_bar.dart';
-import '../../../core/widgets/hodi_amount_text.dart';
-import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
+import '../../../core/widgets/hodi_loading_shimmer.dart';
+import '../../occupations/domain/occupation_model.dart';
 import '../domain/tenant_detail_model.dart';
 import '../providers/tenant_providers.dart';
-import 'widgets/tenant_units_tab.dart';
-import 'widgets/tenant_invoices_tab.dart';
-import 'widgets/tenant_payments_tab.dart';
 
+/// One tenant: who they are, what they occupy, and where they have been.
+///
+/// **The money lives on the tenancies, not on the tenant.** `TenantDetail` sends `current` as a
+/// list of `OccupationRow` — each with its own rent, deposit and arrears — because a tenant can
+/// hold more than one, and a single balance on the person would have to sum them silently. The
+/// totals here are summed from the rows shown, so somebody can check them.
 class TenantDetailScreen extends ConsumerWidget {
-  final String userId;
-
   const TenantDetailScreen({super.key, required this.userId});
+
+  final String userId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final detailAsync = ref.watch(tenantDetailProvider(userId));
+    final async = ref.watch(tenantDetailProvider(userId));
 
     return Scaffold(
       backgroundColor: HodiColors.background,
-      appBar: const HodiAppBar(title: 'Tenant Details'),
-      body: detailAsync.when(
-        data: (detail) {
-          if (detail == null) {
-            return const HodiErrorState(message: 'Tenant not found');
-          }
-          return _TenantDetailContent(detail: detail, userId: userId);
-        },
-        loading: () => const HodiLoadingShimmer(itemCount: 3, itemHeight: 120),
+      appBar: const HodiAppBar(title: 'Tenant'),
+      body: async.when(
+        loading: () => const HodiLoadingShimmer(itemCount: 3, itemHeight: 140),
         error: (e, _) => HodiErrorState(
           message: e is Exception
               ? e.toString().replaceFirst('Exception: ', '')
-              : 'Failed to load tenant details',
+              : 'That tenant could not be loaded.',
           onRetry: () => ref.invalidate(tenantDetailProvider(userId)),
         ),
+        data: (detail) {
+          if (detail == null) {
+            return const HodiErrorState(message: 'That tenant was not found.');
+          }
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _HeaderCard(detail: detail),
+              const SizedBox(height: 16),
+              if (detail.current.isNotEmpty) ...[
+                _Section(
+                  title: detail.current.length == 1
+                      ? 'Current tenancy'
+                      : '${detail.current.length} current tenancies',
+                  child: Column(
+                    children: [
+                      for (final o in detail.current) _TenancyRow(occupation: o),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              if (detail.history.isNotEmpty)
+                _Section(
+                  title: 'Previously',
+                  child: Column(
+                    children: [
+                      for (final h in detail.history) _HistoryRow(history: h),
+                    ],
+                  ),
+                ),
+              // The server names what it has not computed rather than sending zeroes, and the
+              // screen says so rather than showing a confident nought.
+              if (detail.pending.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Not yet available: ${detail.pending.join(', ')}.',
+                  style: HodiTextStyles.bodySmall
+                      .copyWith(color: HodiColors.textLight),
+                ),
+              ],
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _TenantDetailContent extends StatelessWidget {
-  final TenantDetailModel detail;
-  final String userId;
+class _HeaderCard extends StatelessWidget {
+  const _HeaderCard({required this.detail});
 
-  const _TenantDetailContent({required this.detail, required this.userId});
+  final TenantDetailModel detail;
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  _PersonalInfoCard(detail: detail),
-                  const SizedBox(height: 16),
-                  if (detail.content != null)
-                    _FinancialOverviewCard(summary: detail.content!),
-                ],
-              ),
-            ),
-          ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _TabBarDelegate(
-              TabBar(
-                labelColor: HodiColors.primaryStart,
-                unselectedLabelColor: HodiColors.textLight,
-                indicatorColor: HodiColors.primaryStart,
-                indicatorWeight: 3,
-                labelStyle: HodiTextStyles.label.copyWith(fontWeight: FontWeight.w600),
-                unselectedLabelStyle: HodiTextStyles.label,
-                tabs: const [
-                  Tab(text: 'Units'),
-                  Tab(text: 'Invoices'),
-                  Tab(text: 'Payments'),
-                ],
-              ),
-            ),
-          ),
-        ],
-        body: TabBarView(
-          children: [
-            TenantUnitsTab(userId: userId),
-            TenantInvoicesTab(userId: userId),
-            TenantPaymentsTab(userId: userId),
-          ],
-        ),
-      ),
-    );
-  }
-}
+    final t = detail.tenant;
 
-class _PersonalInfoCard extends StatelessWidget {
-  final TenantDetailModel detail;
-
-  const _PersonalInfoCard({required this.detail});
-
-  @override
-  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: HodiGradients.primary,
         borderRadius: HodiBorderRadius.card,
         boxShadow: HodiShadows.card,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: HodiColors.white.withValues(alpha: 0.2),
+              borderRadius: HodiBorderRadius.small,
+            ),
+            child: Center(
+              child: t.organisation
+                  ? const Icon(Icons.business_outlined,
+                      color: HodiColors.white, size: 27)
+                  : Text(
+                      t.initials,
+                      style: HodiTextStyles.heading2
+                          .copyWith(color: HodiColors.white),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            t.displayName,
+            style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
+            textAlign: TextAlign.center,
+          ),
+          if (t.contactName != null && t.contactName!.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              'Contact: ${t.contactName}',
+              style: HodiTextStyles.bodySmall
+                  .copyWith(color: HodiColors.white.withValues(alpha: 0.85)),
+            ),
+          ],
+          const SizedBox(height: 14),
+
+          // Reaching somebody is the commonest reason to open a tenant, so it is a tap rather
+          // than a number to read out and retype.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (t.phone != null && t.phone!.isNotEmpty) ...[
+                _Action(
+                  icon: Icons.phone_outlined,
+                  label: 'Call',
+                  onTap: () => ContactActions.call(t.phone),
+                ),
+                const SizedBox(width: 10),
+                _Action(
+                  icon: Icons.chat_bubble_outline,
+                  label: 'WhatsApp',
+                  onTap: () => ContactActions.whatsApp(
+                    t.phone,
+                    'Hello ${t.displayName},',
+                  ),
+                ),
+              ],
+              if (t.email != null && t.email!.isNotEmpty) ...[
+                const SizedBox(width: 10),
+                _Action(
+                  icon: Icons.mail_outline,
+                  label: 'Email',
+                  onTap: () => ContactActions.email(t.email),
+                ),
+              ],
+            ],
+          ),
+
+          if (detail.current.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            const Divider(height: 1, color: Colors.white24),
+            const SizedBox(height: 14),
             Row(
               children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: HodiColors.white.withValues(alpha: 0.2),
-                    borderRadius: HodiBorderRadius.small,
-                  ),
-                  child: const Icon(Icons.person, color: HodiColors.white, size: 28),
-                ),
-                const SizedBox(width: 14),
                 Expanded(
-                  child: Text(
-                    detail.name ?? '-',
-                    style: HodiTextStyles.heading3.copyWith(color: HodiColors.white),
+                  child: _Figure(
+                    label: 'Rent',
+                    amount: detail.totalRent,
+                  ),
+                ),
+                Container(width: 1, height: 32, color: Colors.white24),
+                Expanded(
+                  child: _Figure(
+                    // One column with a sign, named by which side of nought it falls.
+                    label: detail.inArrears ? 'Owing' : 'In credit',
+                    amount: detail.totalOwed.abs(),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            if (detail.email != null)
-              _ContactRow(icon: Icons.email_outlined, value: detail.email!),
-            if (detail.phone != null)
-              _ContactRow(icon: Icons.phone_outlined, value: detail.phone!),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _Action extends StatelessWidget {
+  const _Action({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: HodiBorderRadius.full,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: HodiColors.white.withValues(alpha: 0.18),
+          borderRadius: HodiBorderRadius.full,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 15, color: HodiColors.white),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: HodiTextStyles.bodySmall.copyWith(
+                color: HodiColors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),
@@ -153,36 +243,164 @@ class _PersonalInfoCard extends StatelessWidget {
   }
 }
 
-class _ContactRow extends StatelessWidget {
-  final IconData icon;
-  final String value;
+class _Figure extends StatelessWidget {
+  const _Figure({required this.label, required this.amount});
 
-  const _ContactRow({required this.icon, required this.value});
+  final String label;
+  final double amount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: HodiTextStyles.bodySmall
+              .copyWith(color: HodiColors.white.withValues(alpha: 0.75)),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'KES ${CurrencyFormatter.format(amount)}',
+          style: HodiTextStyles.currency
+              .copyWith(fontSize: 15, color: HodiColors.white),
+        ),
+      ],
+    );
+  }
+}
+
+class _TenancyRow extends StatelessWidget {
+  const _TenancyRow({required this.occupation});
+
+  final OccupationModel occupation;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: HodiColors.white.withValues(alpha: 0.8)),
-          const SizedBox(width: 10),
-          Text(
-            value,
-            style: HodiTextStyles.bodyMedium.copyWith(
-              color: HodiColors.white.withValues(alpha: 0.9),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  occupation.displayName,
+                  style: HodiTextStyles.bodyMedium
+                      .copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  [
+                    if (occupation.propertyName != null) occupation.propertyName!,
+                    'since ${_date(occupation.occupiedOn)}',
+                  ].join(' · '),
+                  style: HodiTextStyles.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'KES ${CurrencyFormatter.format(occupation.rent)}',
+                style: HodiTextStyles.currency.copyWith(fontSize: 14),
+              ),
+              if (occupation.rentOwed != 0)
+                Text(
+                  occupation.inArrears
+                      ? 'owes ${CurrencyFormatter.format(occupation.rentOwed)}'
+                      : 'credit ${CurrencyFormatter.format(-occupation.rentOwed)}',
+                  style: HodiTextStyles.bodySmall.copyWith(
+                    fontSize: 11,
+                    color: occupation.inArrears
+                        ? HodiColors.errorStart
+                        : HodiColors.successEnd,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _date(String? raw) {
+    final parsed = DateFormatter.parseApiDate(raw);
+    return parsed == null ? '-' : DateFormatter.formatDate(parsed);
+  }
+}
+
+class _HistoryRow extends StatelessWidget {
+  const _HistoryRow({required this.history});
+
+  final TenancyHistoryModel history;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            margin: const EdgeInsets.only(top: 6),
+            decoration: const BoxDecoration(
+              color: HodiColors.dividerStrong,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  history.unit,
+                  style: HodiTextStyles.bodyMedium
+                      .copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  [
+                    if (history.propertyName != null) history.propertyName!,
+                    '${_date(history.occupiedOn)} → ${_date(history.vacatedOn)}',
+                    // Nights read badly past a few weeks; months are what somebody says.
+                    if (history.duration.isNotEmpty) history.duration,
+                  ].join(' · '),
+                  style: HodiTextStyles.bodySmall,
+                ),
+                if (history.reason != null && history.reason!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      history.reason!,
+                      style: HodiTextStyles.bodySmall
+                          .copyWith(fontSize: 11, color: HodiColors.textLight),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
+  static String _date(String? raw) {
+    final parsed = DateFormatter.parseApiDate(raw);
+    return parsed == null ? 'now' : DateFormatter.formatDate(parsed);
+  }
 }
 
-class _FinancialOverviewCard extends StatelessWidget {
-  final TenantFinancialSummary summary;
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.child});
 
-  const _FinancialOverviewCard({required this.summary});
+  final String title;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -197,141 +415,11 @@ class _FinancialOverviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Financial Overview', style: HodiTextStyles.heading3),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _MetricTile(
-                  label: 'Total Rent',
-                  amount: summary.totalRent,
-                  color: HodiColors.primaryStart,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _MetricTile(
-                  label: 'Total Arrears',
-                  amount: summary.totalArrears,
-                  color: summary.totalArrears > 0
-                      ? HodiColors.errorStart
-                      : HodiColors.successStart,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _MetricTile(
-                  label: 'Total Payments',
-                  amount: summary.totalPayment,
-                  color: HodiColors.successStart,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _UnitCountTile(count: summary.occupiedUnits),
-              ),
-            ],
-          ),
+          Text(title, style: HodiTextStyles.heading3.copyWith(fontSize: 16)),
+          const SizedBox(height: 14),
+          child,
         ],
       ),
     );
   }
-}
-
-class _MetricTile extends StatelessWidget {
-  final String label;
-  final double amount;
-  final Color color;
-
-  const _MetricTile({
-    required this.label,
-    required this.amount,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: HodiBorderRadius.small,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textMedium),
-          ),
-          const SizedBox(height: 6),
-          HodiAmountText(
-            amount: amount,
-            style: HodiTextStyles.currency.copyWith(fontSize: 14, color: color),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _UnitCountTile extends StatelessWidget {
-  final int count;
-
-  const _UnitCountTile({required this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: HodiColors.primaryStart.withValues(alpha: 0.08),
-        borderRadius: HodiBorderRadius.small,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Occupied Units',
-            style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textMedium),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            count.toString(),
-            style: HodiTextStyles.currency.copyWith(
-              fontSize: 14,
-              color: HodiColors.primaryStart,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar tabBar;
-
-  _TabBarDelegate(this.tabBar);
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: HodiColors.background,
-      child: tabBar,
-    );
-  }
-
-  @override
-  double get maxExtent => tabBar.preferredSize.height;
-
-  @override
-  double get minExtent => tabBar.preferredSize.height;
-
-  @override
-  bool shouldRebuild(covariant _TabBarDelegate oldDelegate) => false;
 }

@@ -6,52 +6,70 @@ part of 'tenant_detail_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_TenantDetailModel _$TenantDetailModelFromJson(Map<String, dynamic> json) =>
-    _TenantDetailModel(
-      name: json['name'] as String?,
-      email: json['email'] as String?,
-      phone: json['phone'] as String?,
-      content: json['content'] == null
-          ? null
-          : TenantFinancialSummary.fromJson(
-              json['content'] as Map<String, dynamic>,
-            ),
-    );
+_TenantDetailModel _$TenantDetailModelFromJson(
+  Map<String, dynamic> json,
+) => _TenantDetailModel(
+  tenant: TenantModel.fromJson(json['tenant'] as Map<String, dynamic>),
+  current:
+      (json['current'] as List<dynamic>?)
+          ?.map((e) => OccupationModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <OccupationModel>[],
+  history:
+      (json['history'] as List<dynamic>?)
+          ?.map((e) => TenancyHistoryModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <TenancyHistoryModel>[],
+  pending:
+      (json['pending'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const <String>[],
+);
 
 Map<String, dynamic> _$TenantDetailModelToJson(_TenantDetailModel instance) =>
     <String, dynamic>{
-      'name': instance.name,
-      'email': instance.email,
-      'phone': instance.phone,
-      'content': instance.content,
+      'tenant': instance.tenant,
+      'current': instance.current,
+      'history': instance.history,
+      'pending': instance.pending,
     };
 
-_TenantFinancialSummary _$TenantFinancialSummaryFromJson(
-  Map<String, dynamic> json,
-) => _TenantFinancialSummary(
-  totalRent: json['totalRent'] == null ? 0 : _parseDouble(json['totalRent']),
-  totalPayment: json['totalPayment'] == null
-      ? 0
-      : _parseDouble(json['totalPayment']),
-  totalArrears: json['totalArrears'] == null
-      ? 0
-      : _parseDouble(json['totalArrears']),
-  occupiedUnits: (json['occupiedUnits'] as num?)?.toInt() ?? 0,
-  totalTopups: json['totalTopups'] == null
-      ? 0
-      : _parseDouble(json['totalTopups']),
-  totalOverpayments: json['totalOverpayments'] == null
-      ? 0
-      : _parseDouble(json['totalOverpayments']),
-);
+_TenancyHistoryModel _$TenancyHistoryModelFromJson(Map<String, dynamic> json) =>
+    _TenancyHistoryModel(
+      id: json['id'] as String,
+      occupationId: json['occupationId'] as String?,
+      houseId: json['houseId'] as String?,
+      houseCode: json['houseCode'] as String,
+      houseLabel: json['houseLabel'] as String?,
+      propertyName: json['propertyName'] as String?,
+      tenure: json['tenure'] as String?,
+      rent: json['rent'] == null ? 0 : parseDouble(json['rent']),
+      deposit: json['deposit'] == null ? 0 : parseDouble(json['deposit']),
+      refundableDeposit: json['refundableDeposit'] == null
+          ? 0
+          : parseDouble(json['refundableDeposit']),
+      occupiedOn: json['occupiedOn'] as String?,
+      vacatedOn: json['vacatedOn'] as String?,
+      nights: (json['nights'] as num?)?.toInt() ?? 0,
+      reason: json['reason'] as String?,
+      notes: json['notes'] as String?,
+    );
 
-Map<String, dynamic> _$TenantFinancialSummaryToJson(
-  _TenantFinancialSummary instance,
+Map<String, dynamic> _$TenancyHistoryModelToJson(
+  _TenancyHistoryModel instance,
 ) => <String, dynamic>{
-  'totalRent': instance.totalRent,
-  'totalPayment': instance.totalPayment,
-  'totalArrears': instance.totalArrears,
-  'occupiedUnits': instance.occupiedUnits,
-  'totalTopups': instance.totalTopups,
-  'totalOverpayments': instance.totalOverpayments,
+  'id': instance.id,
+  'occupationId': instance.occupationId,
+  'houseId': instance.houseId,
+  'houseCode': instance.houseCode,
+  'houseLabel': instance.houseLabel,
+  'propertyName': instance.propertyName,
+  'tenure': instance.tenure,
+  'rent': instance.rent,
+  'deposit': instance.deposit,
+  'refundableDeposit': instance.refundableDeposit,
+  'occupiedOn': instance.occupiedOn,
+  'vacatedOn': instance.vacatedOn,
+  'nights': instance.nights,
+  'reason': instance.reason,
+  'notes': instance.notes,
 };

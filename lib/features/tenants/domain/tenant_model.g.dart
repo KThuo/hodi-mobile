@@ -7,42 +7,62 @@ part of 'tenant_model.dart';
 // **************************************************************************
 
 _TenantModel _$TenantModelFromJson(Map<String, dynamic> json) => _TenantModel(
-  id: (json['id'] as num?)?.toInt(),
-  houseCode: json['houseCode'] as String?,
-  houseName: json['houseName'] as String?,
-  tenantName: json['tenantName'] as String?,
-  tenantPhone: json['tenantPhone'] as String?,
-  category: json['category'] as String?,
-  estate: json['estate'] as String?,
-  property: json['property'] as String?,
-  houseType: json['houseType'] as String?,
-  rentOwed: (json['rentOwed'] as num?)?.toDouble() ?? 0,
-  dueDate: json['dueDate'] as String?,
-  houseId: (json['houseId'] as num?)?.toInt(),
-  propertyId: (json['propertyId'] as num?)?.toInt(),
-  rent: (json['rent'] as num?)?.toDouble() ?? 0,
-  payDate: json['payDate'] as String?,
-  userId: json['userId'] as String?,
-  self: json['self'] as bool? ?? false,
+  id: json['id'] as String,
+  kind: json['kind'] as String?,
+  organisation: json['organisation'] as bool? ?? false,
+  displayName: json['displayName'] as String,
+  firstName: json['firstName'] as String?,
+  lastName: json['lastName'] as String?,
+  idNumber: json['idNumber'] as String?,
+  registeredName: json['registeredName'] as String?,
+  kraPin: json['kraPin'] as String?,
+  contactName: json['contactName'] as String?,
+  phone: json['phone'] as String?,
+  email: json['email'] as String?,
+  username: json['username'] as String?,
+  invited: json['invited'] as bool? ?? false,
+  estateId: json['estateId'] as String?,
+  occupying:
+      (json['occupying'] as List<dynamic>?)
+          ?.map((e) => OccupiedUnitModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <OccupiedUnitModel>[],
+  status: (json['status'] as num?)?.toInt() ?? 0,
+  createdOn: json['createdOn'] as String?,
 );
 
 Map<String, dynamic> _$TenantModelToJson(_TenantModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'houseCode': instance.houseCode,
-      'houseName': instance.houseName,
-      'tenantName': instance.tenantName,
-      'tenantPhone': instance.tenantPhone,
-      'category': instance.category,
-      'estate': instance.estate,
-      'property': instance.property,
-      'houseType': instance.houseType,
-      'rentOwed': instance.rentOwed,
-      'dueDate': instance.dueDate,
+      'kind': instance.kind,
+      'organisation': instance.organisation,
+      'displayName': instance.displayName,
+      'firstName': instance.firstName,
+      'lastName': instance.lastName,
+      'idNumber': instance.idNumber,
+      'registeredName': instance.registeredName,
+      'kraPin': instance.kraPin,
+      'contactName': instance.contactName,
+      'phone': instance.phone,
+      'email': instance.email,
+      'username': instance.username,
+      'invited': instance.invited,
+      'estateId': instance.estateId,
+      'occupying': instance.occupying,
+      'status': instance.status,
+      'createdOn': instance.createdOn,
+    };
+
+_OccupiedUnitModel _$OccupiedUnitModelFromJson(Map<String, dynamic> json) =>
+    _OccupiedUnitModel(
+      houseId: json['houseId'] as String,
+      houseCode: json['houseCode'] as String,
+      label: json['label'] as String,
+    );
+
+Map<String, dynamic> _$OccupiedUnitModelToJson(_OccupiedUnitModel instance) =>
+    <String, dynamic>{
       'houseId': instance.houseId,
-      'propertyId': instance.propertyId,
-      'rent': instance.rent,
-      'payDate': instance.payDate,
-      'userId': instance.userId,
-      'self': instance.self,
+      'houseCode': instance.houseCode,
+      'label': instance.label,
     };

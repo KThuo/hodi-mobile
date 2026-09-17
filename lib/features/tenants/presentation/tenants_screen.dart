@@ -121,11 +121,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
         final tenant = state.tenants[index];
         return TenantListItem(
           tenant: tenant,
-          onTap: () {
-            if (tenant.userId != null) {
-              context.push('/more/tenants/${tenant.userId}/details');
-            }
-          },
+          onTap: () => context.push('/more/tenants/${tenant.id}/details'),
         );
       },
     );

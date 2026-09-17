@@ -15,7 +15,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TenantDetailModel {
 
- String? get name; String? get email; String? get phone; TenantFinancialSummary? get content;
+ TenantModel get tenant;/// Live tenancies. More than one is normal.
+ List<OccupationModel> get current;/// Where they have lived before, most recent first.
+ List<TenancyHistoryModel> get history;/// Sections whose data belongs to a module that does not exist yet. Named rather than sent as
+/// zeroes, because a zero in a money field reads as "nothing owed".
+ List<String> get pending;
 /// Create a copy of TenantDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +32,16 @@ $TenantDetailModelCopyWith<TenantDetailModel> get copyWith => _$TenantDetailMode
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenantDetailModel&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.content, content) || other.content == content));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenantDetailModel&&(identical(other.tenant, tenant) || other.tenant == tenant)&&const DeepCollectionEquality().equals(other.current, current)&&const DeepCollectionEquality().equals(other.history, history)&&const DeepCollectionEquality().equals(other.pending, pending));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,email,phone,content);
+int get hashCode => Object.hash(runtimeType,tenant,const DeepCollectionEquality().hash(current),const DeepCollectionEquality().hash(history),const DeepCollectionEquality().hash(pending));
 
 @override
 String toString() {
-  return 'TenantDetailModel(name: $name, email: $email, phone: $phone, content: $content)';
+  return 'TenantDetailModel(tenant: $tenant, current: $current, history: $history, pending: $pending)';
 }
 
 
@@ -48,11 +52,11 @@ abstract mixin class $TenantDetailModelCopyWith<$Res>  {
   factory $TenantDetailModelCopyWith(TenantDetailModel value, $Res Function(TenantDetailModel) _then) = _$TenantDetailModelCopyWithImpl;
 @useResult
 $Res call({
- String? name, String? email, String? phone, TenantFinancialSummary? content
+ TenantModel tenant, List<OccupationModel> current, List<TenancyHistoryModel> history, List<String> pending
 });
 
 
-$TenantFinancialSummaryCopyWith<$Res>? get content;
+$TenantModelCopyWith<$Res> get tenant;
 
 }
 /// @nodoc
@@ -65,26 +69,23 @@ class _$TenantDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of TenantDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = freezed,Object? email = freezed,Object? phone = freezed,Object? content = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? tenant = null,Object? current = null,Object? history = null,Object? pending = null,}) {
   return _then(_self.copyWith(
-name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
-as TenantFinancialSummary?,
+tenant: null == tenant ? _self.tenant : tenant // ignore: cast_nullable_to_non_nullable
+as TenantModel,current: null == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
+as List<OccupationModel>,history: null == history ? _self.history : history // ignore: cast_nullable_to_non_nullable
+as List<TenancyHistoryModel>,pending: null == pending ? _self.pending : pending // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 /// Create a copy of TenantDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$TenantFinancialSummaryCopyWith<$Res>? get content {
-    if (_self.content == null) {
-    return null;
-  }
-
-  return $TenantFinancialSummaryCopyWith<$Res>(_self.content!, (value) {
-    return _then(_self.copyWith(content: value));
+$TenantModelCopyWith<$Res> get tenant {
+  
+  return $TenantModelCopyWith<$Res>(_self.tenant, (value) {
+    return _then(_self.copyWith(tenant: value));
   });
 }
 }
@@ -168,10 +169,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? name,  String? email,  String? phone,  TenantFinancialSummary? content)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TenantModel tenant,  List<OccupationModel> current,  List<TenancyHistoryModel> history,  List<String> pending)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TenantDetailModel() when $default != null:
-return $default(_that.name,_that.email,_that.phone,_that.content);case _:
+return $default(_that.tenant,_that.current,_that.history,_that.pending);case _:
   return orElse();
 
 }
@@ -189,10 +190,10 @@ return $default(_that.name,_that.email,_that.phone,_that.content);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? name,  String? email,  String? phone,  TenantFinancialSummary? content)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TenantModel tenant,  List<OccupationModel> current,  List<TenancyHistoryModel> history,  List<String> pending)  $default,) {final _that = this;
 switch (_that) {
 case _TenantDetailModel():
-return $default(_that.name,_that.email,_that.phone,_that.content);case _:
+return $default(_that.tenant,_that.current,_that.history,_that.pending);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +210,10 @@ return $default(_that.name,_that.email,_that.phone,_that.content);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? name,  String? email,  String? phone,  TenantFinancialSummary? content)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TenantModel tenant,  List<OccupationModel> current,  List<TenancyHistoryModel> history,  List<String> pending)?  $default,) {final _that = this;
 switch (_that) {
 case _TenantDetailModel() when $default != null:
-return $default(_that.name,_that.email,_that.phone,_that.content);case _:
+return $default(_that.tenant,_that.current,_that.history,_that.pending);case _:
   return null;
 
 }
@@ -224,13 +225,39 @@ return $default(_that.name,_that.email,_that.phone,_that.content);case _:
 @JsonSerializable()
 
 class _TenantDetailModel extends TenantDetailModel {
-  const _TenantDetailModel({this.name, this.email, this.phone, this.content}): super._();
+  const _TenantDetailModel({required this.tenant, final  List<OccupationModel> current = const <OccupationModel>[], final  List<TenancyHistoryModel> history = const <TenancyHistoryModel>[], final  List<String> pending = const <String>[]}): _current = current,_history = history,_pending = pending,super._();
   factory _TenantDetailModel.fromJson(Map<String, dynamic> json) => _$TenantDetailModelFromJson(json);
 
-@override final  String? name;
-@override final  String? email;
-@override final  String? phone;
-@override final  TenantFinancialSummary? content;
+@override final  TenantModel tenant;
+/// Live tenancies. More than one is normal.
+ final  List<OccupationModel> _current;
+/// Live tenancies. More than one is normal.
+@override@JsonKey() List<OccupationModel> get current {
+  if (_current is EqualUnmodifiableListView) return _current;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_current);
+}
+
+/// Where they have lived before, most recent first.
+ final  List<TenancyHistoryModel> _history;
+/// Where they have lived before, most recent first.
+@override@JsonKey() List<TenancyHistoryModel> get history {
+  if (_history is EqualUnmodifiableListView) return _history;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_history);
+}
+
+/// Sections whose data belongs to a module that does not exist yet. Named rather than sent as
+/// zeroes, because a zero in a money field reads as "nothing owed".
+ final  List<String> _pending;
+/// Sections whose data belongs to a module that does not exist yet. Named rather than sent as
+/// zeroes, because a zero in a money field reads as "nothing owed".
+@override@JsonKey() List<String> get pending {
+  if (_pending is EqualUnmodifiableListView) return _pending;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_pending);
+}
+
 
 /// Create a copy of TenantDetailModel
 /// with the given fields replaced by the non-null parameter values.
@@ -245,16 +272,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenantDetailModel&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.content, content) || other.content == content));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenantDetailModel&&(identical(other.tenant, tenant) || other.tenant == tenant)&&const DeepCollectionEquality().equals(other._current, _current)&&const DeepCollectionEquality().equals(other._history, _history)&&const DeepCollectionEquality().equals(other._pending, _pending));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,email,phone,content);
+int get hashCode => Object.hash(runtimeType,tenant,const DeepCollectionEquality().hash(_current),const DeepCollectionEquality().hash(_history),const DeepCollectionEquality().hash(_pending));
 
 @override
 String toString() {
-  return 'TenantDetailModel(name: $name, email: $email, phone: $phone, content: $content)';
+  return 'TenantDetailModel(tenant: $tenant, current: $current, history: $history, pending: $pending)';
 }
 
 
@@ -265,11 +292,11 @@ abstract mixin class _$TenantDetailModelCopyWith<$Res> implements $TenantDetailM
   factory _$TenantDetailModelCopyWith(_TenantDetailModel value, $Res Function(_TenantDetailModel) _then) = __$TenantDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? name, String? email, String? phone, TenantFinancialSummary? content
+ TenantModel tenant, List<OccupationModel> current, List<TenancyHistoryModel> history, List<String> pending
 });
 
 
-@override $TenantFinancialSummaryCopyWith<$Res>? get content;
+@override $TenantModelCopyWith<$Res> get tenant;
 
 }
 /// @nodoc
@@ -282,13 +309,13 @@ class __$TenantDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of TenantDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = freezed,Object? email = freezed,Object? phone = freezed,Object? content = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tenant = null,Object? current = null,Object? history = null,Object? pending = null,}) {
   return _then(_TenantDetailModel(
-name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
-as TenantFinancialSummary?,
+tenant: null == tenant ? _self.tenant : tenant // ignore: cast_nullable_to_non_nullable
+as TenantModel,current: null == current ? _self._current : current // ignore: cast_nullable_to_non_nullable
+as List<OccupationModel>,history: null == history ? _self._history : history // ignore: cast_nullable_to_non_nullable
+as List<TenancyHistoryModel>,pending: null == pending ? _self._pending : pending // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
@@ -296,55 +323,53 @@ as TenantFinancialSummary?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$TenantFinancialSummaryCopyWith<$Res>? get content {
-    if (_self.content == null) {
-    return null;
-  }
-
-  return $TenantFinancialSummaryCopyWith<$Res>(_self.content!, (value) {
-    return _then(_self.copyWith(content: value));
+$TenantModelCopyWith<$Res> get tenant {
+  
+  return $TenantModelCopyWith<$Res>(_self.tenant, (value) {
+    return _then(_self.copyWith(tenant: value));
   });
 }
 }
 
 
 /// @nodoc
-mixin _$TenantFinancialSummary {
+mixin _$TenancyHistoryModel {
 
-@JsonKey(fromJson: _parseDouble) double get totalRent;@JsonKey(fromJson: _parseDouble) double get totalPayment;@JsonKey(fromJson: _parseDouble) double get totalArrears; int get occupiedUnits;@JsonKey(fromJson: _parseDouble) double get totalTopups;@JsonKey(fromJson: _parseDouble) double get totalOverpayments;
-/// Create a copy of TenantFinancialSummary
+ String get id; String? get occupationId; String? get houseId; String get houseCode; String? get houseLabel; String? get propertyName; String? get tenure;@JsonKey(fromJson: parseDouble) double get rent;@JsonKey(fromJson: parseDouble) double get deposit;@JsonKey(fromJson: parseDouble) double get refundableDeposit; String? get occupiedOn; String? get vacatedOn;/// How long they were there, counted by the server.
+ int get nights; String? get reason; String? get notes;
+/// Create a copy of TenancyHistoryModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$TenantFinancialSummaryCopyWith<TenantFinancialSummary> get copyWith => _$TenantFinancialSummaryCopyWithImpl<TenantFinancialSummary>(this as TenantFinancialSummary, _$identity);
+$TenancyHistoryModelCopyWith<TenancyHistoryModel> get copyWith => _$TenancyHistoryModelCopyWithImpl<TenancyHistoryModel>(this as TenancyHistoryModel, _$identity);
 
-  /// Serializes this TenantFinancialSummary to a JSON map.
+  /// Serializes this TenancyHistoryModel to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenantFinancialSummary&&(identical(other.totalRent, totalRent) || other.totalRent == totalRent)&&(identical(other.totalPayment, totalPayment) || other.totalPayment == totalPayment)&&(identical(other.totalArrears, totalArrears) || other.totalArrears == totalArrears)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits)&&(identical(other.totalTopups, totalTopups) || other.totalTopups == totalTopups)&&(identical(other.totalOverpayments, totalOverpayments) || other.totalOverpayments == totalOverpayments));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenancyHistoryModel&&(identical(other.id, id) || other.id == id)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.deposit, deposit) || other.deposit == deposit)&&(identical(other.refundableDeposit, refundableDeposit) || other.refundableDeposit == refundableDeposit)&&(identical(other.occupiedOn, occupiedOn) || other.occupiedOn == occupiedOn)&&(identical(other.vacatedOn, vacatedOn) || other.vacatedOn == vacatedOn)&&(identical(other.nights, nights) || other.nights == nights)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalRent,totalPayment,totalArrears,occupiedUnits,totalTopups,totalOverpayments);
+int get hashCode => Object.hash(runtimeType,id,occupationId,houseId,houseCode,houseLabel,propertyName,tenure,rent,deposit,refundableDeposit,occupiedOn,vacatedOn,nights,reason,notes);
 
 @override
 String toString() {
-  return 'TenantFinancialSummary(totalRent: $totalRent, totalPayment: $totalPayment, totalArrears: $totalArrears, occupiedUnits: $occupiedUnits, totalTopups: $totalTopups, totalOverpayments: $totalOverpayments)';
+  return 'TenancyHistoryModel(id: $id, occupationId: $occupationId, houseId: $houseId, houseCode: $houseCode, houseLabel: $houseLabel, propertyName: $propertyName, tenure: $tenure, rent: $rent, deposit: $deposit, refundableDeposit: $refundableDeposit, occupiedOn: $occupiedOn, vacatedOn: $vacatedOn, nights: $nights, reason: $reason, notes: $notes)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $TenantFinancialSummaryCopyWith<$Res>  {
-  factory $TenantFinancialSummaryCopyWith(TenantFinancialSummary value, $Res Function(TenantFinancialSummary) _then) = _$TenantFinancialSummaryCopyWithImpl;
+abstract mixin class $TenancyHistoryModelCopyWith<$Res>  {
+  factory $TenancyHistoryModelCopyWith(TenancyHistoryModel value, $Res Function(TenancyHistoryModel) _then) = _$TenancyHistoryModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: _parseDouble) double totalRent,@JsonKey(fromJson: _parseDouble) double totalPayment,@JsonKey(fromJson: _parseDouble) double totalArrears, int occupiedUnits,@JsonKey(fromJson: _parseDouble) double totalTopups,@JsonKey(fromJson: _parseDouble) double totalOverpayments
+ String id, String? occupationId, String? houseId, String houseCode, String? houseLabel, String? propertyName, String? tenure,@JsonKey(fromJson: parseDouble) double rent,@JsonKey(fromJson: parseDouble) double deposit,@JsonKey(fromJson: parseDouble) double refundableDeposit, String? occupiedOn, String? vacatedOn, int nights, String? reason, String? notes
 });
 
 
@@ -352,32 +377,41 @@ $Res call({
 
 }
 /// @nodoc
-class _$TenantFinancialSummaryCopyWithImpl<$Res>
-    implements $TenantFinancialSummaryCopyWith<$Res> {
-  _$TenantFinancialSummaryCopyWithImpl(this._self, this._then);
+class _$TenancyHistoryModelCopyWithImpl<$Res>
+    implements $TenancyHistoryModelCopyWith<$Res> {
+  _$TenancyHistoryModelCopyWithImpl(this._self, this._then);
 
-  final TenantFinancialSummary _self;
-  final $Res Function(TenantFinancialSummary) _then;
+  final TenancyHistoryModel _self;
+  final $Res Function(TenancyHistoryModel) _then;
 
-/// Create a copy of TenantFinancialSummary
+/// Create a copy of TenancyHistoryModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? totalRent = null,Object? totalPayment = null,Object? totalArrears = null,Object? occupiedUnits = null,Object? totalTopups = null,Object? totalOverpayments = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? occupationId = freezed,Object? houseId = freezed,Object? houseCode = null,Object? houseLabel = freezed,Object? propertyName = freezed,Object? tenure = freezed,Object? rent = null,Object? deposit = null,Object? refundableDeposit = null,Object? occupiedOn = freezed,Object? vacatedOn = freezed,Object? nights = null,Object? reason = freezed,Object? notes = freezed,}) {
   return _then(_self.copyWith(
-totalRent: null == totalRent ? _self.totalRent : totalRent // ignore: cast_nullable_to_non_nullable
-as double,totalPayment: null == totalPayment ? _self.totalPayment : totalPayment // ignore: cast_nullable_to_non_nullable
-as double,totalArrears: null == totalArrears ? _self.totalArrears : totalArrears // ignore: cast_nullable_to_non_nullable
-as double,occupiedUnits: null == occupiedUnits ? _self.occupiedUnits : occupiedUnits // ignore: cast_nullable_to_non_nullable
-as int,totalTopups: null == totalTopups ? _self.totalTopups : totalTopups // ignore: cast_nullable_to_non_nullable
-as double,totalOverpayments: null == totalOverpayments ? _self.totalOverpayments : totalOverpayments // ignore: cast_nullable_to_non_nullable
-as double,
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,occupationId: freezed == occupationId ? _self.occupationId : occupationId // ignore: cast_nullable_to_non_nullable
+as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,tenure: freezed == tenure ? _self.tenure : tenure // ignore: cast_nullable_to_non_nullable
+as String?,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double,deposit: null == deposit ? _self.deposit : deposit // ignore: cast_nullable_to_non_nullable
+as double,refundableDeposit: null == refundableDeposit ? _self.refundableDeposit : refundableDeposit // ignore: cast_nullable_to_non_nullable
+as double,occupiedOn: freezed == occupiedOn ? _self.occupiedOn : occupiedOn // ignore: cast_nullable_to_non_nullable
+as String?,vacatedOn: freezed == vacatedOn ? _self.vacatedOn : vacatedOn // ignore: cast_nullable_to_non_nullable
+as String?,nights: null == nights ? _self.nights : nights // ignore: cast_nullable_to_non_nullable
+as int,reason: freezed == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [TenantFinancialSummary].
-extension TenantFinancialSummaryPatterns on TenantFinancialSummary {
+/// Adds pattern-matching-related methods to [TenancyHistoryModel].
+extension TenancyHistoryModelPatterns on TenancyHistoryModel {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -390,10 +424,10 @@ extension TenantFinancialSummaryPatterns on TenantFinancialSummary {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _TenantFinancialSummary value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _TenancyHistoryModel value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _TenantFinancialSummary() when $default != null:
+case _TenancyHistoryModel() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -412,10 +446,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _TenantFinancialSummary value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _TenancyHistoryModel value)  $default,){
 final _that = this;
 switch (_that) {
-case _TenantFinancialSummary():
+case _TenancyHistoryModel():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -433,10 +467,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _TenantFinancialSummary value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _TenancyHistoryModel value)?  $default,){
 final _that = this;
 switch (_that) {
-case _TenantFinancialSummary() when $default != null:
+case _TenancyHistoryModel() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -454,10 +488,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _parseDouble)  double totalRent, @JsonKey(fromJson: _parseDouble)  double totalPayment, @JsonKey(fromJson: _parseDouble)  double totalArrears,  int occupiedUnits, @JsonKey(fromJson: _parseDouble)  double totalTopups, @JsonKey(fromJson: _parseDouble)  double totalOverpayments)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? occupationId,  String? houseId,  String houseCode,  String? houseLabel,  String? propertyName,  String? tenure, @JsonKey(fromJson: parseDouble)  double rent, @JsonKey(fromJson: parseDouble)  double deposit, @JsonKey(fromJson: parseDouble)  double refundableDeposit,  String? occupiedOn,  String? vacatedOn,  int nights,  String? reason,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _TenantFinancialSummary() when $default != null:
-return $default(_that.totalRent,_that.totalPayment,_that.totalArrears,_that.occupiedUnits,_that.totalTopups,_that.totalOverpayments);case _:
+case _TenancyHistoryModel() when $default != null:
+return $default(_that.id,_that.occupationId,_that.houseId,_that.houseCode,_that.houseLabel,_that.propertyName,_that.tenure,_that.rent,_that.deposit,_that.refundableDeposit,_that.occupiedOn,_that.vacatedOn,_that.nights,_that.reason,_that.notes);case _:
   return orElse();
 
 }
@@ -475,10 +509,10 @@ return $default(_that.totalRent,_that.totalPayment,_that.totalArrears,_that.occu
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _parseDouble)  double totalRent, @JsonKey(fromJson: _parseDouble)  double totalPayment, @JsonKey(fromJson: _parseDouble)  double totalArrears,  int occupiedUnits, @JsonKey(fromJson: _parseDouble)  double totalTopups, @JsonKey(fromJson: _parseDouble)  double totalOverpayments)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? occupationId,  String? houseId,  String houseCode,  String? houseLabel,  String? propertyName,  String? tenure, @JsonKey(fromJson: parseDouble)  double rent, @JsonKey(fromJson: parseDouble)  double deposit, @JsonKey(fromJson: parseDouble)  double refundableDeposit,  String? occupiedOn,  String? vacatedOn,  int nights,  String? reason,  String? notes)  $default,) {final _that = this;
 switch (_that) {
-case _TenantFinancialSummary():
-return $default(_that.totalRent,_that.totalPayment,_that.totalArrears,_that.occupiedUnits,_that.totalTopups,_that.totalOverpayments);case _:
+case _TenancyHistoryModel():
+return $default(_that.id,_that.occupationId,_that.houseId,_that.houseCode,_that.houseLabel,_that.propertyName,_that.tenure,_that.rent,_that.deposit,_that.refundableDeposit,_that.occupiedOn,_that.vacatedOn,_that.nights,_that.reason,_that.notes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -495,10 +529,10 @@ return $default(_that.totalRent,_that.totalPayment,_that.totalArrears,_that.occu
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: _parseDouble)  double totalRent, @JsonKey(fromJson: _parseDouble)  double totalPayment, @JsonKey(fromJson: _parseDouble)  double totalArrears,  int occupiedUnits, @JsonKey(fromJson: _parseDouble)  double totalTopups, @JsonKey(fromJson: _parseDouble)  double totalOverpayments)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? occupationId,  String? houseId,  String houseCode,  String? houseLabel,  String? propertyName,  String? tenure, @JsonKey(fromJson: parseDouble)  double rent, @JsonKey(fromJson: parseDouble)  double deposit, @JsonKey(fromJson: parseDouble)  double refundableDeposit,  String? occupiedOn,  String? vacatedOn,  int nights,  String? reason,  String? notes)?  $default,) {final _that = this;
 switch (_that) {
-case _TenantFinancialSummary() when $default != null:
-return $default(_that.totalRent,_that.totalPayment,_that.totalArrears,_that.occupiedUnits,_that.totalTopups,_that.totalOverpayments);case _:
+case _TenancyHistoryModel() when $default != null:
+return $default(_that.id,_that.occupationId,_that.houseId,_that.houseCode,_that.houseLabel,_that.propertyName,_that.tenure,_that.rent,_that.deposit,_that.refundableDeposit,_that.occupiedOn,_that.vacatedOn,_that.nights,_that.reason,_that.notes);case _:
   return null;
 
 }
@@ -509,51 +543,61 @@ return $default(_that.totalRent,_that.totalPayment,_that.totalArrears,_that.occu
 /// @nodoc
 @JsonSerializable()
 
-class _TenantFinancialSummary extends TenantFinancialSummary {
-  const _TenantFinancialSummary({@JsonKey(fromJson: _parseDouble) this.totalRent = 0, @JsonKey(fromJson: _parseDouble) this.totalPayment = 0, @JsonKey(fromJson: _parseDouble) this.totalArrears = 0, this.occupiedUnits = 0, @JsonKey(fromJson: _parseDouble) this.totalTopups = 0, @JsonKey(fromJson: _parseDouble) this.totalOverpayments = 0}): super._();
-  factory _TenantFinancialSummary.fromJson(Map<String, dynamic> json) => _$TenantFinancialSummaryFromJson(json);
+class _TenancyHistoryModel extends TenancyHistoryModel {
+  const _TenancyHistoryModel({required this.id, this.occupationId, this.houseId, required this.houseCode, this.houseLabel, this.propertyName, this.tenure, @JsonKey(fromJson: parseDouble) this.rent = 0, @JsonKey(fromJson: parseDouble) this.deposit = 0, @JsonKey(fromJson: parseDouble) this.refundableDeposit = 0, this.occupiedOn, this.vacatedOn, this.nights = 0, this.reason, this.notes}): super._();
+  factory _TenancyHistoryModel.fromJson(Map<String, dynamic> json) => _$TenancyHistoryModelFromJson(json);
 
-@override@JsonKey(fromJson: _parseDouble) final  double totalRent;
-@override@JsonKey(fromJson: _parseDouble) final  double totalPayment;
-@override@JsonKey(fromJson: _parseDouble) final  double totalArrears;
-@override@JsonKey() final  int occupiedUnits;
-@override@JsonKey(fromJson: _parseDouble) final  double totalTopups;
-@override@JsonKey(fromJson: _parseDouble) final  double totalOverpayments;
+@override final  String id;
+@override final  String? occupationId;
+@override final  String? houseId;
+@override final  String houseCode;
+@override final  String? houseLabel;
+@override final  String? propertyName;
+@override final  String? tenure;
+@override@JsonKey(fromJson: parseDouble) final  double rent;
+@override@JsonKey(fromJson: parseDouble) final  double deposit;
+@override@JsonKey(fromJson: parseDouble) final  double refundableDeposit;
+@override final  String? occupiedOn;
+@override final  String? vacatedOn;
+/// How long they were there, counted by the server.
+@override@JsonKey() final  int nights;
+@override final  String? reason;
+@override final  String? notes;
 
-/// Create a copy of TenantFinancialSummary
+/// Create a copy of TenancyHistoryModel
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$TenantFinancialSummaryCopyWith<_TenantFinancialSummary> get copyWith => __$TenantFinancialSummaryCopyWithImpl<_TenantFinancialSummary>(this, _$identity);
+_$TenancyHistoryModelCopyWith<_TenancyHistoryModel> get copyWith => __$TenancyHistoryModelCopyWithImpl<_TenancyHistoryModel>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$TenantFinancialSummaryToJson(this, );
+  return _$TenancyHistoryModelToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenantFinancialSummary&&(identical(other.totalRent, totalRent) || other.totalRent == totalRent)&&(identical(other.totalPayment, totalPayment) || other.totalPayment == totalPayment)&&(identical(other.totalArrears, totalArrears) || other.totalArrears == totalArrears)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits)&&(identical(other.totalTopups, totalTopups) || other.totalTopups == totalTopups)&&(identical(other.totalOverpayments, totalOverpayments) || other.totalOverpayments == totalOverpayments));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenancyHistoryModel&&(identical(other.id, id) || other.id == id)&&(identical(other.occupationId, occupationId) || other.occupationId == occupationId)&&(identical(other.houseId, houseId) || other.houseId == houseId)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseLabel, houseLabel) || other.houseLabel == houseLabel)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.deposit, deposit) || other.deposit == deposit)&&(identical(other.refundableDeposit, refundableDeposit) || other.refundableDeposit == refundableDeposit)&&(identical(other.occupiedOn, occupiedOn) || other.occupiedOn == occupiedOn)&&(identical(other.vacatedOn, vacatedOn) || other.vacatedOn == vacatedOn)&&(identical(other.nights, nights) || other.nights == nights)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalRent,totalPayment,totalArrears,occupiedUnits,totalTopups,totalOverpayments);
+int get hashCode => Object.hash(runtimeType,id,occupationId,houseId,houseCode,houseLabel,propertyName,tenure,rent,deposit,refundableDeposit,occupiedOn,vacatedOn,nights,reason,notes);
 
 @override
 String toString() {
-  return 'TenantFinancialSummary(totalRent: $totalRent, totalPayment: $totalPayment, totalArrears: $totalArrears, occupiedUnits: $occupiedUnits, totalTopups: $totalTopups, totalOverpayments: $totalOverpayments)';
+  return 'TenancyHistoryModel(id: $id, occupationId: $occupationId, houseId: $houseId, houseCode: $houseCode, houseLabel: $houseLabel, propertyName: $propertyName, tenure: $tenure, rent: $rent, deposit: $deposit, refundableDeposit: $refundableDeposit, occupiedOn: $occupiedOn, vacatedOn: $vacatedOn, nights: $nights, reason: $reason, notes: $notes)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$TenantFinancialSummaryCopyWith<$Res> implements $TenantFinancialSummaryCopyWith<$Res> {
-  factory _$TenantFinancialSummaryCopyWith(_TenantFinancialSummary value, $Res Function(_TenantFinancialSummary) _then) = __$TenantFinancialSummaryCopyWithImpl;
+abstract mixin class _$TenancyHistoryModelCopyWith<$Res> implements $TenancyHistoryModelCopyWith<$Res> {
+  factory _$TenancyHistoryModelCopyWith(_TenancyHistoryModel value, $Res Function(_TenancyHistoryModel) _then) = __$TenancyHistoryModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: _parseDouble) double totalRent,@JsonKey(fromJson: _parseDouble) double totalPayment,@JsonKey(fromJson: _parseDouble) double totalArrears, int occupiedUnits,@JsonKey(fromJson: _parseDouble) double totalTopups,@JsonKey(fromJson: _parseDouble) double totalOverpayments
+ String id, String? occupationId, String? houseId, String houseCode, String? houseLabel, String? propertyName, String? tenure,@JsonKey(fromJson: parseDouble) double rent,@JsonKey(fromJson: parseDouble) double deposit,@JsonKey(fromJson: parseDouble) double refundableDeposit, String? occupiedOn, String? vacatedOn, int nights, String? reason, String? notes
 });
 
 
@@ -561,24 +605,33 @@ $Res call({
 
 }
 /// @nodoc
-class __$TenantFinancialSummaryCopyWithImpl<$Res>
-    implements _$TenantFinancialSummaryCopyWith<$Res> {
-  __$TenantFinancialSummaryCopyWithImpl(this._self, this._then);
+class __$TenancyHistoryModelCopyWithImpl<$Res>
+    implements _$TenancyHistoryModelCopyWith<$Res> {
+  __$TenancyHistoryModelCopyWithImpl(this._self, this._then);
 
-  final _TenantFinancialSummary _self;
-  final $Res Function(_TenantFinancialSummary) _then;
+  final _TenancyHistoryModel _self;
+  final $Res Function(_TenancyHistoryModel) _then;
 
-/// Create a copy of TenantFinancialSummary
+/// Create a copy of TenancyHistoryModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? totalRent = null,Object? totalPayment = null,Object? totalArrears = null,Object? occupiedUnits = null,Object? totalTopups = null,Object? totalOverpayments = null,}) {
-  return _then(_TenantFinancialSummary(
-totalRent: null == totalRent ? _self.totalRent : totalRent // ignore: cast_nullable_to_non_nullable
-as double,totalPayment: null == totalPayment ? _self.totalPayment : totalPayment // ignore: cast_nullable_to_non_nullable
-as double,totalArrears: null == totalArrears ? _self.totalArrears : totalArrears // ignore: cast_nullable_to_non_nullable
-as double,occupiedUnits: null == occupiedUnits ? _self.occupiedUnits : occupiedUnits // ignore: cast_nullable_to_non_nullable
-as int,totalTopups: null == totalTopups ? _self.totalTopups : totalTopups // ignore: cast_nullable_to_non_nullable
-as double,totalOverpayments: null == totalOverpayments ? _self.totalOverpayments : totalOverpayments // ignore: cast_nullable_to_non_nullable
-as double,
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? occupationId = freezed,Object? houseId = freezed,Object? houseCode = null,Object? houseLabel = freezed,Object? propertyName = freezed,Object? tenure = freezed,Object? rent = null,Object? deposit = null,Object? refundableDeposit = null,Object? occupiedOn = freezed,Object? vacatedOn = freezed,Object? nights = null,Object? reason = freezed,Object? notes = freezed,}) {
+  return _then(_TenancyHistoryModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,occupationId: freezed == occupationId ? _self.occupationId : occupationId // ignore: cast_nullable_to_non_nullable
+as String?,houseId: freezed == houseId ? _self.houseId : houseId // ignore: cast_nullable_to_non_nullable
+as String?,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String,houseLabel: freezed == houseLabel ? _self.houseLabel : houseLabel // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,tenure: freezed == tenure ? _self.tenure : tenure // ignore: cast_nullable_to_non_nullable
+as String?,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double,deposit: null == deposit ? _self.deposit : deposit // ignore: cast_nullable_to_non_nullable
+as double,refundableDeposit: null == refundableDeposit ? _self.refundableDeposit : refundableDeposit // ignore: cast_nullable_to_non_nullable
+as double,occupiedOn: freezed == occupiedOn ? _self.occupiedOn : occupiedOn // ignore: cast_nullable_to_non_nullable
+as String?,vacatedOn: freezed == vacatedOn ? _self.vacatedOn : vacatedOn // ignore: cast_nullable_to_non_nullable
+as String?,nights: null == nights ? _self.nights : nights // ignore: cast_nullable_to_non_nullable
+as int,reason: freezed == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
