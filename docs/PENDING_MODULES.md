@@ -207,8 +207,18 @@ asked more firmly. Worth doing before a submission and not before.
 
 ## What is left
 
-1. **`GET /api/v1/occupations/{id}/meters` in `hodi-b`**, gated on `ROLE_TENANT_SELF`, and the
-   Meters tab that hangs off it. The plan prefers this over granting tenants `ROLE_METRE_VIEW`:
-   the authority opens an estate's entire meter list, the path opens one tenancy's.
-2. **An in-app PDF viewer** (§3).
-3. **Privacy policy and terms** (§5), before a store submission.
+1. **An in-app PDF viewer.** Invoices, receipts and lease agreements all download and open in the
+   handset's own reader. A phone with none shows an empty chooser.
+2. **The tenant Meters tab**, which needs `GET /api/v1/occupations/{id}/meters` in `hodi-b` gated
+   on `ROLE_TENANT_SELF`. Checked twice now: the web shows meters only on a **staff** unit page
+   behind `ROLE_METRE_VIEW`, so there is genuinely nothing to reuse.
+3. **Guest booking for stays.** `POST /bnb/bookings` needs `ROLE_BOOKING_NEW`, an operator
+   authority, and `hodi-f`'s stay page says the booking "is the next slice" and hands people to
+   WhatsApp meanwhile. The app matches the web: detail, a real quote, and contact.
+4. **112 packages held back by constraints.** The SDK is current; the dependency tree is not.
+
+## Done since this document was written
+
+Privacy policy and terms · the Flutter upgrade to 3.47.4 · stay detail with a live quote · contact
+actions on both listings and stays · notifications · maintenance · visitors · expenses · tenancy
+reports · agreements · penalties. Plus the migration and bug work the commits describe.
