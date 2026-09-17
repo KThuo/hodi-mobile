@@ -26,28 +26,31 @@ class AuthInterceptor extends QueuedInterceptor {
     ));
   }
 
+  /*
+   * Everything here is wrapped, and `handler.next` is reached on every path.
+   *
+   * This is a QueuedInterceptor: Dio runs one request's `onRequest` at a time and advances the
+   * queue only when the handler is called. `onRequest` returns void, so an exception thrown in
+   * here is an unhandled async error that Dio never sees — the handler is never called, the queue
+   * never advances, and **every subsequent request hangs forever**. No timeout fires either,
+   * because the request was never sent. The screen sits on its loading state for good.
+   *
+   * That is not hypothetical: every await below touches the platform keystore, and
+   * flutter_secure_storage throws on Android when the keystore has been invalidated — an OS
+   * upgrade, or app data restored from a backup. One such throw, at any point in a session, and
+   * the app stops talking to the server until it is killed.
+   *
+   * So the headers are best-effort. A request that goes out without an Authorization header comes
+   * back 401 and is handled; a request that never goes out is a screen nobody can leave.
+   */
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    final token = await _storage.getAccessToken();
-    final expiry = await _storage.getTokenExpiry();
-
-    if (token != null && expiry != null) {
-      final expiryTime = DateTime.fromMillisecondsSinceEpoch(expiry);
-      final now = DateTime.now();
-      final secondsUntilExpiry = expiryTime.difference(now).inSeconds;
-
-      if (secondsUntilExpiry > _refreshBufferSeconds) {
-        // Token still has plenty of time — use as-is.
-        options.headers['Authorization'] = 'Bearer $token';
-      } else if (secondsUntilExpiry > 0) {
-        // Token is about to expire — proactively refresh.
-        final refreshed = await _tryRefreshToken(token);
-        options.headers['Authorization'] = 'Bearer $refreshed';
-      } else {
-        // Token already expired — attach anyway, 003 fallback will handle it.
-        options.headers['Authorization'] = 'Bearer $token';
-      }
+    try {
+      await _attachAuthorization(options);
+    } catch (e) {
+      developer.log('Could not read the stored session: $e',
+          name: 'AuthInterceptor', level: 900);
     }
 
     options.headers[ApiConstants.clientHeader] = ApiConstants.clientMobile;
@@ -60,12 +63,38 @@ class AuthInterceptor extends QueuedInterceptor {
      * which phone it came from would be told there is no PIN here, and the keypad would quietly
      * stop appearing.
      *
-     * Not a credential, and the server does not treat it as one — what makes a PIN row trustworthy
-     * is that the account password created it.
+     * Not a credential, and the server does not treat it as one — what makes a PIN row
+     * trustworthy is that the account password created it. Which is also why a request may go
+     * out without it: the worst case is being told this handset has no PIN.
      */
-    options.headers[ApiConstants.deviceHeader] = await _device.get();
+    try {
+      options.headers[ApiConstants.deviceHeader] = await _device.get();
+    } catch (e) {
+      developer.log('Could not read the device id: $e',
+          name: 'AuthInterceptor', level: 900);
+    }
 
     handler.next(options);
+  }
+
+  Future<void> _attachAuthorization(RequestOptions options) async {
+    final token = await _storage.getAccessToken();
+    final expiry = await _storage.getTokenExpiry();
+    if (token == null || expiry == null) return;
+
+    final expiryTime = DateTime.fromMillisecondsSinceEpoch(expiry);
+    final secondsUntilExpiry = expiryTime.difference(DateTime.now()).inSeconds;
+
+    if (secondsUntilExpiry > _refreshBufferSeconds) {
+      // Token still has plenty of time — use as-is.
+      options.headers['Authorization'] = 'Bearer $token';
+    } else if (secondsUntilExpiry > 0) {
+      // Token is about to expire — proactively refresh.
+      options.headers['Authorization'] = 'Bearer ${await _tryRefreshToken(token)}';
+    } else {
+      // Token already expired — attach anyway, the 003 fallback will handle it.
+      options.headers['Authorization'] = 'Bearer $token';
+    }
   }
 
   /// Exchanges the refresh token for a fresh pair.
