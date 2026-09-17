@@ -124,9 +124,10 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
     final response = method.isPrompt
         ? await repo.prompt(
             rrn: widget.invoice.rrn ?? '',
-            paymentTypeId: method.id ?? '',
+            accountId: method.id ?? '',
             amount: amount,
             phone: _formatPhone(_phoneController.text.trim()),
+            paidBy: _paidByController.text.trim(),
           )
         : await repo.receivePayment(payload: <String, dynamic>{
             // The tenancy the money belongs to. The invoice narrows it; the tenancy is what a

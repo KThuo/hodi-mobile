@@ -129,20 +129,32 @@ class InvoiceRepository {
 
   /// Sends an STK prompt to a payer's handset for this invoice.
   ///
-  /// The channel is checked server-side against what this invoice actually offers, so a prompt
-  /// cannot be aimed at another estate's account.
+  /// **Query parameters, not a JSON body, and the account is `accountId`.** The endpoint binds
+  /// `@RequestParam String accountId, BigDecimal amount, String phone` — this posted a body named
+  /// `paymentTypeId`, so Spring found none of the three required parameters and answered 400
+  /// before the controller ran. Every prompt failed, and the client's old blanket handling of a
+  /// non-2xx turned that into "Server error. Please try again later.", which is why it read as
+  /// the gateway being down rather than a request that was never valid.
+  ///
+  /// The channel is re-derived server-side against what this invoice actually offers, so a prompt
+  /// cannot be aimed at another estate's account whatever id is sent.
+  ///
+  /// The answer is the payment, not an acknowledgement: `paid` false comes back as an error
+  /// envelope carrying the gateway's own reason, which is now what the sheet shows.
   Future<ApiResponse<void>> prompt({
     required String rrn,
-    required String paymentTypeId,
+    required String accountId,
     required double amount,
     required String phone,
+    String? paidBy,
   }) async {
     return _apiClient.post<void>(
       '${ApiConstants.invoiceDetail}/$rrn/prompt',
-      data: {
-        'paymentTypeId': paymentTypeId,
+      queryParameters: {
+        'accountId': accountId,
         'amount': amount,
         'phone': phone,
+        if (paidBy != null && paidBy.trim().isNotEmpty) 'paidBy': paidBy.trim(),
       },
     );
   }

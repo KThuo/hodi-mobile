@@ -41,7 +41,12 @@ class InvoiceDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Header card with RRN
+                // ── The headline is what is owed ────────────────────────
+                //
+                // It was the invoice's face value, which is the wrong figure to shout: somebody
+                // opening a bill they have already part-paid was met with the original total and
+                // no sign of their money. The charge is still here, one line down, because the
+                // balance means nothing without it.
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -63,20 +68,48 @@ class InvoiceDetailScreen extends ConsumerWidget {
                         style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
                       ),
                       const SizedBox(height: 8),
-                      _InvoiceStatusBadge(status: detail.invoice.status, label: detail.invoice.statusLabel),
-                      const SizedBox(height: 8),
+                      _InvoiceStatusBadge(
+                        status: detail.invoice.status,
+                        label: detail.invoice.statusLabel,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        detail.isVoided
+                            ? 'Voided'
+                            : detail.balance > 0
+                                ? 'Balance due'
+                                : 'Settled in full',
+                        style: HodiTextStyles.bodySmall.copyWith(
+                          color: HodiColors.white.withValues(alpha: 0.8),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
                       HodiAmountText(
-                        amount: detail.invoice.amount,
+                        // A voided invoice owes nothing whatever its charges say.
+                        amount: detail.isVoided ? 0 : detail.balance,
                         style: HodiTextStyles.currencyLarge.copyWith(color: HodiColors.white),
                       ),
+                      if (detail.charged != detail.balance) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Invoiced KES ${CurrencyFormatter.format(detail.charged)}',
+                          style: HodiTextStyles.bodySmall.copyWith(
+                            color: HodiColors.white.withValues(alpha: 0.75),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 16),
 
-                // Line items card
-                if (detail.lines.isNotEmpty)
+                // ── The document: charges, then payments, then what is left ──
+                //
+                // Payments sit in the same table as the charges, which is how the web document
+                // and legacy both read it: the page is a subtraction, and splitting it into two
+                // cards makes the reader do the arithmetic across a gap.
+                if (detail.lines.isNotEmpty || detail.payments.isNotEmpty)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -91,36 +124,66 @@ class InvoiceDetailScreen extends ConsumerWidget {
                         Text('Line Items', style: HodiTextStyles.heading3),
                         const SizedBox(height: 12),
                         const Divider(height: 1),
-                        ...detail.lines.map((item) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  item.narration.isEmpty ? '-' : item.narration,
-                                  style: HodiTextStyles.bodyMedium.copyWith(color: HodiColors.textDark),
-                                ),
-                              ),
-                              Text(
-                                'KES ${CurrencyFormatter.format(item.amount)}',
-                                style: HodiTextStyles.currency.copyWith(fontSize: 14),
-                              ),
-                            ],
-                          ),
-                        )),
+                        ...detail.lines.map((item) => _DocRow(
+                              label: item.narration.isEmpty ? '-' : item.narration,
+                              amount: item.amount,
+                            )),
                         const Divider(height: 1),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
+                        _DocRow(
+                          label: 'Total charged',
+                          amount: detail.charged,
+                          bold: true,
+                        ),
+
+                        if (detail.payments.isNotEmpty) ...[
+                          const Divider(height: 1),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Payments received',
+                            style: HodiTextStyles.label.copyWith(
+                              color: HodiColors.textLight,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Negative, because that is what they do to the total above. Printed as
+                          // positive numbers under a "payments" heading, they read as more charge.
+                          ...detail.payments.map((p) => _DocRow(
+                                label: p.label,
+                                amount: -p.amount,
+                                tone: HodiColors.successEnd,
+                              )),
+                          const Divider(height: 1),
+                        ],
+
+                        // The after-figure, shaded, as the printed document has it.
+                        Container(
+                          margin: const EdgeInsets.only(top: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: detail.balance > 0 && !detail.isVoided
+                                ? HodiColors.dangerBg
+                                : HodiColors.successBg,
+                            borderRadius: HodiBorderRadius.small,
+                          ),
                           child: Row(
                             children: [
                               Text(
-                                'Total',
-                                style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+                                'BALANCE DUE',
+                                style: HodiTextStyles.labelBold.copyWith(
+                                  color: HodiColors.textDark,
+                                  fontSize: 12,
+                                ),
                               ),
                               const Spacer(),
                               HodiAmountText(
-                                amount: detail.invoice.amount,
-                                style: HodiTextStyles.currency.copyWith(fontWeight: FontWeight.w700),
+                                amount: detail.isVoided ? 0 : detail.balance,
+                                style: HodiTextStyles.currency.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: detail.balance > 0 && !detail.isVoided
+                                      ? HodiColors.errorStart
+                                      : HodiColors.successEnd,
+                                ),
                               ),
                             ],
                           ),
@@ -274,5 +337,50 @@ class _InvoiceStatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HodiStatusBadge(text: _label, type: _type);
+  }
+}
+
+
+/// One line of the document — a charge, or a payment taking away from it.
+class _DocRow extends StatelessWidget {
+  const _DocRow({
+    required this.label,
+    required this.amount,
+    this.bold = false,
+    this.tone,
+  });
+
+  final String label;
+  final double amount;
+  final bool bold;
+  final Color? tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final sign = amount < 0 ? '-' : '';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: HodiTextStyles.bodyMedium.copyWith(
+                color: tone ?? HodiColors.textDark,
+                fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+          ),
+          Text(
+            '${sign}KES ${CurrencyFormatter.format(amount.abs())}',
+            style: HodiTextStyles.currency.copyWith(
+              fontSize: 14,
+              color: tone,
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

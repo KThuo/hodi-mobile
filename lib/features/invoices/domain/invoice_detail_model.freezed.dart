@@ -15,7 +15,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$InvoiceDetailModel {
 
- InvoiceModel get invoice; List<InvoiceLineItem> get lines;/// Arrears carried into this invoice from earlier periods.
+ InvoiceModel get invoice; List<InvoiceLineItem> get lines;/// What has been paid against this invoice.
+///
+/// An invoice with a balance is a subtraction, and a document showing only the charges asks
+/// the reader to take the balance on trust. The public document carried these and the
+/// signed-in one did not, so the app could show what was owed and never what had been paid
+/// against it — which is the half somebody is actually checking when they open a bill they
+/// have already sent money for.
+ List<InvoicePaymentLine> get payments;/// Arrears carried into this invoice from earlier periods.
 ///
 /// Inside [InvoiceModel.amount] and outside the sum of [lines], which is why it is stated
 /// separately: a detail screen that added the lines and expected the total would be short by
@@ -36,16 +43,16 @@ $InvoiceDetailModelCopyWith<InvoiceDetailModel> get copyWith => _$InvoiceDetailM
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceDetailModel&&(identical(other.invoice, invoice) || other.invoice == invoice)&&const DeepCollectionEquality().equals(other.lines, lines)&&(identical(other.broughtForward, broughtForward) || other.broughtForward == broughtForward)&&(identical(other.totalPayable, totalPayable) || other.totalPayable == totalPayable)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.voidedBy, voidedBy) || other.voidedBy == voidedBy)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.footer, footer) || other.footer == footer));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoiceDetailModel&&(identical(other.invoice, invoice) || other.invoice == invoice)&&const DeepCollectionEquality().equals(other.lines, lines)&&const DeepCollectionEquality().equals(other.payments, payments)&&(identical(other.broughtForward, broughtForward) || other.broughtForward == broughtForward)&&(identical(other.totalPayable, totalPayable) || other.totalPayable == totalPayable)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.voidedBy, voidedBy) || other.voidedBy == voidedBy)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.footer, footer) || other.footer == footer));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,invoice,const DeepCollectionEquality().hash(lines),broughtForward,totalPayable,voidReason,voidedBy,voidedOn,paymentInstructions,footer);
+int get hashCode => Object.hash(runtimeType,invoice,const DeepCollectionEquality().hash(lines),const DeepCollectionEquality().hash(payments),broughtForward,totalPayable,voidReason,voidedBy,voidedOn,paymentInstructions,footer);
 
 @override
 String toString() {
-  return 'InvoiceDetailModel(invoice: $invoice, lines: $lines, broughtForward: $broughtForward, totalPayable: $totalPayable, voidReason: $voidReason, voidedBy: $voidedBy, voidedOn: $voidedOn, paymentInstructions: $paymentInstructions, footer: $footer)';
+  return 'InvoiceDetailModel(invoice: $invoice, lines: $lines, payments: $payments, broughtForward: $broughtForward, totalPayable: $totalPayable, voidReason: $voidReason, voidedBy: $voidedBy, voidedOn: $voidedOn, paymentInstructions: $paymentInstructions, footer: $footer)';
 }
 
 
@@ -56,7 +63,7 @@ abstract mixin class $InvoiceDetailModelCopyWith<$Res>  {
   factory $InvoiceDetailModelCopyWith(InvoiceDetailModel value, $Res Function(InvoiceDetailModel) _then) = _$InvoiceDetailModelCopyWithImpl;
 @useResult
 $Res call({
- InvoiceModel invoice, List<InvoiceLineItem> lines,@JsonKey(fromJson: parseDouble) double broughtForward,@JsonKey(fromJson: parseDouble) double totalPayable, String? voidReason, String? voidedBy, String? voidedOn, String? paymentInstructions, String? footer
+ InvoiceModel invoice, List<InvoiceLineItem> lines, List<InvoicePaymentLine> payments,@JsonKey(fromJson: parseDouble) double broughtForward,@JsonKey(fromJson: parseDouble) double totalPayable, String? voidReason, String? voidedBy, String? voidedOn, String? paymentInstructions, String? footer
 });
 
 
@@ -73,11 +80,12 @@ class _$InvoiceDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? invoice = null,Object? lines = null,Object? broughtForward = null,Object? totalPayable = null,Object? voidReason = freezed,Object? voidedBy = freezed,Object? voidedOn = freezed,Object? paymentInstructions = freezed,Object? footer = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? invoice = null,Object? lines = null,Object? payments = null,Object? broughtForward = null,Object? totalPayable = null,Object? voidReason = freezed,Object? voidedBy = freezed,Object? voidedOn = freezed,Object? paymentInstructions = freezed,Object? footer = freezed,}) {
   return _then(_self.copyWith(
 invoice: null == invoice ? _self.invoice : invoice // ignore: cast_nullable_to_non_nullable
 as InvoiceModel,lines: null == lines ? _self.lines : lines // ignore: cast_nullable_to_non_nullable
-as List<InvoiceLineItem>,broughtForward: null == broughtForward ? _self.broughtForward : broughtForward // ignore: cast_nullable_to_non_nullable
+as List<InvoiceLineItem>,payments: null == payments ? _self.payments : payments // ignore: cast_nullable_to_non_nullable
+as List<InvoicePaymentLine>,broughtForward: null == broughtForward ? _self.broughtForward : broughtForward // ignore: cast_nullable_to_non_nullable
 as double,totalPayable: null == totalPayable ? _self.totalPayable : totalPayable // ignore: cast_nullable_to_non_nullable
 as double,voidReason: freezed == voidReason ? _self.voidReason : voidReason // ignore: cast_nullable_to_non_nullable
 as String?,voidedBy: freezed == voidedBy ? _self.voidedBy : voidedBy // ignore: cast_nullable_to_non_nullable
@@ -178,10 +186,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( InvoiceModel invoice,  List<InvoiceLineItem> lines, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( InvoiceModel invoice,  List<InvoiceLineItem> lines,  List<InvoicePaymentLine> payments, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _InvoiceDetailModel() when $default != null:
-return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
+return $default(_that.invoice,_that.lines,_that.payments,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
   return orElse();
 
 }
@@ -199,10 +207,10 @@ return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayabl
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( InvoiceModel invoice,  List<InvoiceLineItem> lines, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( InvoiceModel invoice,  List<InvoiceLineItem> lines,  List<InvoicePaymentLine> payments, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceDetailModel():
-return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
+return $default(_that.invoice,_that.lines,_that.payments,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -219,10 +227,10 @@ return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayabl
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( InvoiceModel invoice,  List<InvoiceLineItem> lines, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( InvoiceModel invoice,  List<InvoiceLineItem> lines,  List<InvoicePaymentLine> payments, @JsonKey(fromJson: parseDouble)  double broughtForward, @JsonKey(fromJson: parseDouble)  double totalPayable,  String? voidReason,  String? voidedBy,  String? voidedOn,  String? paymentInstructions,  String? footer)?  $default,) {final _that = this;
 switch (_that) {
 case _InvoiceDetailModel() when $default != null:
-return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
+return $default(_that.invoice,_that.lines,_that.payments,_that.broughtForward,_that.totalPayable,_that.voidReason,_that.voidedBy,_that.voidedOn,_that.paymentInstructions,_that.footer);case _:
   return null;
 
 }
@@ -234,7 +242,7 @@ return $default(_that.invoice,_that.lines,_that.broughtForward,_that.totalPayabl
 @JsonSerializable()
 
 class _InvoiceDetailModel extends InvoiceDetailModel {
-  const _InvoiceDetailModel({required this.invoice, final  List<InvoiceLineItem> lines = const [], @JsonKey(fromJson: parseDouble) this.broughtForward = 0, @JsonKey(fromJson: parseDouble) this.totalPayable = 0, this.voidReason, this.voidedBy, this.voidedOn, this.paymentInstructions, this.footer}): _lines = lines,super._();
+  const _InvoiceDetailModel({required this.invoice, final  List<InvoiceLineItem> lines = const [], final  List<InvoicePaymentLine> payments = const [], @JsonKey(fromJson: parseDouble) this.broughtForward = 0, @JsonKey(fromJson: parseDouble) this.totalPayable = 0, this.voidReason, this.voidedBy, this.voidedOn, this.paymentInstructions, this.footer}): _lines = lines,_payments = payments,super._();
   factory _InvoiceDetailModel.fromJson(Map<String, dynamic> json) => _$InvoiceDetailModelFromJson(json);
 
 @override final  InvoiceModel invoice;
@@ -243,6 +251,27 @@ class _InvoiceDetailModel extends InvoiceDetailModel {
   if (_lines is EqualUnmodifiableListView) return _lines;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_lines);
+}
+
+/// What has been paid against this invoice.
+///
+/// An invoice with a balance is a subtraction, and a document showing only the charges asks
+/// the reader to take the balance on trust. The public document carried these and the
+/// signed-in one did not, so the app could show what was owed and never what had been paid
+/// against it — which is the half somebody is actually checking when they open a bill they
+/// have already sent money for.
+ final  List<InvoicePaymentLine> _payments;
+/// What has been paid against this invoice.
+///
+/// An invoice with a balance is a subtraction, and a document showing only the charges asks
+/// the reader to take the balance on trust. The public document carried these and the
+/// signed-in one did not, so the app could show what was owed and never what had been paid
+/// against it — which is the half somebody is actually checking when they open a bill they
+/// have already sent money for.
+@override@JsonKey() List<InvoicePaymentLine> get payments {
+  if (_payments is EqualUnmodifiableListView) return _payments;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_payments);
 }
 
 /// Arrears carried into this invoice from earlier periods.
@@ -274,16 +303,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceDetailModel&&(identical(other.invoice, invoice) || other.invoice == invoice)&&const DeepCollectionEquality().equals(other._lines, _lines)&&(identical(other.broughtForward, broughtForward) || other.broughtForward == broughtForward)&&(identical(other.totalPayable, totalPayable) || other.totalPayable == totalPayable)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.voidedBy, voidedBy) || other.voidedBy == voidedBy)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.footer, footer) || other.footer == footer));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoiceDetailModel&&(identical(other.invoice, invoice) || other.invoice == invoice)&&const DeepCollectionEquality().equals(other._lines, _lines)&&const DeepCollectionEquality().equals(other._payments, _payments)&&(identical(other.broughtForward, broughtForward) || other.broughtForward == broughtForward)&&(identical(other.totalPayable, totalPayable) || other.totalPayable == totalPayable)&&(identical(other.voidReason, voidReason) || other.voidReason == voidReason)&&(identical(other.voidedBy, voidedBy) || other.voidedBy == voidedBy)&&(identical(other.voidedOn, voidedOn) || other.voidedOn == voidedOn)&&(identical(other.paymentInstructions, paymentInstructions) || other.paymentInstructions == paymentInstructions)&&(identical(other.footer, footer) || other.footer == footer));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,invoice,const DeepCollectionEquality().hash(_lines),broughtForward,totalPayable,voidReason,voidedBy,voidedOn,paymentInstructions,footer);
+int get hashCode => Object.hash(runtimeType,invoice,const DeepCollectionEquality().hash(_lines),const DeepCollectionEquality().hash(_payments),broughtForward,totalPayable,voidReason,voidedBy,voidedOn,paymentInstructions,footer);
 
 @override
 String toString() {
-  return 'InvoiceDetailModel(invoice: $invoice, lines: $lines, broughtForward: $broughtForward, totalPayable: $totalPayable, voidReason: $voidReason, voidedBy: $voidedBy, voidedOn: $voidedOn, paymentInstructions: $paymentInstructions, footer: $footer)';
+  return 'InvoiceDetailModel(invoice: $invoice, lines: $lines, payments: $payments, broughtForward: $broughtForward, totalPayable: $totalPayable, voidReason: $voidReason, voidedBy: $voidedBy, voidedOn: $voidedOn, paymentInstructions: $paymentInstructions, footer: $footer)';
 }
 
 
@@ -294,7 +323,7 @@ abstract mixin class _$InvoiceDetailModelCopyWith<$Res> implements $InvoiceDetai
   factory _$InvoiceDetailModelCopyWith(_InvoiceDetailModel value, $Res Function(_InvoiceDetailModel) _then) = __$InvoiceDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- InvoiceModel invoice, List<InvoiceLineItem> lines,@JsonKey(fromJson: parseDouble) double broughtForward,@JsonKey(fromJson: parseDouble) double totalPayable, String? voidReason, String? voidedBy, String? voidedOn, String? paymentInstructions, String? footer
+ InvoiceModel invoice, List<InvoiceLineItem> lines, List<InvoicePaymentLine> payments,@JsonKey(fromJson: parseDouble) double broughtForward,@JsonKey(fromJson: parseDouble) double totalPayable, String? voidReason, String? voidedBy, String? voidedOn, String? paymentInstructions, String? footer
 });
 
 
@@ -311,11 +340,12 @@ class __$InvoiceDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of InvoiceDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? invoice = null,Object? lines = null,Object? broughtForward = null,Object? totalPayable = null,Object? voidReason = freezed,Object? voidedBy = freezed,Object? voidedOn = freezed,Object? paymentInstructions = freezed,Object? footer = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? invoice = null,Object? lines = null,Object? payments = null,Object? broughtForward = null,Object? totalPayable = null,Object? voidReason = freezed,Object? voidedBy = freezed,Object? voidedOn = freezed,Object? paymentInstructions = freezed,Object? footer = freezed,}) {
   return _then(_InvoiceDetailModel(
 invoice: null == invoice ? _self.invoice : invoice // ignore: cast_nullable_to_non_nullable
 as InvoiceModel,lines: null == lines ? _self._lines : lines // ignore: cast_nullable_to_non_nullable
-as List<InvoiceLineItem>,broughtForward: null == broughtForward ? _self.broughtForward : broughtForward // ignore: cast_nullable_to_non_nullable
+as List<InvoiceLineItem>,payments: null == payments ? _self._payments : payments // ignore: cast_nullable_to_non_nullable
+as List<InvoicePaymentLine>,broughtForward: null == broughtForward ? _self.broughtForward : broughtForward // ignore: cast_nullable_to_non_nullable
 as double,totalPayable: null == totalPayable ? _self.totalPayable : totalPayable // ignore: cast_nullable_to_non_nullable
 as double,voidReason: freezed == voidReason ? _self.voidReason : voidReason // ignore: cast_nullable_to_non_nullable
 as String?,voidedBy: freezed == voidedBy ? _self.voidedBy : voidedBy // ignore: cast_nullable_to_non_nullable
@@ -336,6 +366,272 @@ $InvoiceModelCopyWith<$Res> get invoice {
     return _then(_self.copyWith(invoice: value));
   });
 }
+}
+
+
+/// @nodoc
+mixin _$InvoicePaymentLine {
+
+ String? get narration;@JsonKey(fromJson: parseDouble) double get amount;
+/// Create a copy of InvoicePaymentLine
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$InvoicePaymentLineCopyWith<InvoicePaymentLine> get copyWith => _$InvoicePaymentLineCopyWithImpl<InvoicePaymentLine>(this as InvoicePaymentLine, _$identity);
+
+  /// Serializes this InvoicePaymentLine to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvoicePaymentLine&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.amount, amount) || other.amount == amount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,narration,amount);
+
+@override
+String toString() {
+  return 'InvoicePaymentLine(narration: $narration, amount: $amount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $InvoicePaymentLineCopyWith<$Res>  {
+  factory $InvoicePaymentLineCopyWith(InvoicePaymentLine value, $Res Function(InvoicePaymentLine) _then) = _$InvoicePaymentLineCopyWithImpl;
+@useResult
+$Res call({
+ String? narration,@JsonKey(fromJson: parseDouble) double amount
+});
+
+
+
+
+}
+/// @nodoc
+class _$InvoicePaymentLineCopyWithImpl<$Res>
+    implements $InvoicePaymentLineCopyWith<$Res> {
+  _$InvoicePaymentLineCopyWithImpl(this._self, this._then);
+
+  final InvoicePaymentLine _self;
+  final $Res Function(InvoicePaymentLine) _then;
+
+/// Create a copy of InvoicePaymentLine
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? narration = freezed,Object? amount = null,}) {
+  return _then(_self.copyWith(
+narration: freezed == narration ? _self.narration : narration // ignore: cast_nullable_to_non_nullable
+as String?,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [InvoicePaymentLine].
+extension InvoicePaymentLinePatterns on InvoicePaymentLine {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _InvoicePaymentLine value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _InvoicePaymentLine() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _InvoicePaymentLine value)  $default,){
+final _that = this;
+switch (_that) {
+case _InvoicePaymentLine():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _InvoicePaymentLine value)?  $default,){
+final _that = this;
+switch (_that) {
+case _InvoicePaymentLine() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? narration, @JsonKey(fromJson: parseDouble)  double amount)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _InvoicePaymentLine() when $default != null:
+return $default(_that.narration,_that.amount);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? narration, @JsonKey(fromJson: parseDouble)  double amount)  $default,) {final _that = this;
+switch (_that) {
+case _InvoicePaymentLine():
+return $default(_that.narration,_that.amount);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? narration, @JsonKey(fromJson: parseDouble)  double amount)?  $default,) {final _that = this;
+switch (_that) {
+case _InvoicePaymentLine() when $default != null:
+return $default(_that.narration,_that.amount);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _InvoicePaymentLine extends InvoicePaymentLine {
+  const _InvoicePaymentLine({this.narration, @JsonKey(fromJson: parseDouble) this.amount = 0}): super._();
+  factory _InvoicePaymentLine.fromJson(Map<String, dynamic> json) => _$InvoicePaymentLineFromJson(json);
+
+@override final  String? narration;
+@override@JsonKey(fromJson: parseDouble) final  double amount;
+
+/// Create a copy of InvoicePaymentLine
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$InvoicePaymentLineCopyWith<_InvoicePaymentLine> get copyWith => __$InvoicePaymentLineCopyWithImpl<_InvoicePaymentLine>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$InvoicePaymentLineToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvoicePaymentLine&&(identical(other.narration, narration) || other.narration == narration)&&(identical(other.amount, amount) || other.amount == amount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,narration,amount);
+
+@override
+String toString() {
+  return 'InvoicePaymentLine(narration: $narration, amount: $amount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$InvoicePaymentLineCopyWith<$Res> implements $InvoicePaymentLineCopyWith<$Res> {
+  factory _$InvoicePaymentLineCopyWith(_InvoicePaymentLine value, $Res Function(_InvoicePaymentLine) _then) = __$InvoicePaymentLineCopyWithImpl;
+@override @useResult
+$Res call({
+ String? narration,@JsonKey(fromJson: parseDouble) double amount
+});
+
+
+
+
+}
+/// @nodoc
+class __$InvoicePaymentLineCopyWithImpl<$Res>
+    implements _$InvoicePaymentLineCopyWith<$Res> {
+  __$InvoicePaymentLineCopyWithImpl(this._self, this._then);
+
+  final _InvoicePaymentLine _self;
+  final $Res Function(_InvoicePaymentLine) _then;
+
+/// Create a copy of InvoicePaymentLine
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? narration = freezed,Object? amount = null,}) {
+  return _then(_InvoicePaymentLine(
+narration: freezed == narration ? _self.narration : narration // ignore: cast_nullable_to_non_nullable
+as String?,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
 }
 
 

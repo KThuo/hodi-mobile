@@ -14,6 +14,13 @@ _InvoiceDetailModel _$InvoiceDetailModelFromJson(Map<String, dynamic> json) =>
               ?.map((e) => InvoiceLineItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      payments:
+          (json['payments'] as List<dynamic>?)
+              ?.map(
+                (e) => InvoicePaymentLine.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
       broughtForward: json['broughtForward'] == null
           ? 0
           : parseDouble(json['broughtForward']),
@@ -31,6 +38,7 @@ Map<String, dynamic> _$InvoiceDetailModelToJson(_InvoiceDetailModel instance) =>
     <String, dynamic>{
       'invoice': instance.invoice,
       'lines': instance.lines,
+      'payments': instance.payments,
       'broughtForward': instance.broughtForward,
       'totalPayable': instance.totalPayable,
       'voidReason': instance.voidReason,
@@ -38,6 +46,18 @@ Map<String, dynamic> _$InvoiceDetailModelToJson(_InvoiceDetailModel instance) =>
       'voidedOn': instance.voidedOn,
       'paymentInstructions': instance.paymentInstructions,
       'footer': instance.footer,
+    };
+
+_InvoicePaymentLine _$InvoicePaymentLineFromJson(Map<String, dynamic> json) =>
+    _InvoicePaymentLine(
+      narration: json['narration'] as String?,
+      amount: json['amount'] == null ? 0 : parseDouble(json['amount']),
+    );
+
+Map<String, dynamic> _$InvoicePaymentLineToJson(_InvoicePaymentLine instance) =>
+    <String, dynamic>{
+      'narration': instance.narration,
+      'amount': instance.amount,
     };
 
 _InvoiceLineItem _$InvoiceLineItemFromJson(Map<String, dynamic> json) =>
