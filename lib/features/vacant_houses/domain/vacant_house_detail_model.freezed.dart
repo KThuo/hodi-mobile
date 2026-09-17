@@ -15,12 +15,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$VacantHouseDetailModel {
 
- String? get id; String? get houseName; String? get houseNumber; String? get houseCode;@JsonKey(fromJson: parseIntNullable) int? get floor; String? get description; String? get category; String? get houseType; String? get location; double? get latitude; double? get longitude; String? get property; String? get estate;@JsonKey(fromJson: parseDouble) double get rent; double? get squareFt;@JsonKey(fromJson: parseIntNullable) int? get featureCount; String? get lastOccupied; String? get imageUrl; List<VacantHouseBill> get utilityBills; List<VacantHouseBill> get onboardFees;@JsonKey(fromJson: parseDouble) double get totalMonthlyBills;@JsonKey(fromJson: parseDouble) double get totalOnboardFees;@JsonKey(fromJson: parseDouble) double get maxRefundableAmount; List<VacantHouseFeature> get houseFeatures; List<VacantHouseImage> get categoryImages;/// Who to ring about it.
-///
-/// Sent by `VacantUnitModels` and dropped on the floor here until now, which left the app
-/// showing a listing with no way to enquire about it while the browser showed a phone number,
-/// an email address and a WhatsApp button.
- String? get contactName; String? get contactPhone; String? get contactEmail;
+ String get id; String get title; String? get categoryName;/// Residential, Commercial.
+ String? get usageClassName; String? get description; String? get propertyName; String? get area;@JsonKey(fromJson: parseDoubleNullable) double? get rent;@JsonKey(fromJson: parseDoubleNullable) double? get deposit;/// Everything payable before the keys change hands, itemised. Some of it comes back at the
+/// end and some does not, which is the distinction [MoveInCostModel.refundable] carries.
+ List<MoveInCostModel> get moveInCosts; int? get bedrooms; int? get bathrooms; int? get ensuiteBathrooms;@JsonKey(fromJson: parseDoubleNullable) double? get squareFt; String? get floorLabel; bool get dsq; int? get parkingSpaces; double? get latitude; double? get longitude; List<String> get images; List<ListingAmenity> get amenities; String? get availableFrom; String? get contactName; String? get contactPhone; String? get contactEmail;
 /// Create a copy of VacantHouseDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -33,16 +31,16 @@ $VacantHouseDetailModelCopyWith<VacantHouseDetailModel> get copyWith => _$Vacant
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacantHouseDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&(identical(other.houseType, houseType) || other.houseType == houseType)&&(identical(other.location, location) || other.location == location)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.property, property) || other.property == property)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.featureCount, featureCount) || other.featureCount == featureCount)&&(identical(other.lastOccupied, lastOccupied) || other.lastOccupied == lastOccupied)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.utilityBills, utilityBills)&&const DeepCollectionEquality().equals(other.onboardFees, onboardFees)&&(identical(other.totalMonthlyBills, totalMonthlyBills) || other.totalMonthlyBills == totalMonthlyBills)&&(identical(other.totalOnboardFees, totalOnboardFees) || other.totalOnboardFees == totalOnboardFees)&&(identical(other.maxRefundableAmount, maxRefundableAmount) || other.maxRefundableAmount == maxRefundableAmount)&&const DeepCollectionEquality().equals(other.houseFeatures, houseFeatures)&&const DeepCollectionEquality().equals(other.categoryImages, categoryImages)&&(identical(other.contactName, contactName) || other.contactName == contactName)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacantHouseDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.description, description) || other.description == description)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.area, area) || other.area == area)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.deposit, deposit) || other.deposit == deposit)&&const DeepCollectionEquality().equals(other.moveInCosts, moveInCosts)&&(identical(other.bedrooms, bedrooms) || other.bedrooms == bedrooms)&&(identical(other.bathrooms, bathrooms) || other.bathrooms == bathrooms)&&(identical(other.ensuiteBathrooms, ensuiteBathrooms) || other.ensuiteBathrooms == ensuiteBathrooms)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parkingSpaces, parkingSpaces) || other.parkingSpaces == parkingSpaces)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&const DeepCollectionEquality().equals(other.images, images)&&const DeepCollectionEquality().equals(other.amenities, amenities)&&(identical(other.availableFrom, availableFrom) || other.availableFrom == availableFrom)&&(identical(other.contactName, contactName) || other.contactName == contactName)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,houseName,houseNumber,houseCode,floor,description,category,houseType,location,latitude,longitude,property,estate,rent,squareFt,featureCount,lastOccupied,imageUrl,const DeepCollectionEquality().hash(utilityBills),const DeepCollectionEquality().hash(onboardFees),totalMonthlyBills,totalOnboardFees,maxRefundableAmount,const DeepCollectionEquality().hash(houseFeatures),const DeepCollectionEquality().hash(categoryImages),contactName,contactPhone,contactEmail]);
+int get hashCode => Object.hashAll([runtimeType,id,title,categoryName,usageClassName,description,propertyName,area,rent,deposit,const DeepCollectionEquality().hash(moveInCosts),bedrooms,bathrooms,ensuiteBathrooms,squareFt,floorLabel,dsq,parkingSpaces,latitude,longitude,const DeepCollectionEquality().hash(images),const DeepCollectionEquality().hash(amenities),availableFrom,contactName,contactPhone,contactEmail]);
 
 @override
 String toString() {
-  return 'VacantHouseDetailModel(id: $id, houseName: $houseName, houseNumber: $houseNumber, houseCode: $houseCode, floor: $floor, description: $description, category: $category, houseType: $houseType, location: $location, latitude: $latitude, longitude: $longitude, property: $property, estate: $estate, rent: $rent, squareFt: $squareFt, featureCount: $featureCount, lastOccupied: $lastOccupied, imageUrl: $imageUrl, utilityBills: $utilityBills, onboardFees: $onboardFees, totalMonthlyBills: $totalMonthlyBills, totalOnboardFees: $totalOnboardFees, maxRefundableAmount: $maxRefundableAmount, houseFeatures: $houseFeatures, categoryImages: $categoryImages, contactName: $contactName, contactPhone: $contactPhone, contactEmail: $contactEmail)';
+  return 'VacantHouseDetailModel(id: $id, title: $title, categoryName: $categoryName, usageClassName: $usageClassName, description: $description, propertyName: $propertyName, area: $area, rent: $rent, deposit: $deposit, moveInCosts: $moveInCosts, bedrooms: $bedrooms, bathrooms: $bathrooms, ensuiteBathrooms: $ensuiteBathrooms, squareFt: $squareFt, floorLabel: $floorLabel, dsq: $dsq, parkingSpaces: $parkingSpaces, latitude: $latitude, longitude: $longitude, images: $images, amenities: $amenities, availableFrom: $availableFrom, contactName: $contactName, contactPhone: $contactPhone, contactEmail: $contactEmail)';
 }
 
 
@@ -53,7 +51,7 @@ abstract mixin class $VacantHouseDetailModelCopyWith<$Res>  {
   factory $VacantHouseDetailModelCopyWith(VacantHouseDetailModel value, $Res Function(VacantHouseDetailModel) _then) = _$VacantHouseDetailModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? houseName, String? houseNumber, String? houseCode,@JsonKey(fromJson: parseIntNullable) int? floor, String? description, String? category, String? houseType, String? location, double? latitude, double? longitude, String? property, String? estate,@JsonKey(fromJson: parseDouble) double rent, double? squareFt,@JsonKey(fromJson: parseIntNullable) int? featureCount, String? lastOccupied, String? imageUrl, List<VacantHouseBill> utilityBills, List<VacantHouseBill> onboardFees,@JsonKey(fromJson: parseDouble) double totalMonthlyBills,@JsonKey(fromJson: parseDouble) double totalOnboardFees,@JsonKey(fromJson: parseDouble) double maxRefundableAmount, List<VacantHouseFeature> houseFeatures, List<VacantHouseImage> categoryImages, String? contactName, String? contactPhone, String? contactEmail
+ String id, String title, String? categoryName, String? usageClassName, String? description, String? propertyName, String? area,@JsonKey(fromJson: parseDoubleNullable) double? rent,@JsonKey(fromJson: parseDoubleNullable) double? deposit, List<MoveInCostModel> moveInCosts, int? bedrooms, int? bathrooms, int? ensuiteBathrooms,@JsonKey(fromJson: parseDoubleNullable) double? squareFt, String? floorLabel, bool dsq, int? parkingSpaces, double? latitude, double? longitude, List<String> images, List<ListingAmenity> amenities, String? availableFrom, String? contactName, String? contactPhone, String? contactEmail
 });
 
 
@@ -70,34 +68,31 @@ class _$VacantHouseDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of VacantHouseDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? houseName = freezed,Object? houseNumber = freezed,Object? houseCode = freezed,Object? floor = freezed,Object? description = freezed,Object? category = freezed,Object? houseType = freezed,Object? location = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? property = freezed,Object? estate = freezed,Object? rent = null,Object? squareFt = freezed,Object? featureCount = freezed,Object? lastOccupied = freezed,Object? imageUrl = freezed,Object? utilityBills = null,Object? onboardFees = null,Object? totalMonthlyBills = null,Object? totalOnboardFees = null,Object? maxRefundableAmount = null,Object? houseFeatures = null,Object? categoryImages = null,Object? contactName = freezed,Object? contactPhone = freezed,Object? contactEmail = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? categoryName = freezed,Object? usageClassName = freezed,Object? description = freezed,Object? propertyName = freezed,Object? area = freezed,Object? rent = freezed,Object? deposit = freezed,Object? moveInCosts = null,Object? bedrooms = freezed,Object? bathrooms = freezed,Object? ensuiteBathrooms = freezed,Object? squareFt = freezed,Object? floorLabel = freezed,Object? dsq = null,Object? parkingSpaces = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? images = null,Object? amenities = null,Object? availableFrom = freezed,Object? contactName = freezed,Object? contactPhone = freezed,Object? contactEmail = freezed,}) {
   return _then(_self.copyWith(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,floor: freezed == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
+as String?,usageClassName: freezed == usageClassName ? _self.usageClassName : usageClassName // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double?,deposit: freezed == deposit ? _self.deposit : deposit // ignore: cast_nullable_to_non_nullable
+as double?,moveInCosts: null == moveInCosts ? _self.moveInCosts : moveInCosts // ignore: cast_nullable_to_non_nullable
+as List<MoveInCostModel>,bedrooms: freezed == bedrooms ? _self.bedrooms : bedrooms // ignore: cast_nullable_to_non_nullable
+as int?,bathrooms: freezed == bathrooms ? _self.bathrooms : bathrooms // ignore: cast_nullable_to_non_nullable
+as int?,ensuiteBathrooms: freezed == ensuiteBathrooms ? _self.ensuiteBathrooms : ensuiteBathrooms // ignore: cast_nullable_to_non_nullable
+as int?,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
+as double?,floorLabel: freezed == floorLabel ? _self.floorLabel : floorLabel // ignore: cast_nullable_to_non_nullable
+as String?,dsq: null == dsq ? _self.dsq : dsq // ignore: cast_nullable_to_non_nullable
+as bool,parkingSpaces: freezed == parkingSpaces ? _self.parkingSpaces : parkingSpaces // ignore: cast_nullable_to_non_nullable
+as int?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
-as double,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
-as double?,featureCount: freezed == featureCount ? _self.featureCount : featureCount // ignore: cast_nullable_to_non_nullable
-as int?,lastOccupied: freezed == lastOccupied ? _self.lastOccupied : lastOccupied // ignore: cast_nullable_to_non_nullable
-as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,utilityBills: null == utilityBills ? _self.utilityBills : utilityBills // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseBill>,onboardFees: null == onboardFees ? _self.onboardFees : onboardFees // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseBill>,totalMonthlyBills: null == totalMonthlyBills ? _self.totalMonthlyBills : totalMonthlyBills // ignore: cast_nullable_to_non_nullable
-as double,totalOnboardFees: null == totalOnboardFees ? _self.totalOnboardFees : totalOnboardFees // ignore: cast_nullable_to_non_nullable
-as double,maxRefundableAmount: null == maxRefundableAmount ? _self.maxRefundableAmount : maxRefundableAmount // ignore: cast_nullable_to_non_nullable
-as double,houseFeatures: null == houseFeatures ? _self.houseFeatures : houseFeatures // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseFeature>,categoryImages: null == categoryImages ? _self.categoryImages : categoryImages // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseImage>,contactName: freezed == contactName ? _self.contactName : contactName // ignore: cast_nullable_to_non_nullable
+as double?,images: null == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
+as List<String>,amenities: null == amenities ? _self.amenities : amenities // ignore: cast_nullable_to_non_nullable
+as List<ListingAmenity>,availableFrom: freezed == availableFrom ? _self.availableFrom : availableFrom // ignore: cast_nullable_to_non_nullable
+as String?,contactName: freezed == contactName ? _self.contactName : contactName // ignore: cast_nullable_to_non_nullable
 as String?,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable
 as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -185,10 +180,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? houseName,  String? houseNumber,  String? houseCode, @JsonKey(fromJson: parseIntNullable)  int? floor,  String? description,  String? category,  String? houseType,  String? location,  double? latitude,  double? longitude,  String? property,  String? estate, @JsonKey(fromJson: parseDouble)  double rent,  double? squareFt, @JsonKey(fromJson: parseIntNullable)  int? featureCount,  String? lastOccupied,  String? imageUrl,  List<VacantHouseBill> utilityBills,  List<VacantHouseBill> onboardFees, @JsonKey(fromJson: parseDouble)  double totalMonthlyBills, @JsonKey(fromJson: parseDouble)  double totalOnboardFees, @JsonKey(fromJson: parseDouble)  double maxRefundableAmount,  List<VacantHouseFeature> houseFeatures,  List<VacantHouseImage> categoryImages,  String? contactName,  String? contactPhone,  String? contactEmail)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String? categoryName,  String? usageClassName,  String? description,  String? propertyName,  String? area, @JsonKey(fromJson: parseDoubleNullable)  double? rent, @JsonKey(fromJson: parseDoubleNullable)  double? deposit,  List<MoveInCostModel> moveInCosts,  int? bedrooms,  int? bathrooms,  int? ensuiteBathrooms, @JsonKey(fromJson: parseDoubleNullable)  double? squareFt,  String? floorLabel,  bool dsq,  int? parkingSpaces,  double? latitude,  double? longitude,  List<String> images,  List<ListingAmenity> amenities,  String? availableFrom,  String? contactName,  String? contactPhone,  String? contactEmail)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VacantHouseDetailModel() when $default != null:
-return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that.floor,_that.description,_that.category,_that.houseType,_that.location,_that.latitude,_that.longitude,_that.property,_that.estate,_that.rent,_that.squareFt,_that.featureCount,_that.lastOccupied,_that.imageUrl,_that.utilityBills,_that.onboardFees,_that.totalMonthlyBills,_that.totalOnboardFees,_that.maxRefundableAmount,_that.houseFeatures,_that.categoryImages,_that.contactName,_that.contactPhone,_that.contactEmail);case _:
+return $default(_that.id,_that.title,_that.categoryName,_that.usageClassName,_that.description,_that.propertyName,_that.area,_that.rent,_that.deposit,_that.moveInCosts,_that.bedrooms,_that.bathrooms,_that.ensuiteBathrooms,_that.squareFt,_that.floorLabel,_that.dsq,_that.parkingSpaces,_that.latitude,_that.longitude,_that.images,_that.amenities,_that.availableFrom,_that.contactName,_that.contactPhone,_that.contactEmail);case _:
   return orElse();
 
 }
@@ -206,10 +201,10 @@ return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? houseName,  String? houseNumber,  String? houseCode, @JsonKey(fromJson: parseIntNullable)  int? floor,  String? description,  String? category,  String? houseType,  String? location,  double? latitude,  double? longitude,  String? property,  String? estate, @JsonKey(fromJson: parseDouble)  double rent,  double? squareFt, @JsonKey(fromJson: parseIntNullable)  int? featureCount,  String? lastOccupied,  String? imageUrl,  List<VacantHouseBill> utilityBills,  List<VacantHouseBill> onboardFees, @JsonKey(fromJson: parseDouble)  double totalMonthlyBills, @JsonKey(fromJson: parseDouble)  double totalOnboardFees, @JsonKey(fromJson: parseDouble)  double maxRefundableAmount,  List<VacantHouseFeature> houseFeatures,  List<VacantHouseImage> categoryImages,  String? contactName,  String? contactPhone,  String? contactEmail)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String? categoryName,  String? usageClassName,  String? description,  String? propertyName,  String? area, @JsonKey(fromJson: parseDoubleNullable)  double? rent, @JsonKey(fromJson: parseDoubleNullable)  double? deposit,  List<MoveInCostModel> moveInCosts,  int? bedrooms,  int? bathrooms,  int? ensuiteBathrooms, @JsonKey(fromJson: parseDoubleNullable)  double? squareFt,  String? floorLabel,  bool dsq,  int? parkingSpaces,  double? latitude,  double? longitude,  List<String> images,  List<ListingAmenity> amenities,  String? availableFrom,  String? contactName,  String? contactPhone,  String? contactEmail)  $default,) {final _that = this;
 switch (_that) {
 case _VacantHouseDetailModel():
-return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that.floor,_that.description,_that.category,_that.houseType,_that.location,_that.latitude,_that.longitude,_that.property,_that.estate,_that.rent,_that.squareFt,_that.featureCount,_that.lastOccupied,_that.imageUrl,_that.utilityBills,_that.onboardFees,_that.totalMonthlyBills,_that.totalOnboardFees,_that.maxRefundableAmount,_that.houseFeatures,_that.categoryImages,_that.contactName,_that.contactPhone,_that.contactEmail);case _:
+return $default(_that.id,_that.title,_that.categoryName,_that.usageClassName,_that.description,_that.propertyName,_that.area,_that.rent,_that.deposit,_that.moveInCosts,_that.bedrooms,_that.bathrooms,_that.ensuiteBathrooms,_that.squareFt,_that.floorLabel,_that.dsq,_that.parkingSpaces,_that.latitude,_that.longitude,_that.images,_that.amenities,_that.availableFrom,_that.contactName,_that.contactPhone,_that.contactEmail);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -226,10 +221,10 @@ return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? houseName,  String? houseNumber,  String? houseCode, @JsonKey(fromJson: parseIntNullable)  int? floor,  String? description,  String? category,  String? houseType,  String? location,  double? latitude,  double? longitude,  String? property,  String? estate, @JsonKey(fromJson: parseDouble)  double rent,  double? squareFt, @JsonKey(fromJson: parseIntNullable)  int? featureCount,  String? lastOccupied,  String? imageUrl,  List<VacantHouseBill> utilityBills,  List<VacantHouseBill> onboardFees, @JsonKey(fromJson: parseDouble)  double totalMonthlyBills, @JsonKey(fromJson: parseDouble)  double totalOnboardFees, @JsonKey(fromJson: parseDouble)  double maxRefundableAmount,  List<VacantHouseFeature> houseFeatures,  List<VacantHouseImage> categoryImages,  String? contactName,  String? contactPhone,  String? contactEmail)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String? categoryName,  String? usageClassName,  String? description,  String? propertyName,  String? area, @JsonKey(fromJson: parseDoubleNullable)  double? rent, @JsonKey(fromJson: parseDoubleNullable)  double? deposit,  List<MoveInCostModel> moveInCosts,  int? bedrooms,  int? bathrooms,  int? ensuiteBathrooms, @JsonKey(fromJson: parseDoubleNullable)  double? squareFt,  String? floorLabel,  bool dsq,  int? parkingSpaces,  double? latitude,  double? longitude,  List<String> images,  List<ListingAmenity> amenities,  String? availableFrom,  String? contactName,  String? contactPhone,  String? contactEmail)?  $default,) {final _that = this;
 switch (_that) {
 case _VacantHouseDetailModel() when $default != null:
-return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that.floor,_that.description,_that.category,_that.houseType,_that.location,_that.latitude,_that.longitude,_that.property,_that.estate,_that.rent,_that.squareFt,_that.featureCount,_that.lastOccupied,_that.imageUrl,_that.utilityBills,_that.onboardFees,_that.totalMonthlyBills,_that.totalOnboardFees,_that.maxRefundableAmount,_that.houseFeatures,_that.categoryImages,_that.contactName,_that.contactPhone,_that.contactEmail);case _:
+return $default(_that.id,_that.title,_that.categoryName,_that.usageClassName,_that.description,_that.propertyName,_that.area,_that.rent,_that.deposit,_that.moveInCosts,_that.bedrooms,_that.bathrooms,_that.ensuiteBathrooms,_that.squareFt,_that.floorLabel,_that.dsq,_that.parkingSpaces,_that.latitude,_that.longitude,_that.images,_that.amenities,_that.availableFrom,_that.contactName,_that.contactPhone,_that.contactEmail);case _:
   return null;
 
 }
@@ -241,63 +236,54 @@ return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that
 @JsonSerializable()
 
 class _VacantHouseDetailModel extends VacantHouseDetailModel {
-  const _VacantHouseDetailModel({this.id, this.houseName, this.houseNumber, this.houseCode, @JsonKey(fromJson: parseIntNullable) this.floor, this.description, this.category, this.houseType, this.location, this.latitude, this.longitude, this.property, this.estate, @JsonKey(fromJson: parseDouble) this.rent = 0, this.squareFt, @JsonKey(fromJson: parseIntNullable) this.featureCount, this.lastOccupied, this.imageUrl, final  List<VacantHouseBill> utilityBills = const [], final  List<VacantHouseBill> onboardFees = const [], @JsonKey(fromJson: parseDouble) this.totalMonthlyBills = 0, @JsonKey(fromJson: parseDouble) this.totalOnboardFees = 0, @JsonKey(fromJson: parseDouble) this.maxRefundableAmount = 0, final  List<VacantHouseFeature> houseFeatures = const [], final  List<VacantHouseImage> categoryImages = const [], this.contactName, this.contactPhone, this.contactEmail}): _utilityBills = utilityBills,_onboardFees = onboardFees,_houseFeatures = houseFeatures,_categoryImages = categoryImages,super._();
+  const _VacantHouseDetailModel({required this.id, this.title = '', this.categoryName, this.usageClassName, this.description, this.propertyName, this.area, @JsonKey(fromJson: parseDoubleNullable) this.rent, @JsonKey(fromJson: parseDoubleNullable) this.deposit, final  List<MoveInCostModel> moveInCosts = const <MoveInCostModel>[], this.bedrooms, this.bathrooms, this.ensuiteBathrooms, @JsonKey(fromJson: parseDoubleNullable) this.squareFt, this.floorLabel, this.dsq = false, this.parkingSpaces, this.latitude, this.longitude, final  List<String> images = const <String>[], final  List<ListingAmenity> amenities = const <ListingAmenity>[], this.availableFrom, this.contactName, this.contactPhone, this.contactEmail}): _moveInCosts = moveInCosts,_images = images,_amenities = amenities,super._();
   factory _VacantHouseDetailModel.fromJson(Map<String, dynamic> json) => _$VacantHouseDetailModelFromJson(json);
 
-@override final  String? id;
-@override final  String? houseName;
-@override final  String? houseNumber;
-@override final  String? houseCode;
-@override@JsonKey(fromJson: parseIntNullable) final  int? floor;
+@override final  String id;
+@override@JsonKey() final  String title;
+@override final  String? categoryName;
+/// Residential, Commercial.
+@override final  String? usageClassName;
 @override final  String? description;
-@override final  String? category;
-@override final  String? houseType;
-@override final  String? location;
+@override final  String? propertyName;
+@override final  String? area;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? rent;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? deposit;
+/// Everything payable before the keys change hands, itemised. Some of it comes back at the
+/// end and some does not, which is the distinction [MoveInCostModel.refundable] carries.
+ final  List<MoveInCostModel> _moveInCosts;
+/// Everything payable before the keys change hands, itemised. Some of it comes back at the
+/// end and some does not, which is the distinction [MoveInCostModel.refundable] carries.
+@override@JsonKey() List<MoveInCostModel> get moveInCosts {
+  if (_moveInCosts is EqualUnmodifiableListView) return _moveInCosts;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_moveInCosts);
+}
+
+@override final  int? bedrooms;
+@override final  int? bathrooms;
+@override final  int? ensuiteBathrooms;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? squareFt;
+@override final  String? floorLabel;
+@override@JsonKey() final  bool dsq;
+@override final  int? parkingSpaces;
 @override final  double? latitude;
 @override final  double? longitude;
-@override final  String? property;
-@override final  String? estate;
-@override@JsonKey(fromJson: parseDouble) final  double rent;
-@override final  double? squareFt;
-@override@JsonKey(fromJson: parseIntNullable) final  int? featureCount;
-@override final  String? lastOccupied;
-@override final  String? imageUrl;
- final  List<VacantHouseBill> _utilityBills;
-@override@JsonKey() List<VacantHouseBill> get utilityBills {
-  if (_utilityBills is EqualUnmodifiableListView) return _utilityBills;
+ final  List<String> _images;
+@override@JsonKey() List<String> get images {
+  if (_images is EqualUnmodifiableListView) return _images;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_utilityBills);
+  return EqualUnmodifiableListView(_images);
 }
 
- final  List<VacantHouseBill> _onboardFees;
-@override@JsonKey() List<VacantHouseBill> get onboardFees {
-  if (_onboardFees is EqualUnmodifiableListView) return _onboardFees;
+ final  List<ListingAmenity> _amenities;
+@override@JsonKey() List<ListingAmenity> get amenities {
+  if (_amenities is EqualUnmodifiableListView) return _amenities;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_onboardFees);
+  return EqualUnmodifiableListView(_amenities);
 }
 
-@override@JsonKey(fromJson: parseDouble) final  double totalMonthlyBills;
-@override@JsonKey(fromJson: parseDouble) final  double totalOnboardFees;
-@override@JsonKey(fromJson: parseDouble) final  double maxRefundableAmount;
- final  List<VacantHouseFeature> _houseFeatures;
-@override@JsonKey() List<VacantHouseFeature> get houseFeatures {
-  if (_houseFeatures is EqualUnmodifiableListView) return _houseFeatures;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_houseFeatures);
-}
-
- final  List<VacantHouseImage> _categoryImages;
-@override@JsonKey() List<VacantHouseImage> get categoryImages {
-  if (_categoryImages is EqualUnmodifiableListView) return _categoryImages;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_categoryImages);
-}
-
-/// Who to ring about it.
-///
-/// Sent by `VacantUnitModels` and dropped on the floor here until now, which left the app
-/// showing a listing with no way to enquire about it while the browser showed a phone number,
-/// an email address and a WhatsApp button.
+@override final  String? availableFrom;
 @override final  String? contactName;
 @override final  String? contactPhone;
 @override final  String? contactEmail;
@@ -315,16 +301,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacantHouseDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&(identical(other.houseType, houseType) || other.houseType == houseType)&&(identical(other.location, location) || other.location == location)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.property, property) || other.property == property)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.featureCount, featureCount) || other.featureCount == featureCount)&&(identical(other.lastOccupied, lastOccupied) || other.lastOccupied == lastOccupied)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other._utilityBills, _utilityBills)&&const DeepCollectionEquality().equals(other._onboardFees, _onboardFees)&&(identical(other.totalMonthlyBills, totalMonthlyBills) || other.totalMonthlyBills == totalMonthlyBills)&&(identical(other.totalOnboardFees, totalOnboardFees) || other.totalOnboardFees == totalOnboardFees)&&(identical(other.maxRefundableAmount, maxRefundableAmount) || other.maxRefundableAmount == maxRefundableAmount)&&const DeepCollectionEquality().equals(other._houseFeatures, _houseFeatures)&&const DeepCollectionEquality().equals(other._categoryImages, _categoryImages)&&(identical(other.contactName, contactName) || other.contactName == contactName)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacantHouseDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.description, description) || other.description == description)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.area, area) || other.area == area)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.deposit, deposit) || other.deposit == deposit)&&const DeepCollectionEquality().equals(other._moveInCosts, _moveInCosts)&&(identical(other.bedrooms, bedrooms) || other.bedrooms == bedrooms)&&(identical(other.bathrooms, bathrooms) || other.bathrooms == bathrooms)&&(identical(other.ensuiteBathrooms, ensuiteBathrooms) || other.ensuiteBathrooms == ensuiteBathrooms)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parkingSpaces, parkingSpaces) || other.parkingSpaces == parkingSpaces)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&const DeepCollectionEquality().equals(other._images, _images)&&const DeepCollectionEquality().equals(other._amenities, _amenities)&&(identical(other.availableFrom, availableFrom) || other.availableFrom == availableFrom)&&(identical(other.contactName, contactName) || other.contactName == contactName)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,houseName,houseNumber,houseCode,floor,description,category,houseType,location,latitude,longitude,property,estate,rent,squareFt,featureCount,lastOccupied,imageUrl,const DeepCollectionEquality().hash(_utilityBills),const DeepCollectionEquality().hash(_onboardFees),totalMonthlyBills,totalOnboardFees,maxRefundableAmount,const DeepCollectionEquality().hash(_houseFeatures),const DeepCollectionEquality().hash(_categoryImages),contactName,contactPhone,contactEmail]);
+int get hashCode => Object.hashAll([runtimeType,id,title,categoryName,usageClassName,description,propertyName,area,rent,deposit,const DeepCollectionEquality().hash(_moveInCosts),bedrooms,bathrooms,ensuiteBathrooms,squareFt,floorLabel,dsq,parkingSpaces,latitude,longitude,const DeepCollectionEquality().hash(_images),const DeepCollectionEquality().hash(_amenities),availableFrom,contactName,contactPhone,contactEmail]);
 
 @override
 String toString() {
-  return 'VacantHouseDetailModel(id: $id, houseName: $houseName, houseNumber: $houseNumber, houseCode: $houseCode, floor: $floor, description: $description, category: $category, houseType: $houseType, location: $location, latitude: $latitude, longitude: $longitude, property: $property, estate: $estate, rent: $rent, squareFt: $squareFt, featureCount: $featureCount, lastOccupied: $lastOccupied, imageUrl: $imageUrl, utilityBills: $utilityBills, onboardFees: $onboardFees, totalMonthlyBills: $totalMonthlyBills, totalOnboardFees: $totalOnboardFees, maxRefundableAmount: $maxRefundableAmount, houseFeatures: $houseFeatures, categoryImages: $categoryImages, contactName: $contactName, contactPhone: $contactPhone, contactEmail: $contactEmail)';
+  return 'VacantHouseDetailModel(id: $id, title: $title, categoryName: $categoryName, usageClassName: $usageClassName, description: $description, propertyName: $propertyName, area: $area, rent: $rent, deposit: $deposit, moveInCosts: $moveInCosts, bedrooms: $bedrooms, bathrooms: $bathrooms, ensuiteBathrooms: $ensuiteBathrooms, squareFt: $squareFt, floorLabel: $floorLabel, dsq: $dsq, parkingSpaces: $parkingSpaces, latitude: $latitude, longitude: $longitude, images: $images, amenities: $amenities, availableFrom: $availableFrom, contactName: $contactName, contactPhone: $contactPhone, contactEmail: $contactEmail)';
 }
 
 
@@ -335,7 +321,7 @@ abstract mixin class _$VacantHouseDetailModelCopyWith<$Res> implements $VacantHo
   factory _$VacantHouseDetailModelCopyWith(_VacantHouseDetailModel value, $Res Function(_VacantHouseDetailModel) _then) = __$VacantHouseDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? houseName, String? houseNumber, String? houseCode,@JsonKey(fromJson: parseIntNullable) int? floor, String? description, String? category, String? houseType, String? location, double? latitude, double? longitude, String? property, String? estate,@JsonKey(fromJson: parseDouble) double rent, double? squareFt,@JsonKey(fromJson: parseIntNullable) int? featureCount, String? lastOccupied, String? imageUrl, List<VacantHouseBill> utilityBills, List<VacantHouseBill> onboardFees,@JsonKey(fromJson: parseDouble) double totalMonthlyBills,@JsonKey(fromJson: parseDouble) double totalOnboardFees,@JsonKey(fromJson: parseDouble) double maxRefundableAmount, List<VacantHouseFeature> houseFeatures, List<VacantHouseImage> categoryImages, String? contactName, String? contactPhone, String? contactEmail
+ String id, String title, String? categoryName, String? usageClassName, String? description, String? propertyName, String? area,@JsonKey(fromJson: parseDoubleNullable) double? rent,@JsonKey(fromJson: parseDoubleNullable) double? deposit, List<MoveInCostModel> moveInCosts, int? bedrooms, int? bathrooms, int? ensuiteBathrooms,@JsonKey(fromJson: parseDoubleNullable) double? squareFt, String? floorLabel, bool dsq, int? parkingSpaces, double? latitude, double? longitude, List<String> images, List<ListingAmenity> amenities, String? availableFrom, String? contactName, String? contactPhone, String? contactEmail
 });
 
 
@@ -352,34 +338,31 @@ class __$VacantHouseDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of VacantHouseDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? houseName = freezed,Object? houseNumber = freezed,Object? houseCode = freezed,Object? floor = freezed,Object? description = freezed,Object? category = freezed,Object? houseType = freezed,Object? location = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? property = freezed,Object? estate = freezed,Object? rent = null,Object? squareFt = freezed,Object? featureCount = freezed,Object? lastOccupied = freezed,Object? imageUrl = freezed,Object? utilityBills = null,Object? onboardFees = null,Object? totalMonthlyBills = null,Object? totalOnboardFees = null,Object? maxRefundableAmount = null,Object? houseFeatures = null,Object? categoryImages = null,Object? contactName = freezed,Object? contactPhone = freezed,Object? contactEmail = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? categoryName = freezed,Object? usageClassName = freezed,Object? description = freezed,Object? propertyName = freezed,Object? area = freezed,Object? rent = freezed,Object? deposit = freezed,Object? moveInCosts = null,Object? bedrooms = freezed,Object? bathrooms = freezed,Object? ensuiteBathrooms = freezed,Object? squareFt = freezed,Object? floorLabel = freezed,Object? dsq = null,Object? parkingSpaces = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? images = null,Object? amenities = null,Object? availableFrom = freezed,Object? contactName = freezed,Object? contactPhone = freezed,Object? contactEmail = freezed,}) {
   return _then(_VacantHouseDetailModel(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,floor: freezed == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
+as String?,usageClassName: freezed == usageClassName ? _self.usageClassName : usageClassName // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double?,deposit: freezed == deposit ? _self.deposit : deposit // ignore: cast_nullable_to_non_nullable
+as double?,moveInCosts: null == moveInCosts ? _self._moveInCosts : moveInCosts // ignore: cast_nullable_to_non_nullable
+as List<MoveInCostModel>,bedrooms: freezed == bedrooms ? _self.bedrooms : bedrooms // ignore: cast_nullable_to_non_nullable
+as int?,bathrooms: freezed == bathrooms ? _self.bathrooms : bathrooms // ignore: cast_nullable_to_non_nullable
+as int?,ensuiteBathrooms: freezed == ensuiteBathrooms ? _self.ensuiteBathrooms : ensuiteBathrooms // ignore: cast_nullable_to_non_nullable
+as int?,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
+as double?,floorLabel: freezed == floorLabel ? _self.floorLabel : floorLabel // ignore: cast_nullable_to_non_nullable
+as String?,dsq: null == dsq ? _self.dsq : dsq // ignore: cast_nullable_to_non_nullable
+as bool,parkingSpaces: freezed == parkingSpaces ? _self.parkingSpaces : parkingSpaces // ignore: cast_nullable_to_non_nullable
+as int?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
-as double,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
-as double?,featureCount: freezed == featureCount ? _self.featureCount : featureCount // ignore: cast_nullable_to_non_nullable
-as int?,lastOccupied: freezed == lastOccupied ? _self.lastOccupied : lastOccupied // ignore: cast_nullable_to_non_nullable
-as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,utilityBills: null == utilityBills ? _self._utilityBills : utilityBills // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseBill>,onboardFees: null == onboardFees ? _self._onboardFees : onboardFees // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseBill>,totalMonthlyBills: null == totalMonthlyBills ? _self.totalMonthlyBills : totalMonthlyBills // ignore: cast_nullable_to_non_nullable
-as double,totalOnboardFees: null == totalOnboardFees ? _self.totalOnboardFees : totalOnboardFees // ignore: cast_nullable_to_non_nullable
-as double,maxRefundableAmount: null == maxRefundableAmount ? _self.maxRefundableAmount : maxRefundableAmount // ignore: cast_nullable_to_non_nullable
-as double,houseFeatures: null == houseFeatures ? _self._houseFeatures : houseFeatures // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseFeature>,categoryImages: null == categoryImages ? _self._categoryImages : categoryImages // ignore: cast_nullable_to_non_nullable
-as List<VacantHouseImage>,contactName: freezed == contactName ? _self.contactName : contactName // ignore: cast_nullable_to_non_nullable
+as double?,images: null == images ? _self._images : images // ignore: cast_nullable_to_non_nullable
+as List<String>,amenities: null == amenities ? _self._amenities : amenities // ignore: cast_nullable_to_non_nullable
+as List<ListingAmenity>,availableFrom: freezed == availableFrom ? _self.availableFrom : availableFrom // ignore: cast_nullable_to_non_nullable
+as String?,contactName: freezed == contactName ? _self.contactName : contactName // ignore: cast_nullable_to_non_nullable
 as String?,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable
 as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -391,42 +374,47 @@ as String?,
 
 
 /// @nodoc
-mixin _$VacantHouseBill {
+mixin _$MoveInCostModel {
 
-@JsonKey(fromJson: parseIntNullable) int? get id; String? get name;@JsonKey(fromJson: parseDouble) double get amount; bool get isOnboard;
-/// Create a copy of VacantHouseBill
+ String get name;/// Null where the charge is expressed as a rule rather than a figure — "two months' rent"
+/// before a rent has been agreed. Shown as the rule, not as zero.
+@JsonKey(fromJson: parseDoubleNullable) double? get amount;/// Whether it comes back at the end. The difference between a deposit and a fee, and the
+/// thing somebody most wants to know when they add the total up.
+ bool get refundable;/// Expressed in months of rent, where that is how it is set.
+ int? get months;
+/// Create a copy of MoveInCostModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$VacantHouseBillCopyWith<VacantHouseBill> get copyWith => _$VacantHouseBillCopyWithImpl<VacantHouseBill>(this as VacantHouseBill, _$identity);
+$MoveInCostModelCopyWith<MoveInCostModel> get copyWith => _$MoveInCostModelCopyWithImpl<MoveInCostModel>(this as MoveInCostModel, _$identity);
 
-  /// Serializes this VacantHouseBill to a JSON map.
+  /// Serializes this MoveInCostModel to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacantHouseBill&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.isOnboard, isOnboard) || other.isOnboard == isOnboard));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MoveInCostModel&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.refundable, refundable) || other.refundable == refundable)&&(identical(other.months, months) || other.months == months));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,amount,isOnboard);
+int get hashCode => Object.hash(runtimeType,name,amount,refundable,months);
 
 @override
 String toString() {
-  return 'VacantHouseBill(id: $id, name: $name, amount: $amount, isOnboard: $isOnboard)';
+  return 'MoveInCostModel(name: $name, amount: $amount, refundable: $refundable, months: $months)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $VacantHouseBillCopyWith<$Res>  {
-  factory $VacantHouseBillCopyWith(VacantHouseBill value, $Res Function(VacantHouseBill) _then) = _$VacantHouseBillCopyWithImpl;
+abstract mixin class $MoveInCostModelCopyWith<$Res>  {
+  factory $MoveInCostModelCopyWith(MoveInCostModel value, $Res Function(MoveInCostModel) _then) = _$MoveInCostModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: parseIntNullable) int? id, String? name,@JsonKey(fromJson: parseDouble) double amount, bool isOnboard
+ String name,@JsonKey(fromJson: parseDoubleNullable) double? amount, bool refundable, int? months
 });
 
 
@@ -434,30 +422,30 @@ $Res call({
 
 }
 /// @nodoc
-class _$VacantHouseBillCopyWithImpl<$Res>
-    implements $VacantHouseBillCopyWith<$Res> {
-  _$VacantHouseBillCopyWithImpl(this._self, this._then);
+class _$MoveInCostModelCopyWithImpl<$Res>
+    implements $MoveInCostModelCopyWith<$Res> {
+  _$MoveInCostModelCopyWithImpl(this._self, this._then);
 
-  final VacantHouseBill _self;
-  final $Res Function(VacantHouseBill) _then;
+  final MoveInCostModel _self;
+  final $Res Function(MoveInCostModel) _then;
 
-/// Create a copy of VacantHouseBill
+/// Create a copy of MoveInCostModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? amount = null,Object? isOnboard = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? amount = freezed,Object? refundable = null,Object? months = freezed,}) {
   return _then(_self.copyWith(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,isOnboard: null == isOnboard ? _self.isOnboard : isOnboard // ignore: cast_nullable_to_non_nullable
-as bool,
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,amount: freezed == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double?,refundable: null == refundable ? _self.refundable : refundable // ignore: cast_nullable_to_non_nullable
+as bool,months: freezed == months ? _self.months : months // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [VacantHouseBill].
-extension VacantHouseBillPatterns on VacantHouseBill {
+/// Adds pattern-matching-related methods to [MoveInCostModel].
+extension MoveInCostModelPatterns on MoveInCostModel {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -470,10 +458,10 @@ extension VacantHouseBillPatterns on VacantHouseBill {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VacantHouseBill value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MoveInCostModel value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _VacantHouseBill() when $default != null:
+case _MoveInCostModel() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -492,10 +480,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VacantHouseBill value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MoveInCostModel value)  $default,){
 final _that = this;
 switch (_that) {
-case _VacantHouseBill():
+case _MoveInCostModel():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -513,10 +501,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VacantHouseBill value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MoveInCostModel value)?  $default,){
 final _that = this;
 switch (_that) {
-case _VacantHouseBill() when $default != null:
+case _MoveInCostModel() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -534,10 +522,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? name, @JsonKey(fromJson: parseDouble)  double amount,  bool isOnboard)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name, @JsonKey(fromJson: parseDoubleNullable)  double? amount,  bool refundable,  int? months)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _VacantHouseBill() when $default != null:
-return $default(_that.id,_that.name,_that.amount,_that.isOnboard);case _:
+case _MoveInCostModel() when $default != null:
+return $default(_that.name,_that.amount,_that.refundable,_that.months);case _:
   return orElse();
 
 }
@@ -555,10 +543,10 @@ return $default(_that.id,_that.name,_that.amount,_that.isOnboard);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? name, @JsonKey(fromJson: parseDouble)  double amount,  bool isOnboard)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name, @JsonKey(fromJson: parseDoubleNullable)  double? amount,  bool refundable,  int? months)  $default,) {final _that = this;
 switch (_that) {
-case _VacantHouseBill():
-return $default(_that.id,_that.name,_that.amount,_that.isOnboard);case _:
+case _MoveInCostModel():
+return $default(_that.name,_that.amount,_that.refundable,_that.months);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -575,10 +563,10 @@ return $default(_that.id,_that.name,_that.amount,_that.isOnboard);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? name, @JsonKey(fromJson: parseDouble)  double amount,  bool isOnboard)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name, @JsonKey(fromJson: parseDoubleNullable)  double? amount,  bool refundable,  int? months)?  $default,) {final _that = this;
 switch (_that) {
-case _VacantHouseBill() when $default != null:
-return $default(_that.id,_that.name,_that.amount,_that.isOnboard);case _:
+case _MoveInCostModel() when $default != null:
+return $default(_that.name,_that.amount,_that.refundable,_that.months);case _:
   return null;
 
 }
@@ -589,49 +577,54 @@ return $default(_that.id,_that.name,_that.amount,_that.isOnboard);case _:
 /// @nodoc
 @JsonSerializable()
 
-class _VacantHouseBill implements VacantHouseBill {
-  const _VacantHouseBill({@JsonKey(fromJson: parseIntNullable) this.id, this.name, @JsonKey(fromJson: parseDouble) this.amount = 0, this.isOnboard = false});
-  factory _VacantHouseBill.fromJson(Map<String, dynamic> json) => _$VacantHouseBillFromJson(json);
+class _MoveInCostModel extends MoveInCostModel {
+  const _MoveInCostModel({required this.name, @JsonKey(fromJson: parseDoubleNullable) this.amount, this.refundable = false, this.months}): super._();
+  factory _MoveInCostModel.fromJson(Map<String, dynamic> json) => _$MoveInCostModelFromJson(json);
 
-@override@JsonKey(fromJson: parseIntNullable) final  int? id;
-@override final  String? name;
-@override@JsonKey(fromJson: parseDouble) final  double amount;
-@override@JsonKey() final  bool isOnboard;
+@override final  String name;
+/// Null where the charge is expressed as a rule rather than a figure — "two months' rent"
+/// before a rent has been agreed. Shown as the rule, not as zero.
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? amount;
+/// Whether it comes back at the end. The difference between a deposit and a fee, and the
+/// thing somebody most wants to know when they add the total up.
+@override@JsonKey() final  bool refundable;
+/// Expressed in months of rent, where that is how it is set.
+@override final  int? months;
 
-/// Create a copy of VacantHouseBill
+/// Create a copy of MoveInCostModel
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$VacantHouseBillCopyWith<_VacantHouseBill> get copyWith => __$VacantHouseBillCopyWithImpl<_VacantHouseBill>(this, _$identity);
+_$MoveInCostModelCopyWith<_MoveInCostModel> get copyWith => __$MoveInCostModelCopyWithImpl<_MoveInCostModel>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$VacantHouseBillToJson(this, );
+  return _$MoveInCostModelToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacantHouseBill&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.isOnboard, isOnboard) || other.isOnboard == isOnboard));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MoveInCostModel&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.refundable, refundable) || other.refundable == refundable)&&(identical(other.months, months) || other.months == months));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,amount,isOnboard);
+int get hashCode => Object.hash(runtimeType,name,amount,refundable,months);
 
 @override
 String toString() {
-  return 'VacantHouseBill(id: $id, name: $name, amount: $amount, isOnboard: $isOnboard)';
+  return 'MoveInCostModel(name: $name, amount: $amount, refundable: $refundable, months: $months)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$VacantHouseBillCopyWith<$Res> implements $VacantHouseBillCopyWith<$Res> {
-  factory _$VacantHouseBillCopyWith(_VacantHouseBill value, $Res Function(_VacantHouseBill) _then) = __$VacantHouseBillCopyWithImpl;
+abstract mixin class _$MoveInCostModelCopyWith<$Res> implements $MoveInCostModelCopyWith<$Res> {
+  factory _$MoveInCostModelCopyWith(_MoveInCostModel value, $Res Function(_MoveInCostModel) _then) = __$MoveInCostModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: parseIntNullable) int? id, String? name,@JsonKey(fromJson: parseDouble) double amount, bool isOnboard
+ String name,@JsonKey(fromJson: parseDoubleNullable) double? amount, bool refundable, int? months
 });
 
 
@@ -639,22 +632,22 @@ $Res call({
 
 }
 /// @nodoc
-class __$VacantHouseBillCopyWithImpl<$Res>
-    implements _$VacantHouseBillCopyWith<$Res> {
-  __$VacantHouseBillCopyWithImpl(this._self, this._then);
+class __$MoveInCostModelCopyWithImpl<$Res>
+    implements _$MoveInCostModelCopyWith<$Res> {
+  __$MoveInCostModelCopyWithImpl(this._self, this._then);
 
-  final _VacantHouseBill _self;
-  final $Res Function(_VacantHouseBill) _then;
+  final _MoveInCostModel _self;
+  final $Res Function(_MoveInCostModel) _then;
 
-/// Create a copy of VacantHouseBill
+/// Create a copy of MoveInCostModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? amount = null,Object? isOnboard = null,}) {
-  return _then(_VacantHouseBill(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,isOnboard: null == isOnboard ? _self.isOnboard : isOnboard // ignore: cast_nullable_to_non_nullable
-as bool,
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? amount = freezed,Object? refundable = null,Object? months = freezed,}) {
+  return _then(_MoveInCostModel(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,amount: freezed == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double?,refundable: null == refundable ? _self.refundable : refundable // ignore: cast_nullable_to_non_nullable
+as bool,months: freezed == months ? _self.months : months // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -663,42 +656,42 @@ as bool,
 
 
 /// @nodoc
-mixin _$VacantHouseFeature {
+mixin _$ListingAmenity {
 
-@JsonKey(fromJson: parseIntNullable) int? get id; String? get name;
-/// Create a copy of VacantHouseFeature
+ String get name; String? get icon;
+/// Create a copy of ListingAmenity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$VacantHouseFeatureCopyWith<VacantHouseFeature> get copyWith => _$VacantHouseFeatureCopyWithImpl<VacantHouseFeature>(this as VacantHouseFeature, _$identity);
+$ListingAmenityCopyWith<ListingAmenity> get copyWith => _$ListingAmenityCopyWithImpl<ListingAmenity>(this as ListingAmenity, _$identity);
 
-  /// Serializes this VacantHouseFeature to a JSON map.
+  /// Serializes this ListingAmenity to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacantHouseFeature&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ListingAmenity&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name);
+int get hashCode => Object.hash(runtimeType,name,icon);
 
 @override
 String toString() {
-  return 'VacantHouseFeature(id: $id, name: $name)';
+  return 'ListingAmenity(name: $name, icon: $icon)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $VacantHouseFeatureCopyWith<$Res>  {
-  factory $VacantHouseFeatureCopyWith(VacantHouseFeature value, $Res Function(VacantHouseFeature) _then) = _$VacantHouseFeatureCopyWithImpl;
+abstract mixin class $ListingAmenityCopyWith<$Res>  {
+  factory $ListingAmenityCopyWith(ListingAmenity value, $Res Function(ListingAmenity) _then) = _$ListingAmenityCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: parseIntNullable) int? id, String? name
+ String name, String? icon
 });
 
 
@@ -706,19 +699,19 @@ $Res call({
 
 }
 /// @nodoc
-class _$VacantHouseFeatureCopyWithImpl<$Res>
-    implements $VacantHouseFeatureCopyWith<$Res> {
-  _$VacantHouseFeatureCopyWithImpl(this._self, this._then);
+class _$ListingAmenityCopyWithImpl<$Res>
+    implements $ListingAmenityCopyWith<$Res> {
+  _$ListingAmenityCopyWithImpl(this._self, this._then);
 
-  final VacantHouseFeature _self;
-  final $Res Function(VacantHouseFeature) _then;
+  final ListingAmenity _self;
+  final $Res Function(ListingAmenity) _then;
 
-/// Create a copy of VacantHouseFeature
+/// Create a copy of ListingAmenity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? icon = freezed,}) {
   return _then(_self.copyWith(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -726,8 +719,8 @@ as String?,
 }
 
 
-/// Adds pattern-matching-related methods to [VacantHouseFeature].
-extension VacantHouseFeaturePatterns on VacantHouseFeature {
+/// Adds pattern-matching-related methods to [ListingAmenity].
+extension ListingAmenityPatterns on ListingAmenity {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -740,10 +733,10 @@ extension VacantHouseFeaturePatterns on VacantHouseFeature {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VacantHouseFeature value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ListingAmenity value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _VacantHouseFeature() when $default != null:
+case _ListingAmenity() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -762,10 +755,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VacantHouseFeature value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ListingAmenity value)  $default,){
 final _that = this;
 switch (_that) {
-case _VacantHouseFeature():
+case _ListingAmenity():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -783,10 +776,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VacantHouseFeature value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ListingAmenity value)?  $default,){
 final _that = this;
 switch (_that) {
-case _VacantHouseFeature() when $default != null:
+case _ListingAmenity() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -804,10 +797,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? name)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? icon)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _VacantHouseFeature() when $default != null:
-return $default(_that.id,_that.name);case _:
+case _ListingAmenity() when $default != null:
+return $default(_that.name,_that.icon);case _:
   return orElse();
 
 }
@@ -825,10 +818,10 @@ return $default(_that.id,_that.name);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? name)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? icon)  $default,) {final _that = this;
 switch (_that) {
-case _VacantHouseFeature():
-return $default(_that.id,_that.name);case _:
+case _ListingAmenity():
+return $default(_that.name,_that.icon);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -845,10 +838,10 @@ return $default(_that.id,_that.name);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? name)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? icon)?  $default,) {final _that = this;
 switch (_that) {
-case _VacantHouseFeature() when $default != null:
-return $default(_that.id,_that.name);case _:
+case _ListingAmenity() when $default != null:
+return $default(_that.name,_that.icon);case _:
   return null;
 
 }
@@ -859,47 +852,47 @@ return $default(_that.id,_that.name);case _:
 /// @nodoc
 @JsonSerializable()
 
-class _VacantHouseFeature implements VacantHouseFeature {
-  const _VacantHouseFeature({@JsonKey(fromJson: parseIntNullable) this.id, this.name});
-  factory _VacantHouseFeature.fromJson(Map<String, dynamic> json) => _$VacantHouseFeatureFromJson(json);
+class _ListingAmenity extends ListingAmenity {
+  const _ListingAmenity({required this.name, this.icon}): super._();
+  factory _ListingAmenity.fromJson(Map<String, dynamic> json) => _$ListingAmenityFromJson(json);
 
-@override@JsonKey(fromJson: parseIntNullable) final  int? id;
-@override final  String? name;
+@override final  String name;
+@override final  String? icon;
 
-/// Create a copy of VacantHouseFeature
+/// Create a copy of ListingAmenity
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$VacantHouseFeatureCopyWith<_VacantHouseFeature> get copyWith => __$VacantHouseFeatureCopyWithImpl<_VacantHouseFeature>(this, _$identity);
+_$ListingAmenityCopyWith<_ListingAmenity> get copyWith => __$ListingAmenityCopyWithImpl<_ListingAmenity>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$VacantHouseFeatureToJson(this, );
+  return _$ListingAmenityToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacantHouseFeature&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ListingAmenity&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name);
+int get hashCode => Object.hash(runtimeType,name,icon);
 
 @override
 String toString() {
-  return 'VacantHouseFeature(id: $id, name: $name)';
+  return 'ListingAmenity(name: $name, icon: $icon)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$VacantHouseFeatureCopyWith<$Res> implements $VacantHouseFeatureCopyWith<$Res> {
-  factory _$VacantHouseFeatureCopyWith(_VacantHouseFeature value, $Res Function(_VacantHouseFeature) _then) = __$VacantHouseFeatureCopyWithImpl;
+abstract mixin class _$ListingAmenityCopyWith<$Res> implements $ListingAmenityCopyWith<$Res> {
+  factory _$ListingAmenityCopyWith(_ListingAmenity value, $Res Function(_ListingAmenity) _then) = __$ListingAmenityCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: parseIntNullable) int? id, String? name
+ String name, String? icon
 });
 
 
@@ -907,19 +900,19 @@ $Res call({
 
 }
 /// @nodoc
-class __$VacantHouseFeatureCopyWithImpl<$Res>
-    implements _$VacantHouseFeatureCopyWith<$Res> {
-  __$VacantHouseFeatureCopyWithImpl(this._self, this._then);
+class __$ListingAmenityCopyWithImpl<$Res>
+    implements _$ListingAmenityCopyWith<$Res> {
+  __$ListingAmenityCopyWithImpl(this._self, this._then);
 
-  final _VacantHouseFeature _self;
-  final $Res Function(_VacantHouseFeature) _then;
+  final _ListingAmenity _self;
+  final $Res Function(_ListingAmenity) _then;
 
-/// Create a copy of VacantHouseFeature
+/// Create a copy of ListingAmenity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,}) {
-  return _then(_VacantHouseFeature(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? icon = freezed,}) {
+  return _then(_ListingAmenity(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -929,42 +922,42 @@ as String?,
 
 
 /// @nodoc
-mixin _$VacantHouseImage {
+mixin _$ListingChoice {
 
-@JsonKey(fromJson: parseIntNullable) int? get id; String? get filename; String? get originalName; String? get imageUrl;
-/// Create a copy of VacantHouseImage
+ String get value; String get label; int get count;
+/// Create a copy of ListingChoice
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$VacantHouseImageCopyWith<VacantHouseImage> get copyWith => _$VacantHouseImageCopyWithImpl<VacantHouseImage>(this as VacantHouseImage, _$identity);
+$ListingChoiceCopyWith<ListingChoice> get copyWith => _$ListingChoiceCopyWithImpl<ListingChoice>(this as ListingChoice, _$identity);
 
-  /// Serializes this VacantHouseImage to a JSON map.
+  /// Serializes this ListingChoice to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacantHouseImage&&(identical(other.id, id) || other.id == id)&&(identical(other.filename, filename) || other.filename == filename)&&(identical(other.originalName, originalName) || other.originalName == originalName)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ListingChoice&&(identical(other.value, value) || other.value == value)&&(identical(other.label, label) || other.label == label)&&(identical(other.count, count) || other.count == count));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,filename,originalName,imageUrl);
+int get hashCode => Object.hash(runtimeType,value,label,count);
 
 @override
 String toString() {
-  return 'VacantHouseImage(id: $id, filename: $filename, originalName: $originalName, imageUrl: $imageUrl)';
+  return 'ListingChoice(value: $value, label: $label, count: $count)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $VacantHouseImageCopyWith<$Res>  {
-  factory $VacantHouseImageCopyWith(VacantHouseImage value, $Res Function(VacantHouseImage) _then) = _$VacantHouseImageCopyWithImpl;
+abstract mixin class $ListingChoiceCopyWith<$Res>  {
+  factory $ListingChoiceCopyWith(ListingChoice value, $Res Function(ListingChoice) _then) = _$ListingChoiceCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: parseIntNullable) int? id, String? filename, String? originalName, String? imageUrl
+ String value, String label, int count
 });
 
 
@@ -972,30 +965,29 @@ $Res call({
 
 }
 /// @nodoc
-class _$VacantHouseImageCopyWithImpl<$Res>
-    implements $VacantHouseImageCopyWith<$Res> {
-  _$VacantHouseImageCopyWithImpl(this._self, this._then);
+class _$ListingChoiceCopyWithImpl<$Res>
+    implements $ListingChoiceCopyWith<$Res> {
+  _$ListingChoiceCopyWithImpl(this._self, this._then);
 
-  final VacantHouseImage _self;
-  final $Res Function(VacantHouseImage) _then;
+  final ListingChoice _self;
+  final $Res Function(ListingChoice) _then;
 
-/// Create a copy of VacantHouseImage
+/// Create a copy of ListingChoice
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? filename = freezed,Object? originalName = freezed,Object? imageUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? value = null,Object? label = null,Object? count = null,}) {
   return _then(_self.copyWith(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,filename: freezed == filename ? _self.filename : filename // ignore: cast_nullable_to_non_nullable
-as String?,originalName: freezed == originalName ? _self.originalName : originalName // ignore: cast_nullable_to_non_nullable
-as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+as String,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [VacantHouseImage].
-extension VacantHouseImagePatterns on VacantHouseImage {
+/// Adds pattern-matching-related methods to [ListingChoice].
+extension ListingChoicePatterns on ListingChoice {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -1008,10 +1000,10 @@ extension VacantHouseImagePatterns on VacantHouseImage {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VacantHouseImage value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ListingChoice value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _VacantHouseImage() when $default != null:
+case _ListingChoice() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -1030,10 +1022,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VacantHouseImage value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ListingChoice value)  $default,){
 final _that = this;
 switch (_that) {
-case _VacantHouseImage():
+case _ListingChoice():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -1051,10 +1043,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VacantHouseImage value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ListingChoice value)?  $default,){
 final _that = this;
 switch (_that) {
-case _VacantHouseImage() when $default != null:
+case _ListingChoice() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -1072,10 +1064,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? filename,  String? originalName,  String? imageUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String value,  String label,  int count)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _VacantHouseImage() when $default != null:
-return $default(_that.id,_that.filename,_that.originalName,_that.imageUrl);case _:
+case _ListingChoice() when $default != null:
+return $default(_that.value,_that.label,_that.count);case _:
   return orElse();
 
 }
@@ -1093,10 +1085,10 @@ return $default(_that.id,_that.filename,_that.originalName,_that.imageUrl);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? filename,  String? originalName,  String? imageUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String value,  String label,  int count)  $default,) {final _that = this;
 switch (_that) {
-case _VacantHouseImage():
-return $default(_that.id,_that.filename,_that.originalName,_that.imageUrl);case _:
+case _ListingChoice():
+return $default(_that.value,_that.label,_that.count);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1113,10 +1105,10 @@ return $default(_that.id,_that.filename,_that.originalName,_that.imageUrl);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: parseIntNullable)  int? id,  String? filename,  String? originalName,  String? imageUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String value,  String label,  int count)?  $default,) {final _that = this;
 switch (_that) {
-case _VacantHouseImage() when $default != null:
-return $default(_that.id,_that.filename,_that.originalName,_that.imageUrl);case _:
+case _ListingChoice() when $default != null:
+return $default(_that.value,_that.label,_that.count);case _:
   return null;
 
 }
@@ -1127,49 +1119,48 @@ return $default(_that.id,_that.filename,_that.originalName,_that.imageUrl);case 
 /// @nodoc
 @JsonSerializable()
 
-class _VacantHouseImage implements VacantHouseImage {
-  const _VacantHouseImage({@JsonKey(fromJson: parseIntNullable) this.id, this.filename, this.originalName, this.imageUrl});
-  factory _VacantHouseImage.fromJson(Map<String, dynamic> json) => _$VacantHouseImageFromJson(json);
+class _ListingChoice extends ListingChoice {
+  const _ListingChoice({required this.value, required this.label, this.count = 0}): super._();
+  factory _ListingChoice.fromJson(Map<String, dynamic> json) => _$ListingChoiceFromJson(json);
 
-@override@JsonKey(fromJson: parseIntNullable) final  int? id;
-@override final  String? filename;
-@override final  String? originalName;
-@override final  String? imageUrl;
+@override final  String value;
+@override final  String label;
+@override@JsonKey() final  int count;
 
-/// Create a copy of VacantHouseImage
+/// Create a copy of ListingChoice
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$VacantHouseImageCopyWith<_VacantHouseImage> get copyWith => __$VacantHouseImageCopyWithImpl<_VacantHouseImage>(this, _$identity);
+_$ListingChoiceCopyWith<_ListingChoice> get copyWith => __$ListingChoiceCopyWithImpl<_ListingChoice>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$VacantHouseImageToJson(this, );
+  return _$ListingChoiceToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacantHouseImage&&(identical(other.id, id) || other.id == id)&&(identical(other.filename, filename) || other.filename == filename)&&(identical(other.originalName, originalName) || other.originalName == originalName)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ListingChoice&&(identical(other.value, value) || other.value == value)&&(identical(other.label, label) || other.label == label)&&(identical(other.count, count) || other.count == count));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,filename,originalName,imageUrl);
+int get hashCode => Object.hash(runtimeType,value,label,count);
 
 @override
 String toString() {
-  return 'VacantHouseImage(id: $id, filename: $filename, originalName: $originalName, imageUrl: $imageUrl)';
+  return 'ListingChoice(value: $value, label: $label, count: $count)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$VacantHouseImageCopyWith<$Res> implements $VacantHouseImageCopyWith<$Res> {
-  factory _$VacantHouseImageCopyWith(_VacantHouseImage value, $Res Function(_VacantHouseImage) _then) = __$VacantHouseImageCopyWithImpl;
+abstract mixin class _$ListingChoiceCopyWith<$Res> implements $ListingChoiceCopyWith<$Res> {
+  factory _$ListingChoiceCopyWith(_ListingChoice value, $Res Function(_ListingChoice) _then) = __$ListingChoiceCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: parseIntNullable) int? id, String? filename, String? originalName, String? imageUrl
+ String value, String label, int count
 });
 
 
@@ -1177,22 +1168,317 @@ $Res call({
 
 }
 /// @nodoc
-class __$VacantHouseImageCopyWithImpl<$Res>
-    implements _$VacantHouseImageCopyWith<$Res> {
-  __$VacantHouseImageCopyWithImpl(this._self, this._then);
+class __$ListingChoiceCopyWithImpl<$Res>
+    implements _$ListingChoiceCopyWith<$Res> {
+  __$ListingChoiceCopyWithImpl(this._self, this._then);
 
-  final _VacantHouseImage _self;
-  final $Res Function(_VacantHouseImage) _then;
+  final _ListingChoice _self;
+  final $Res Function(_ListingChoice) _then;
 
-/// Create a copy of VacantHouseImage
+/// Create a copy of ListingChoice
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? filename = freezed,Object? originalName = freezed,Object? imageUrl = freezed,}) {
-  return _then(_VacantHouseImage(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int?,filename: freezed == filename ? _self.filename : filename // ignore: cast_nullable_to_non_nullable
-as String?,originalName: freezed == originalName ? _self.originalName : originalName // ignore: cast_nullable_to_non_nullable
-as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+@override @pragma('vm:prefer-inline') $Res call({Object? value = null,Object? label = null,Object? count = null,}) {
+  return _then(_ListingChoice(
+value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+as String,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ListingFilters {
+
+ List<ListingChoice> get categories;/// Areas, which is what the server offers instead of house types. The app asked for
+/// `/filters/house-types` and there is no such endpoint.
+ List<ListingChoice> get areas;@JsonKey(fromJson: parseDoubleNullable) double? get minRent;@JsonKey(fromJson: parseDoubleNullable) double? get maxRent; int get maxBedrooms; int get total;
+/// Create a copy of ListingFilters
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ListingFiltersCopyWith<ListingFilters> get copyWith => _$ListingFiltersCopyWithImpl<ListingFilters>(this as ListingFilters, _$identity);
+
+  /// Serializes this ListingFilters to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ListingFilters&&const DeepCollectionEquality().equals(other.categories, categories)&&const DeepCollectionEquality().equals(other.areas, areas)&&(identical(other.minRent, minRent) || other.minRent == minRent)&&(identical(other.maxRent, maxRent) || other.maxRent == maxRent)&&(identical(other.maxBedrooms, maxBedrooms) || other.maxBedrooms == maxBedrooms)&&(identical(other.total, total) || other.total == total));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(categories),const DeepCollectionEquality().hash(areas),minRent,maxRent,maxBedrooms,total);
+
+@override
+String toString() {
+  return 'ListingFilters(categories: $categories, areas: $areas, minRent: $minRent, maxRent: $maxRent, maxBedrooms: $maxBedrooms, total: $total)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ListingFiltersCopyWith<$Res>  {
+  factory $ListingFiltersCopyWith(ListingFilters value, $Res Function(ListingFilters) _then) = _$ListingFiltersCopyWithImpl;
+@useResult
+$Res call({
+ List<ListingChoice> categories, List<ListingChoice> areas,@JsonKey(fromJson: parseDoubleNullable) double? minRent,@JsonKey(fromJson: parseDoubleNullable) double? maxRent, int maxBedrooms, int total
+});
+
+
+
+
+}
+/// @nodoc
+class _$ListingFiltersCopyWithImpl<$Res>
+    implements $ListingFiltersCopyWith<$Res> {
+  _$ListingFiltersCopyWithImpl(this._self, this._then);
+
+  final ListingFilters _self;
+  final $Res Function(ListingFilters) _then;
+
+/// Create a copy of ListingFilters
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? categories = null,Object? areas = null,Object? minRent = freezed,Object? maxRent = freezed,Object? maxBedrooms = null,Object? total = null,}) {
+  return _then(_self.copyWith(
+categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
+as List<ListingChoice>,areas: null == areas ? _self.areas : areas // ignore: cast_nullable_to_non_nullable
+as List<ListingChoice>,minRent: freezed == minRent ? _self.minRent : minRent // ignore: cast_nullable_to_non_nullable
+as double?,maxRent: freezed == maxRent ? _self.maxRent : maxRent // ignore: cast_nullable_to_non_nullable
+as double?,maxBedrooms: null == maxBedrooms ? _self.maxBedrooms : maxBedrooms // ignore: cast_nullable_to_non_nullable
+as int,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ListingFilters].
+extension ListingFiltersPatterns on ListingFilters {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ListingFilters value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ListingFilters() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ListingFilters value)  $default,){
+final _that = this;
+switch (_that) {
+case _ListingFilters():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ListingFilters value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ListingFilters() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ListingChoice> categories,  List<ListingChoice> areas, @JsonKey(fromJson: parseDoubleNullable)  double? minRent, @JsonKey(fromJson: parseDoubleNullable)  double? maxRent,  int maxBedrooms,  int total)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ListingFilters() when $default != null:
+return $default(_that.categories,_that.areas,_that.minRent,_that.maxRent,_that.maxBedrooms,_that.total);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ListingChoice> categories,  List<ListingChoice> areas, @JsonKey(fromJson: parseDoubleNullable)  double? minRent, @JsonKey(fromJson: parseDoubleNullable)  double? maxRent,  int maxBedrooms,  int total)  $default,) {final _that = this;
+switch (_that) {
+case _ListingFilters():
+return $default(_that.categories,_that.areas,_that.minRent,_that.maxRent,_that.maxBedrooms,_that.total);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ListingChoice> categories,  List<ListingChoice> areas, @JsonKey(fromJson: parseDoubleNullable)  double? minRent, @JsonKey(fromJson: parseDoubleNullable)  double? maxRent,  int maxBedrooms,  int total)?  $default,) {final _that = this;
+switch (_that) {
+case _ListingFilters() when $default != null:
+return $default(_that.categories,_that.areas,_that.minRent,_that.maxRent,_that.maxBedrooms,_that.total);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ListingFilters extends ListingFilters {
+  const _ListingFilters({final  List<ListingChoice> categories = const <ListingChoice>[], final  List<ListingChoice> areas = const <ListingChoice>[], @JsonKey(fromJson: parseDoubleNullable) this.minRent, @JsonKey(fromJson: parseDoubleNullable) this.maxRent, this.maxBedrooms = 0, this.total = 0}): _categories = categories,_areas = areas,super._();
+  factory _ListingFilters.fromJson(Map<String, dynamic> json) => _$ListingFiltersFromJson(json);
+
+ final  List<ListingChoice> _categories;
+@override@JsonKey() List<ListingChoice> get categories {
+  if (_categories is EqualUnmodifiableListView) return _categories;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_categories);
+}
+
+/// Areas, which is what the server offers instead of house types. The app asked for
+/// `/filters/house-types` and there is no such endpoint.
+ final  List<ListingChoice> _areas;
+/// Areas, which is what the server offers instead of house types. The app asked for
+/// `/filters/house-types` and there is no such endpoint.
+@override@JsonKey() List<ListingChoice> get areas {
+  if (_areas is EqualUnmodifiableListView) return _areas;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_areas);
+}
+
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? minRent;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? maxRent;
+@override@JsonKey() final  int maxBedrooms;
+@override@JsonKey() final  int total;
+
+/// Create a copy of ListingFilters
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ListingFiltersCopyWith<_ListingFilters> get copyWith => __$ListingFiltersCopyWithImpl<_ListingFilters>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ListingFiltersToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ListingFilters&&const DeepCollectionEquality().equals(other._categories, _categories)&&const DeepCollectionEquality().equals(other._areas, _areas)&&(identical(other.minRent, minRent) || other.minRent == minRent)&&(identical(other.maxRent, maxRent) || other.maxRent == maxRent)&&(identical(other.maxBedrooms, maxBedrooms) || other.maxBedrooms == maxBedrooms)&&(identical(other.total, total) || other.total == total));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_categories),const DeepCollectionEquality().hash(_areas),minRent,maxRent,maxBedrooms,total);
+
+@override
+String toString() {
+  return 'ListingFilters(categories: $categories, areas: $areas, minRent: $minRent, maxRent: $maxRent, maxBedrooms: $maxBedrooms, total: $total)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ListingFiltersCopyWith<$Res> implements $ListingFiltersCopyWith<$Res> {
+  factory _$ListingFiltersCopyWith(_ListingFilters value, $Res Function(_ListingFilters) _then) = __$ListingFiltersCopyWithImpl;
+@override @useResult
+$Res call({
+ List<ListingChoice> categories, List<ListingChoice> areas,@JsonKey(fromJson: parseDoubleNullable) double? minRent,@JsonKey(fromJson: parseDoubleNullable) double? maxRent, int maxBedrooms, int total
+});
+
+
+
+
+}
+/// @nodoc
+class __$ListingFiltersCopyWithImpl<$Res>
+    implements _$ListingFiltersCopyWith<$Res> {
+  __$ListingFiltersCopyWithImpl(this._self, this._then);
+
+  final _ListingFilters _self;
+  final $Res Function(_ListingFilters) _then;
+
+/// Create a copy of ListingFilters
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? categories = null,Object? areas = null,Object? minRent = freezed,Object? maxRent = freezed,Object? maxBedrooms = null,Object? total = null,}) {
+  return _then(_ListingFilters(
+categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
+as List<ListingChoice>,areas: null == areas ? _self._areas : areas // ignore: cast_nullable_to_non_nullable
+as List<ListingChoice>,minRent: freezed == minRent ? _self.minRent : minRent // ignore: cast_nullable_to_non_nullable
+as double?,maxRent: freezed == maxRent ? _self.maxRent : maxRent // ignore: cast_nullable_to_non_nullable
+as double?,maxBedrooms: null == maxBedrooms ? _self.maxBedrooms : maxBedrooms // ignore: cast_nullable_to_non_nullable
+as int,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

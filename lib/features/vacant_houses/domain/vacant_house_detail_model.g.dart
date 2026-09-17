@@ -9,53 +9,38 @@ part of 'vacant_house_detail_model.dart';
 _VacantHouseDetailModel _$VacantHouseDetailModelFromJson(
   Map<String, dynamic> json,
 ) => _VacantHouseDetailModel(
-  id: json['id'] as String?,
-  houseName: json['houseName'] as String?,
-  houseNumber: json['houseNumber'] as String?,
-  houseCode: json['houseCode'] as String?,
-  floor: parseIntNullable(json['floor']),
+  id: json['id'] as String,
+  title: json['title'] as String? ?? '',
+  categoryName: json['categoryName'] as String?,
+  usageClassName: json['usageClassName'] as String?,
   description: json['description'] as String?,
-  category: json['category'] as String?,
-  houseType: json['houseType'] as String?,
-  location: json['location'] as String?,
+  propertyName: json['propertyName'] as String?,
+  area: json['area'] as String?,
+  rent: parseDoubleNullable(json['rent']),
+  deposit: parseDoubleNullable(json['deposit']),
+  moveInCosts:
+      (json['moveInCosts'] as List<dynamic>?)
+          ?.map((e) => MoveInCostModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <MoveInCostModel>[],
+  bedrooms: (json['bedrooms'] as num?)?.toInt(),
+  bathrooms: (json['bathrooms'] as num?)?.toInt(),
+  ensuiteBathrooms: (json['ensuiteBathrooms'] as num?)?.toInt(),
+  squareFt: parseDoubleNullable(json['squareFt']),
+  floorLabel: json['floorLabel'] as String?,
+  dsq: json['dsq'] as bool? ?? false,
+  parkingSpaces: (json['parkingSpaces'] as num?)?.toInt(),
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
-  property: json['property'] as String?,
-  estate: json['estate'] as String?,
-  rent: json['rent'] == null ? 0 : parseDouble(json['rent']),
-  squareFt: (json['squareFt'] as num?)?.toDouble(),
-  featureCount: parseIntNullable(json['featureCount']),
-  lastOccupied: json['lastOccupied'] as String?,
-  imageUrl: json['imageUrl'] as String?,
-  utilityBills:
-      (json['utilityBills'] as List<dynamic>?)
-          ?.map((e) => VacantHouseBill.fromJson(e as Map<String, dynamic>))
+  images:
+      (json['images'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const <String>[],
+  amenities:
+      (json['amenities'] as List<dynamic>?)
+          ?.map((e) => ListingAmenity.fromJson(e as Map<String, dynamic>))
           .toList() ??
-      const [],
-  onboardFees:
-      (json['onboardFees'] as List<dynamic>?)
-          ?.map((e) => VacantHouseBill.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-  totalMonthlyBills: json['totalMonthlyBills'] == null
-      ? 0
-      : parseDouble(json['totalMonthlyBills']),
-  totalOnboardFees: json['totalOnboardFees'] == null
-      ? 0
-      : parseDouble(json['totalOnboardFees']),
-  maxRefundableAmount: json['maxRefundableAmount'] == null
-      ? 0
-      : parseDouble(json['maxRefundableAmount']),
-  houseFeatures:
-      (json['houseFeatures'] as List<dynamic>?)
-          ?.map((e) => VacantHouseFeature.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-  categoryImages:
-      (json['categoryImages'] as List<dynamic>?)
-          ?.map((e) => VacantHouseImage.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
+      const <ListingAmenity>[],
+  availableFrom: json['availableFrom'] as String?,
   contactName: json['contactName'] as String?,
   contactPhone: json['contactPhone'] as String?,
   contactEmail: json['contactEmail'] as String?,
@@ -65,72 +50,95 @@ Map<String, dynamic> _$VacantHouseDetailModelToJson(
   _VacantHouseDetailModel instance,
 ) => <String, dynamic>{
   'id': instance.id,
-  'houseName': instance.houseName,
-  'houseNumber': instance.houseNumber,
-  'houseCode': instance.houseCode,
-  'floor': instance.floor,
+  'title': instance.title,
+  'categoryName': instance.categoryName,
+  'usageClassName': instance.usageClassName,
   'description': instance.description,
-  'category': instance.category,
-  'houseType': instance.houseType,
-  'location': instance.location,
+  'propertyName': instance.propertyName,
+  'area': instance.area,
+  'rent': instance.rent,
+  'deposit': instance.deposit,
+  'moveInCosts': instance.moveInCosts,
+  'bedrooms': instance.bedrooms,
+  'bathrooms': instance.bathrooms,
+  'ensuiteBathrooms': instance.ensuiteBathrooms,
+  'squareFt': instance.squareFt,
+  'floorLabel': instance.floorLabel,
+  'dsq': instance.dsq,
+  'parkingSpaces': instance.parkingSpaces,
   'latitude': instance.latitude,
   'longitude': instance.longitude,
-  'property': instance.property,
-  'estate': instance.estate,
-  'rent': instance.rent,
-  'squareFt': instance.squareFt,
-  'featureCount': instance.featureCount,
-  'lastOccupied': instance.lastOccupied,
-  'imageUrl': instance.imageUrl,
-  'utilityBills': instance.utilityBills,
-  'onboardFees': instance.onboardFees,
-  'totalMonthlyBills': instance.totalMonthlyBills,
-  'totalOnboardFees': instance.totalOnboardFees,
-  'maxRefundableAmount': instance.maxRefundableAmount,
-  'houseFeatures': instance.houseFeatures,
-  'categoryImages': instance.categoryImages,
+  'images': instance.images,
+  'amenities': instance.amenities,
+  'availableFrom': instance.availableFrom,
   'contactName': instance.contactName,
   'contactPhone': instance.contactPhone,
   'contactEmail': instance.contactEmail,
 };
 
-_VacantHouseBill _$VacantHouseBillFromJson(Map<String, dynamic> json) =>
-    _VacantHouseBill(
-      id: parseIntNullable(json['id']),
-      name: json['name'] as String?,
-      amount: json['amount'] == null ? 0 : parseDouble(json['amount']),
-      isOnboard: json['isOnboard'] as bool? ?? false,
+_MoveInCostModel _$MoveInCostModelFromJson(Map<String, dynamic> json) =>
+    _MoveInCostModel(
+      name: json['name'] as String,
+      amount: parseDoubleNullable(json['amount']),
+      refundable: json['refundable'] as bool? ?? false,
+      months: (json['months'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$VacantHouseBillToJson(_VacantHouseBill instance) =>
+Map<String, dynamic> _$MoveInCostModelToJson(_MoveInCostModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'name': instance.name,
       'amount': instance.amount,
-      'isOnboard': instance.isOnboard,
+      'refundable': instance.refundable,
+      'months': instance.months,
     };
 
-_VacantHouseFeature _$VacantHouseFeatureFromJson(Map<String, dynamic> json) =>
-    _VacantHouseFeature(
-      id: parseIntNullable(json['id']),
-      name: json['name'] as String?,
+_ListingAmenity _$ListingAmenityFromJson(Map<String, dynamic> json) =>
+    _ListingAmenity(
+      name: json['name'] as String,
+      icon: json['icon'] as String?,
     );
 
-Map<String, dynamic> _$VacantHouseFeatureToJson(_VacantHouseFeature instance) =>
-    <String, dynamic>{'id': instance.id, 'name': instance.name};
+Map<String, dynamic> _$ListingAmenityToJson(_ListingAmenity instance) =>
+    <String, dynamic>{'name': instance.name, 'icon': instance.icon};
 
-_VacantHouseImage _$VacantHouseImageFromJson(Map<String, dynamic> json) =>
-    _VacantHouseImage(
-      id: parseIntNullable(json['id']),
-      filename: json['filename'] as String?,
-      originalName: json['originalName'] as String?,
-      imageUrl: json['imageUrl'] as String?,
+_ListingChoice _$ListingChoiceFromJson(Map<String, dynamic> json) =>
+    _ListingChoice(
+      value: json['value'] as String,
+      label: json['label'] as String,
+      count: (json['count'] as num?)?.toInt() ?? 0,
     );
 
-Map<String, dynamic> _$VacantHouseImageToJson(_VacantHouseImage instance) =>
+Map<String, dynamic> _$ListingChoiceToJson(_ListingChoice instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'filename': instance.filename,
-      'originalName': instance.originalName,
-      'imageUrl': instance.imageUrl,
+      'value': instance.value,
+      'label': instance.label,
+      'count': instance.count,
+    };
+
+_ListingFilters _$ListingFiltersFromJson(Map<String, dynamic> json) =>
+    _ListingFilters(
+      categories:
+          (json['categories'] as List<dynamic>?)
+              ?.map((e) => ListingChoice.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <ListingChoice>[],
+      areas:
+          (json['areas'] as List<dynamic>?)
+              ?.map((e) => ListingChoice.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <ListingChoice>[],
+      minRent: parseDoubleNullable(json['minRent']),
+      maxRent: parseDoubleNullable(json['maxRent']),
+      maxBedrooms: (json['maxBedrooms'] as num?)?.toInt() ?? 0,
+      total: (json['total'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$ListingFiltersToJson(_ListingFilters instance) =>
+    <String, dynamic>{
+      'categories': instance.categories,
+      'areas': instance.areas,
+      'minRent': instance.minRent,
+      'maxRent': instance.maxRent,
+      'maxBedrooms': instance.maxBedrooms,
+      'total': instance.total,
     };

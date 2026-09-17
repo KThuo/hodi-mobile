@@ -1,33 +1,36 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/api/api_client.dart';
 import '../data/vacant_house_repository.dart';
-import '../domain/vacant_house_model.dart';
 import '../domain/vacant_house_detail_model.dart';
+import '../domain/vacant_house_model.dart';
 
 final vacantHouseRepositoryProvider = Provider<VacantHouseRepository>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return VacantHouseRepository(apiClient: apiClient);
+  return VacantHouseRepository(apiClient: ref.watch(apiClientProvider));
 });
 
-// --- Filter options ---
-
-final vacantHouseCategoriesProvider =
-    FutureProvider<List<FilterItem>>((ref) async {
-  final repo = ref.watch(vacantHouseRepositoryProvider);
-  final response = await repo.getCategories();
-  if (response.isSuccess && response.data != null) return response.data!;
-  return [];
+/// Categories and areas, each with a count, from one call.
+///
+/// Empty rather than an error if it fails: filters are how somebody narrows a list, and a list
+/// that will not render because its filter bar could not load is worse than a list with no filters.
+final listingFiltersProvider = FutureProvider<ListingFilters>((ref) async {
+  final response = await ref.watch(vacantHouseRepositoryProvider).filters();
+  return response.isSuccess
+      ? (response.data ?? const ListingFilters())
+      : const ListingFilters();
 });
 
-final vacantHouseTypesProvider =
-    FutureProvider<List<FilterItem>>((ref) async {
-  final repo = ref.watch(vacantHouseRepositoryProvider);
-  final response = await repo.getHouseTypes();
-  if (response.isSuccess && response.data != null) return response.data!;
-  return [];
+final vacantHouseDetailProvider = FutureProvider.autoDispose
+    .family<VacantHouseDetailModel?, String>((ref, id) async {
+  final response =
+      await ref.watch(vacantHouseRepositoryProvider).getVacantHouseDetail(id);
+  if (!response.isSuccess) {
+    throw Exception(response.message.isNotEmpty
+        ? response.message
+        : 'That listing is no longer available.');
+  }
+  return response.data;
 });
-
-// --- Vacant House List ---
 
 class VacantHouseListState {
   final List<VacantHouseModel> houses;
@@ -36,19 +39,21 @@ class VacantHouseListState {
   final int currentPage;
   final String? error;
   final String? searchTerm;
-  final String? categoryId;
-  final String? houseTypeId;
+  final String? category;
+  final String? area;
 
-  VacantHouseListState({
+  const VacantHouseListState({
     this.houses = const [],
     this.isLoading = false,
     this.hasMore = true,
     this.currentPage = 0,
     this.error,
     this.searchTerm,
-    this.categoryId,
-    this.houseTypeId,
+    this.category,
+    this.area,
   });
+
+  bool get filtered => category != null || area != null;
 
   VacantHouseListState copyWith({
     List<VacantHouseModel>? houses,
@@ -57,8 +62,8 @@ class VacantHouseListState {
     int? currentPage,
     String? error,
     String? searchTerm,
-    String? Function()? categoryId,
-    String? Function()? houseTypeId,
+    String? Function()? category,
+    String? Function()? area,
   }) {
     return VacantHouseListState(
       houses: houses ?? this.houses,
@@ -67,8 +72,8 @@ class VacantHouseListState {
       currentPage: currentPage ?? this.currentPage,
       error: error,
       searchTerm: searchTerm ?? this.searchTerm,
-      categoryId: categoryId != null ? categoryId() : this.categoryId,
-      houseTypeId: houseTypeId != null ? houseTypeId() : this.houseTypeId,
+      category: category != null ? category() : this.category,
+      area: area != null ? area() : this.area,
     );
   }
 }
@@ -77,17 +82,18 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
   @override
   VacantHouseListState build() {
     Future.microtask(() => _fetchPage(0));
-    return VacantHouseListState(isLoading: true);
+    return const VacantHouseListState(isLoading: true);
   }
 
-  VacantHouseRepository get _repository => ref.read(vacantHouseRepositoryProvider);
+  VacantHouseRepository get _repository =>
+      ref.read(vacantHouseRepositoryProvider);
 
   Future<void> _fetchPage(int page) async {
     final response = await _repository.searchVacantHouses(
       page: page,
       searchTerm: state.searchTerm,
-      categoryId: state.categoryId,
-      houseTypeId: state.houseTypeId,
+      category: state.category,
+      area: state.area,
     );
 
     if (response.isSuccess && response.data != null) {
@@ -99,10 +105,7 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
         currentPage: page,
       );
     } else {
-      state = state.copyWith(
-        isLoading: false,
-        error: response.message,
-      );
+      state = state.copyWith(isLoading: false, error: response.message);
     }
   }
 
@@ -118,31 +121,42 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
   }
 
   Future<void> search(String term) async {
-    state = VacantHouseListState(
+    state = state.copyWith(
+      houses: const [],
       isLoading: true,
       searchTerm: term,
-      categoryId: state.categoryId,
-      houseTypeId: state.houseTypeId,
+      currentPage: 0,
     );
     await _fetchPage(0);
   }
 
-  Future<void> filterByCategory(String? id) async {
-    state = VacantHouseListState(
+  Future<void> filterByCategory(String? category) async {
+    state = state.copyWith(
+      houses: const [],
       isLoading: true,
-      searchTerm: state.searchTerm,
-      categoryId: id,
-      houseTypeId: state.houseTypeId,
+      category: () => category,
+      currentPage: 0,
     );
     await _fetchPage(0);
   }
 
-  Future<void> filterByHouseType(String? id) async {
-    state = VacantHouseListState(
+  Future<void> filterByArea(String? area) async {
+    state = state.copyWith(
+      houses: const [],
       isLoading: true,
-      searchTerm: state.searchTerm,
-      categoryId: state.categoryId,
-      houseTypeId: id,
+      area: () => area,
+      currentPage: 0,
+    );
+    await _fetchPage(0);
+  }
+
+  Future<void> clearFilters() async {
+    state = state.copyWith(
+      houses: const [],
+      isLoading: true,
+      category: () => null,
+      area: () => null,
+      currentPage: 0,
     );
     await _fetchPage(0);
   }
@@ -152,16 +166,3 @@ final vacantHouseListProvider =
     NotifierProvider<VacantHouseListNotifier, VacantHouseListState>(
   VacantHouseListNotifier.new,
 );
-
-// --- Vacant House Detail ---
-
-final vacantHouseDetailProvider =
-    FutureProvider.autoDispose.family<VacantHouseDetailModel?, String>((ref, id) async {
-  final repo = ref.watch(vacantHouseRepositoryProvider);
-  final response = await repo.getVacantHouseDetail(id);
-  if (response.isEstateOverdue) return null;
-  if (!response.isSuccess) {
-    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load details');
-  }
-  return response.data;
-});

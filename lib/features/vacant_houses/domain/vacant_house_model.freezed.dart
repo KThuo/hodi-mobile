@@ -15,7 +15,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$VacantHouseModel {
 
- String? get id; String? get houseName; String? get houseNumber; String? get houseCode; int get floor; String? get description; String? get category; String? get houseType; String? get location; double? get latitude; double? get longitude; String? get property; String? get estate; double get rent; double? get squareFt; int get featureCount; String? get lastOccupied; String? get imageUrl; String? get distanceText; double? get distance;
+ String get id;/// What to call it, composed by the server. There is no `houseName`.
+ String get title; String? get categoryName; String? get propertyName;/// Where it is, as somebody would say it — "Kilimani", not a coordinate.
+ String? get area;@JsonKey(fromJson: parseDoubleNullable) double? get rent; int? get bedrooms; int? get bathrooms;@JsonKey(fromJson: parseDoubleNullable) double? get squareFt; bool get dsq; int? get parkingSpaces; double? get latitude; double? get longitude;/// How far from where somebody searched, when they searched by location.
+@JsonKey(fromJson: parseDoubleNullable) double? get distanceKm; List<String> get images; int get imageCount; String? get availableFrom;
 /// Create a copy of VacantHouseModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +31,16 @@ $VacantHouseModelCopyWith<VacantHouseModel> get copyWith => _$VacantHouseModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacantHouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&(identical(other.houseType, houseType) || other.houseType == houseType)&&(identical(other.location, location) || other.location == location)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.property, property) || other.property == property)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.featureCount, featureCount) || other.featureCount == featureCount)&&(identical(other.lastOccupied, lastOccupied) || other.lastOccupied == lastOccupied)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.distanceText, distanceText) || other.distanceText == distanceText)&&(identical(other.distance, distance) || other.distance == distance));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VacantHouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.area, area) || other.area == area)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.bedrooms, bedrooms) || other.bedrooms == bedrooms)&&(identical(other.bathrooms, bathrooms) || other.bathrooms == bathrooms)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parkingSpaces, parkingSpaces) || other.parkingSpaces == parkingSpaces)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.distanceKm, distanceKm) || other.distanceKm == distanceKm)&&const DeepCollectionEquality().equals(other.images, images)&&(identical(other.imageCount, imageCount) || other.imageCount == imageCount)&&(identical(other.availableFrom, availableFrom) || other.availableFrom == availableFrom));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,houseName,houseNumber,houseCode,floor,description,category,houseType,location,latitude,longitude,property,estate,rent,squareFt,featureCount,lastOccupied,imageUrl,distanceText,distance]);
+int get hashCode => Object.hash(runtimeType,id,title,categoryName,propertyName,area,rent,bedrooms,bathrooms,squareFt,dsq,parkingSpaces,latitude,longitude,distanceKm,const DeepCollectionEquality().hash(images),imageCount,availableFrom);
 
 @override
 String toString() {
-  return 'VacantHouseModel(id: $id, houseName: $houseName, houseNumber: $houseNumber, houseCode: $houseCode, floor: $floor, description: $description, category: $category, houseType: $houseType, location: $location, latitude: $latitude, longitude: $longitude, property: $property, estate: $estate, rent: $rent, squareFt: $squareFt, featureCount: $featureCount, lastOccupied: $lastOccupied, imageUrl: $imageUrl, distanceText: $distanceText, distance: $distance)';
+  return 'VacantHouseModel(id: $id, title: $title, categoryName: $categoryName, propertyName: $propertyName, area: $area, rent: $rent, bedrooms: $bedrooms, bathrooms: $bathrooms, squareFt: $squareFt, dsq: $dsq, parkingSpaces: $parkingSpaces, latitude: $latitude, longitude: $longitude, distanceKm: $distanceKm, images: $images, imageCount: $imageCount, availableFrom: $availableFrom)';
 }
 
 
@@ -48,7 +51,7 @@ abstract mixin class $VacantHouseModelCopyWith<$Res>  {
   factory $VacantHouseModelCopyWith(VacantHouseModel value, $Res Function(VacantHouseModel) _then) = _$VacantHouseModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? houseName, String? houseNumber, String? houseCode, int floor, String? description, String? category, String? houseType, String? location, double? latitude, double? longitude, String? property, String? estate, double rent, double? squareFt, int featureCount, String? lastOccupied, String? imageUrl, String? distanceText, double? distance
+ String id, String title, String? categoryName, String? propertyName, String? area,@JsonKey(fromJson: parseDoubleNullable) double? rent, int? bedrooms, int? bathrooms,@JsonKey(fromJson: parseDoubleNullable) double? squareFt, bool dsq, int? parkingSpaces, double? latitude, double? longitude,@JsonKey(fromJson: parseDoubleNullable) double? distanceKm, List<String> images, int imageCount, String? availableFrom
 });
 
 
@@ -65,29 +68,26 @@ class _$VacantHouseModelCopyWithImpl<$Res>
 
 /// Create a copy of VacantHouseModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? houseName = freezed,Object? houseNumber = freezed,Object? houseCode = freezed,Object? floor = null,Object? description = freezed,Object? category = freezed,Object? houseType = freezed,Object? location = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? property = freezed,Object? estate = freezed,Object? rent = null,Object? squareFt = freezed,Object? featureCount = null,Object? lastOccupied = freezed,Object? imageUrl = freezed,Object? distanceText = freezed,Object? distance = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? categoryName = freezed,Object? propertyName = freezed,Object? area = freezed,Object? rent = freezed,Object? bedrooms = freezed,Object? bathrooms = freezed,Object? squareFt = freezed,Object? dsq = null,Object? parkingSpaces = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? distanceKm = freezed,Object? images = null,Object? imageCount = null,Object? availableFrom = freezed,}) {
   return _then(_self.copyWith(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,floor: null == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double?,bedrooms: freezed == bedrooms ? _self.bedrooms : bedrooms // ignore: cast_nullable_to_non_nullable
+as int?,bathrooms: freezed == bathrooms ? _self.bathrooms : bathrooms // ignore: cast_nullable_to_non_nullable
+as int?,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
+as double?,dsq: null == dsq ? _self.dsq : dsq // ignore: cast_nullable_to_non_nullable
+as bool,parkingSpaces: freezed == parkingSpaces ? _self.parkingSpaces : parkingSpaces // ignore: cast_nullable_to_non_nullable
+as int?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
-as double,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
-as double?,featureCount: null == featureCount ? _self.featureCount : featureCount // ignore: cast_nullable_to_non_nullable
-as int,lastOccupied: freezed == lastOccupied ? _self.lastOccupied : lastOccupied // ignore: cast_nullable_to_non_nullable
-as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,distanceText: freezed == distanceText ? _self.distanceText : distanceText // ignore: cast_nullable_to_non_nullable
-as String?,distance: freezed == distance ? _self.distance : distance // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,distanceKm: freezed == distanceKm ? _self.distanceKm : distanceKm // ignore: cast_nullable_to_non_nullable
+as double?,images: null == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
+as List<String>,imageCount: null == imageCount ? _self.imageCount : imageCount // ignore: cast_nullable_to_non_nullable
+as int,availableFrom: freezed == availableFrom ? _self.availableFrom : availableFrom // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -172,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? houseName,  String? houseNumber,  String? houseCode,  int floor,  String? description,  String? category,  String? houseType,  String? location,  double? latitude,  double? longitude,  String? property,  String? estate,  double rent,  double? squareFt,  int featureCount,  String? lastOccupied,  String? imageUrl,  String? distanceText,  double? distance)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String? categoryName,  String? propertyName,  String? area, @JsonKey(fromJson: parseDoubleNullable)  double? rent,  int? bedrooms,  int? bathrooms, @JsonKey(fromJson: parseDoubleNullable)  double? squareFt,  bool dsq,  int? parkingSpaces,  double? latitude,  double? longitude, @JsonKey(fromJson: parseDoubleNullable)  double? distanceKm,  List<String> images,  int imageCount,  String? availableFrom)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VacantHouseModel() when $default != null:
-return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that.floor,_that.description,_that.category,_that.houseType,_that.location,_that.latitude,_that.longitude,_that.property,_that.estate,_that.rent,_that.squareFt,_that.featureCount,_that.lastOccupied,_that.imageUrl,_that.distanceText,_that.distance);case _:
+return $default(_that.id,_that.title,_that.categoryName,_that.propertyName,_that.area,_that.rent,_that.bedrooms,_that.bathrooms,_that.squareFt,_that.dsq,_that.parkingSpaces,_that.latitude,_that.longitude,_that.distanceKm,_that.images,_that.imageCount,_that.availableFrom);case _:
   return orElse();
 
 }
@@ -193,10 +193,10 @@ return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? houseName,  String? houseNumber,  String? houseCode,  int floor,  String? description,  String? category,  String? houseType,  String? location,  double? latitude,  double? longitude,  String? property,  String? estate,  double rent,  double? squareFt,  int featureCount,  String? lastOccupied,  String? imageUrl,  String? distanceText,  double? distance)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String? categoryName,  String? propertyName,  String? area, @JsonKey(fromJson: parseDoubleNullable)  double? rent,  int? bedrooms,  int? bathrooms, @JsonKey(fromJson: parseDoubleNullable)  double? squareFt,  bool dsq,  int? parkingSpaces,  double? latitude,  double? longitude, @JsonKey(fromJson: parseDoubleNullable)  double? distanceKm,  List<String> images,  int imageCount,  String? availableFrom)  $default,) {final _that = this;
 switch (_that) {
 case _VacantHouseModel():
-return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that.floor,_that.description,_that.category,_that.houseType,_that.location,_that.latitude,_that.longitude,_that.property,_that.estate,_that.rent,_that.squareFt,_that.featureCount,_that.lastOccupied,_that.imageUrl,_that.distanceText,_that.distance);case _:
+return $default(_that.id,_that.title,_that.categoryName,_that.propertyName,_that.area,_that.rent,_that.bedrooms,_that.bathrooms,_that.squareFt,_that.dsq,_that.parkingSpaces,_that.latitude,_that.longitude,_that.distanceKm,_that.images,_that.imageCount,_that.availableFrom);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -213,10 +213,10 @@ return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? houseName,  String? houseNumber,  String? houseCode,  int floor,  String? description,  String? category,  String? houseType,  String? location,  double? latitude,  double? longitude,  String? property,  String? estate,  double rent,  double? squareFt,  int featureCount,  String? lastOccupied,  String? imageUrl,  String? distanceText,  double? distance)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String? categoryName,  String? propertyName,  String? area, @JsonKey(fromJson: parseDoubleNullable)  double? rent,  int? bedrooms,  int? bathrooms, @JsonKey(fromJson: parseDoubleNullable)  double? squareFt,  bool dsq,  int? parkingSpaces,  double? latitude,  double? longitude, @JsonKey(fromJson: parseDoubleNullable)  double? distanceKm,  List<String> images,  int imageCount,  String? availableFrom)?  $default,) {final _that = this;
 switch (_that) {
 case _VacantHouseModel() when $default != null:
-return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that.floor,_that.description,_that.category,_that.houseType,_that.location,_that.latitude,_that.longitude,_that.property,_that.estate,_that.rent,_that.squareFt,_that.featureCount,_that.lastOccupied,_that.imageUrl,_that.distanceText,_that.distance);case _:
+return $default(_that.id,_that.title,_that.categoryName,_that.propertyName,_that.area,_that.rent,_that.bedrooms,_that.bathrooms,_that.squareFt,_that.dsq,_that.parkingSpaces,_that.latitude,_that.longitude,_that.distanceKm,_that.images,_that.imageCount,_that.availableFrom);case _:
   return null;
 
 }
@@ -228,29 +228,35 @@ return $default(_that.id,_that.houseName,_that.houseNumber,_that.houseCode,_that
 @JsonSerializable()
 
 class _VacantHouseModel extends VacantHouseModel {
-  const _VacantHouseModel({this.id, this.houseName, this.houseNumber, this.houseCode, this.floor = 0, this.description, this.category, this.houseType, this.location, this.latitude, this.longitude, this.property, this.estate, this.rent = 0, this.squareFt, this.featureCount = 0, this.lastOccupied, this.imageUrl, this.distanceText, this.distance}): super._();
+  const _VacantHouseModel({required this.id, this.title = '', this.categoryName, this.propertyName, this.area, @JsonKey(fromJson: parseDoubleNullable) this.rent, this.bedrooms, this.bathrooms, @JsonKey(fromJson: parseDoubleNullable) this.squareFt, this.dsq = false, this.parkingSpaces, this.latitude, this.longitude, @JsonKey(fromJson: parseDoubleNullable) this.distanceKm, final  List<String> images = const <String>[], this.imageCount = 0, this.availableFrom}): _images = images,super._();
   factory _VacantHouseModel.fromJson(Map<String, dynamic> json) => _$VacantHouseModelFromJson(json);
 
-@override final  String? id;
-@override final  String? houseName;
-@override final  String? houseNumber;
-@override final  String? houseCode;
-@override@JsonKey() final  int floor;
-@override final  String? description;
-@override final  String? category;
-@override final  String? houseType;
-@override final  String? location;
+@override final  String id;
+/// What to call it, composed by the server. There is no `houseName`.
+@override@JsonKey() final  String title;
+@override final  String? categoryName;
+@override final  String? propertyName;
+/// Where it is, as somebody would say it — "Kilimani", not a coordinate.
+@override final  String? area;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? rent;
+@override final  int? bedrooms;
+@override final  int? bathrooms;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? squareFt;
+@override@JsonKey() final  bool dsq;
+@override final  int? parkingSpaces;
 @override final  double? latitude;
 @override final  double? longitude;
-@override final  String? property;
-@override final  String? estate;
-@override@JsonKey() final  double rent;
-@override final  double? squareFt;
-@override@JsonKey() final  int featureCount;
-@override final  String? lastOccupied;
-@override final  String? imageUrl;
-@override final  String? distanceText;
-@override final  double? distance;
+/// How far from where somebody searched, when they searched by location.
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? distanceKm;
+ final  List<String> _images;
+@override@JsonKey() List<String> get images {
+  if (_images is EqualUnmodifiableListView) return _images;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_images);
+}
+
+@override@JsonKey() final  int imageCount;
+@override final  String? availableFrom;
 
 /// Create a copy of VacantHouseModel
 /// with the given fields replaced by the non-null parameter values.
@@ -265,16 +271,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacantHouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&(identical(other.houseType, houseType) || other.houseType == houseType)&&(identical(other.location, location) || other.location == location)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.property, property) || other.property == property)&&(identical(other.estate, estate) || other.estate == estate)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.featureCount, featureCount) || other.featureCount == featureCount)&&(identical(other.lastOccupied, lastOccupied) || other.lastOccupied == lastOccupied)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.distanceText, distanceText) || other.distanceText == distanceText)&&(identical(other.distance, distance) || other.distance == distance));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VacantHouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.area, area) || other.area == area)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.bedrooms, bedrooms) || other.bedrooms == bedrooms)&&(identical(other.bathrooms, bathrooms) || other.bathrooms == bathrooms)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parkingSpaces, parkingSpaces) || other.parkingSpaces == parkingSpaces)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.distanceKm, distanceKm) || other.distanceKm == distanceKm)&&const DeepCollectionEquality().equals(other._images, _images)&&(identical(other.imageCount, imageCount) || other.imageCount == imageCount)&&(identical(other.availableFrom, availableFrom) || other.availableFrom == availableFrom));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,houseName,houseNumber,houseCode,floor,description,category,houseType,location,latitude,longitude,property,estate,rent,squareFt,featureCount,lastOccupied,imageUrl,distanceText,distance]);
+int get hashCode => Object.hash(runtimeType,id,title,categoryName,propertyName,area,rent,bedrooms,bathrooms,squareFt,dsq,parkingSpaces,latitude,longitude,distanceKm,const DeepCollectionEquality().hash(_images),imageCount,availableFrom);
 
 @override
 String toString() {
-  return 'VacantHouseModel(id: $id, houseName: $houseName, houseNumber: $houseNumber, houseCode: $houseCode, floor: $floor, description: $description, category: $category, houseType: $houseType, location: $location, latitude: $latitude, longitude: $longitude, property: $property, estate: $estate, rent: $rent, squareFt: $squareFt, featureCount: $featureCount, lastOccupied: $lastOccupied, imageUrl: $imageUrl, distanceText: $distanceText, distance: $distance)';
+  return 'VacantHouseModel(id: $id, title: $title, categoryName: $categoryName, propertyName: $propertyName, area: $area, rent: $rent, bedrooms: $bedrooms, bathrooms: $bathrooms, squareFt: $squareFt, dsq: $dsq, parkingSpaces: $parkingSpaces, latitude: $latitude, longitude: $longitude, distanceKm: $distanceKm, images: $images, imageCount: $imageCount, availableFrom: $availableFrom)';
 }
 
 
@@ -285,7 +291,7 @@ abstract mixin class _$VacantHouseModelCopyWith<$Res> implements $VacantHouseMod
   factory _$VacantHouseModelCopyWith(_VacantHouseModel value, $Res Function(_VacantHouseModel) _then) = __$VacantHouseModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? houseName, String? houseNumber, String? houseCode, int floor, String? description, String? category, String? houseType, String? location, double? latitude, double? longitude, String? property, String? estate, double rent, double? squareFt, int featureCount, String? lastOccupied, String? imageUrl, String? distanceText, double? distance
+ String id, String title, String? categoryName, String? propertyName, String? area,@JsonKey(fromJson: parseDoubleNullable) double? rent, int? bedrooms, int? bathrooms,@JsonKey(fromJson: parseDoubleNullable) double? squareFt, bool dsq, int? parkingSpaces, double? latitude, double? longitude,@JsonKey(fromJson: parseDoubleNullable) double? distanceKm, List<String> images, int imageCount, String? availableFrom
 });
 
 
@@ -302,29 +308,26 @@ class __$VacantHouseModelCopyWithImpl<$Res>
 
 /// Create a copy of VacantHouseModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? houseName = freezed,Object? houseNumber = freezed,Object? houseCode = freezed,Object? floor = null,Object? description = freezed,Object? category = freezed,Object? houseType = freezed,Object? location = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? property = freezed,Object? estate = freezed,Object? rent = null,Object? squareFt = freezed,Object? featureCount = null,Object? lastOccupied = freezed,Object? imageUrl = freezed,Object? distanceText = freezed,Object? distance = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? categoryName = freezed,Object? propertyName = freezed,Object? area = freezed,Object? rent = freezed,Object? bedrooms = freezed,Object? bathrooms = freezed,Object? squareFt = freezed,Object? dsq = null,Object? parkingSpaces = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? distanceKm = freezed,Object? images = null,Object? imageCount = null,Object? availableFrom = freezed,}) {
   return _then(_VacantHouseModel(
-id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,floor: null == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,houseType: freezed == houseType ? _self.houseType : houseType // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double?,bedrooms: freezed == bedrooms ? _self.bedrooms : bedrooms // ignore: cast_nullable_to_non_nullable
+as int?,bathrooms: freezed == bathrooms ? _self.bathrooms : bathrooms // ignore: cast_nullable_to_non_nullable
+as int?,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
+as double?,dsq: null == dsq ? _self.dsq : dsq // ignore: cast_nullable_to_non_nullable
+as bool,parkingSpaces: freezed == parkingSpaces ? _self.parkingSpaces : parkingSpaces // ignore: cast_nullable_to_non_nullable
+as int?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,property: freezed == property ? _self.property : property // ignore: cast_nullable_to_non_nullable
-as String?,estate: freezed == estate ? _self.estate : estate // ignore: cast_nullable_to_non_nullable
-as String?,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
-as double,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
-as double?,featureCount: null == featureCount ? _self.featureCount : featureCount // ignore: cast_nullable_to_non_nullable
-as int,lastOccupied: freezed == lastOccupied ? _self.lastOccupied : lastOccupied // ignore: cast_nullable_to_non_nullable
-as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,distanceText: freezed == distanceText ? _self.distanceText : distanceText // ignore: cast_nullable_to_non_nullable
-as String?,distance: freezed == distance ? _self.distance : distance // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,distanceKm: freezed == distanceKm ? _self.distanceKm : distanceKm // ignore: cast_nullable_to_non_nullable
+as double?,images: null == images ? _self._images : images // ignore: cast_nullable_to_non_nullable
+as List<String>,imageCount: null == imageCount ? _self.imageCount : imageCount // ignore: cast_nullable_to_non_nullable
+as int,availableFrom: freezed == availableFrom ? _self.availableFrom : availableFrom // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

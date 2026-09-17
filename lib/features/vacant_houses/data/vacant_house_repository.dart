@@ -5,6 +5,20 @@ import '../../../core/api/paged_response.dart';
 import '../domain/vacant_house_model.dart';
 import '../domain/vacant_house_detail_model.dart';
 
+/// What is available to rent.
+///
+/// ## Three of these paths were wrong, and one of them produced a strange error
+///
+/// The app called `/vacant-units/search`, `/vacant-units/{id}/details` and two
+/// `/vacant-units/filters/*` paths. None exists. The server has `GET /vacant-units` for the
+/// search, `GET /vacant-units/{id}` for one listing, and a single `GET /vacant-units/filters`.
+///
+/// `/search` is the interesting failure: Spring matched it against `@GetMapping("/{id}")` with the
+/// id `"search"`, and `PublicIds.require` parses base 36 — every letter in "search" is a valid
+/// digit — so it decoded to a number out of range and answered *"That listing link is not one we
+/// recognise."* A wrong path, reported as a bad link.
+///
+/// Everything here is public. Somebody looking for a place to live does not have an account yet.
 class VacantHouseRepository {
   final ApiClient _apiClient;
 
@@ -14,21 +28,23 @@ class VacantHouseRepository {
     int page = 0,
     int pageSize = 20,
     String? searchTerm,
-    String? categoryId,
-    String? houseTypeId,
-    String? minRent,
-    String? maxRent,
+    String? category,
+    String? area,
+    double? minRent,
+    double? maxRent,
+    int? minBedrooms,
   }) async {
     return _apiClient.get<PagedResponse<VacantHouseModel>>(
-      '${ApiConstants.vacantUnits}/search',
+      ApiConstants.vacantUnits,
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
-        'categoryId': ?categoryId,
-        'houseTypeId': ?houseTypeId,
+        'category': ?category,
+        'area': ?area,
         'minRent': ?minRent,
         'maxRent': ?maxRent,
+        'minBedrooms': ?minBedrooms,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,
@@ -37,42 +53,22 @@ class VacantHouseRepository {
     );
   }
 
+  /// One listing. The id is the public token the list row carried.
   Future<ApiResponse<VacantHouseDetailModel>> getVacantHouseDetail(String id) async {
     return _apiClient.get<VacantHouseDetailModel>(
-      '${ApiConstants.vacantUnits}/$id/details',
-      fromJsonT: (data) => VacantHouseDetailModel.fromJson(data as Map<String, dynamic>),
+      '${ApiConstants.vacantUnits}/$id',
+      fromJsonT: (data) =>
+          VacantHouseDetailModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
-  Future<ApiResponse<List<FilterItem>>> getCategories() async {
-    return _apiClient.get<List<FilterItem>>(
-      '${ApiConstants.vacantUnits}/filters/categories',
-      fromJsonT: (data) => (data as List)
-          .map((item) => FilterItem.fromJson(item as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Future<ApiResponse<List<FilterItem>>> getHouseTypes() async {
-    return _apiClient.get<List<FilterItem>>(
-      '${ApiConstants.vacantUnits}/filters/house-types',
-      fromJsonT: (data) => (data as List)
-          .map((item) => FilterItem.fromJson(item as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-}
-
-class FilterItem {
-  final String id;
-  final String name;
-
-  const FilterItem({required this.id, required this.name});
-
-  factory FilterItem.fromJson(Map<String, dynamic> json) {
-    return FilterItem(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
+  /// Everything filterable, in one call — categories and areas, each with a count, plus the rent
+  /// range actually present. The app was asking for two endpoints that do not exist, one of them
+  /// for house types the server does not filter on.
+  Future<ApiResponse<ListingFilters>> filters() async {
+    return _apiClient.get<ListingFilters>(
+      '${ApiConstants.vacantUnits}/filters',
+      fromJsonT: (data) => ListingFilters.fromJson(data as Map<String, dynamic>),
     );
   }
 }

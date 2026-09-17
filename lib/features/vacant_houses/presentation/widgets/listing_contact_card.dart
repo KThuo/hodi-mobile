@@ -18,8 +18,9 @@ class ListingContactCard extends StatelessWidget {
   final VacantHouseDetailModel detail;
 
   String get _message {
-    final what = detail.houseName ?? detail.houseCode ?? 'a unit';
-    final where = detail.property != null ? ' at ${detail.property}' : '';
+    final what = detail.title.isEmpty ? 'a unit' : detail.title;
+    final where =
+        detail.propertyName != null ? ' at ${detail.propertyName}' : '';
     return 'Hello, I saw $what$where on HODI and would like to enquire about it.';
   }
 
@@ -99,7 +100,7 @@ class ListingContactCard extends StatelessWidget {
                 context,
                 () => ContactActions.email(
                   detail.contactEmail,
-                  subject: detail.houseName ?? detail.houseCode ?? 'Enquiry',
+                  subject: detail.title.isEmpty ? 'Enquiry' : detail.title,
                   body: _message,
                 ),
                 'No mail app on this phone.',
