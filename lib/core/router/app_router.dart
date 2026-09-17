@@ -26,6 +26,9 @@ import '../../features/metres/presentation/metre_history_screen.dart';
 import '../../features/vacant_houses/presentation/vacant_houses_screen.dart';
 import '../../features/vacant_houses/presentation/vacant_house_detail_screen.dart';
 import '../../features/vacate_notices/presentation/vacate_notices_screen.dart';
+import '../../features/occupations/domain/occupation_model.dart';
+import '../../features/occupations/presentation/my_houses_screen.dart';
+import '../../features/occupations/presentation/occupation_detail_screen.dart';
 import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/vacate_notices/presentation/vacate_notice_detail_screen.dart';
 
@@ -202,6 +205,37 @@ final routerProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) {
                       final rrn = state.pathParameters['rrn'] ?? '';
                       return PaymentDetailScreen(rrn: rrn);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // My houses — a tenant's own tenancies.
+          //
+          // Its own branch rather than a variant of /houses, because the two read different
+          // endpoints under different authorities and a shared branch would have to decide which
+          // at build time. Branch 6, after More, so the existing indices do not shift.
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/my-houses',
+                name: RouteNames.myHouses,
+                builder: (context, state) => const MyHousesScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: RouteNames.myHouseDetail,
+                    builder: (context, state) {
+                      // The row travels in `extra`; there is no GET /occupations/{id} to fetch it
+                      // back from, so a cold link renders from the balance read alone.
+                      final id = state.pathParameters['id'] ?? '';
+                      final row = state.extra;
+                      return OccupationDetailScreen(
+                        occupationId: id,
+                        occupation: row is OccupationModel ? row : null,
+                      );
                     },
                   ),
                 ],

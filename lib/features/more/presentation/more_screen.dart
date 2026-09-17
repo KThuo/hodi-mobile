@@ -31,11 +31,23 @@ const _moduleItems = <_MenuItem>[
     permissions: [AppPermissions.propertyView],
     route: '/properties',
   ),
+  // Two rows, not one, because they are two endpoints.
+  //
+  // Staff read the estate's units from `/units`, which requires ROLE_HOUSE_VIEW. A tenant's own
+  // tenancies are `/occupations`, which accepts ROLE_TENANT_SELF. One row offering itself to
+  // both sent the tenant to a path the server refuses them — the menu showed the door and the
+  // door was locked.
   _MenuItem(
     label: 'Houses',
     icon: Icons.home_work,
-    permissions: [AppPermissions.houseView, AppPermissions.tenantSelf],
+    permissions: [AppPermissions.houseView],
     route: '/houses',
+  ),
+  _MenuItem(
+    label: 'My Houses',
+    icon: Icons.holiday_village,
+    permissions: [AppPermissions.tenantSelf],
+    route: '/my-houses',
   ),
   _MenuItem(
     label: 'Tenants',

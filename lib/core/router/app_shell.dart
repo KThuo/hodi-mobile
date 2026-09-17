@@ -49,14 +49,29 @@ class _AppShellState extends ConsumerState<AppShell> {
     bool hasPermission(String p) => authorities.contains(p);
     bool hasAny(List<String> perms) => perms.any((p) => authorities.contains(p));
 
-    // Houses
-    if (hasAny([AppPermissions.houseView, AppPermissions.tenantSelf])) {
+    // Houses, or My Houses — two endpoints, so two tabs, and never both.
+    //
+    // Staff read `/units` behind ROLE_HOUSE_VIEW. A tenant's own tenancies are `/occupations`,
+    // behind ROLE_TENANT_SELF. One tab offering itself to either authority sent the tenant to a
+    // path the server refuses them: the tab appeared, and tapping it showed an error.
+    //
+    // Somebody who is both a landlord and a tenant holds both authorities and gets the staff
+    // list here; their own tenancies are a row in More rather than a sixth tab.
+    if (hasPermission(AppPermissions.houseView)) {
       tabs.add(const _NavTab(
         label: 'Houses',
         icon: Icons.home_work_outlined,
         activeIcon: Icons.home_work,
         path: '/houses',
         branchIndex: 1,
+      ));
+    } else if (hasPermission(AppPermissions.tenantSelf)) {
+      tabs.add(const _NavTab(
+        label: 'My Houses',
+        icon: Icons.holiday_village_outlined,
+        activeIcon: Icons.holiday_village,
+        path: '/my-houses',
+        branchIndex: 5,
       ));
     }
 
@@ -103,12 +118,13 @@ class _AppShellState extends ConsumerState<AppShell> {
     visibleTabs.addAll(featureTabs.take(maxFeatureTabs));
 
     // Always add More tab
+    // Branch 6: /my-houses was added as branch 5, ahead of this one in the router.
     visibleTabs.add(const _NavTab(
       label: 'More',
       icon: Icons.menu_outlined,
       activeIcon: Icons.menu,
       path: '/more',
-      branchIndex: 5,
+      branchIndex: 6,
     ));
 
     return visibleTabs;
