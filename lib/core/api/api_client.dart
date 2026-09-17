@@ -62,11 +62,9 @@ class ApiClient {
       }
       return ApiResponse.fromJson(response.data, fromJsonT);
     } on DioException catch (e) {
-      developer.log('GET $path DioException: $e', name: 'API', level: 1000);
-      return ApiResponse<T>(
-        status: '01',
-        message: _getErrorMessage(e),
-      );
+      developer.log('GET $path failed: ${e.response?.statusCode} ${e.response?.data}',
+          name: 'API', level: 1000);
+      return _fromError<T>(e);
     } catch (e, stack) {
       developer.log('GET $path parse error: $e', name: 'API', level: 1000, stackTrace: stack);
       return ApiResponse<T>(
@@ -86,11 +84,9 @@ class ApiClient {
       final response = await _dio.post(path, data: data, queryParameters: queryParameters);
       return ApiResponse.fromJson(response.data, fromJsonT);
     } on DioException catch (e) {
-      developer.log('POST $path DioException: $e', name: 'API', level: 1000);
-      return ApiResponse<T>(
-        status: '01',
-        message: _getErrorMessage(e),
-      );
+      developer.log('POST $path failed: ${e.response?.statusCode} ${e.response?.data}',
+          name: 'API', level: 1000);
+      return _fromError<T>(e);
     } catch (e, stack) {
       developer.log('POST $path parse error: $e', name: 'API', level: 1000, stackTrace: stack);
       return ApiResponse<T>(
@@ -110,11 +106,9 @@ class ApiClient {
       final response = await _dio.put(path, data: data, queryParameters: queryParameters);
       return ApiResponse.fromJson(response.data, fromJsonT);
     } on DioException catch (e) {
-      developer.log('PUT $path DioException: $e', name: 'API', level: 1000);
-      return ApiResponse<T>(
-        status: '01',
-        message: _getErrorMessage(e),
-      );
+      developer.log('PUT $path failed: ${e.response?.statusCode} ${e.response?.data}',
+          name: 'API', level: 1000);
+      return _fromError<T>(e);
     } catch (e, stack) {
       developer.log('PUT $path parse error: $e', name: 'API', level: 1000, stackTrace: stack);
       return ApiResponse<T>(
@@ -135,7 +129,40 @@ class ApiClient {
     return _dio.post(path, data: data);
   }
 
-  String _getErrorMessage(DioException e) {
+  /// Turns a failed request into the answer the server actually gave.
+  ///
+  /// ## The server explains itself; this used to throw that away
+  ///
+  /// Dio raises a [DioException] for every non-2xx, and the old code answered all of them with
+  /// "Server error. Please try again later." But `ApiExceptionHandler` returns a full
+  /// `{status, message, data}` body on 400, 404 and 500 alike — "Your password is wrong", "That
+  /// PIN is one of the first anybody would guess", the summary of a validation failure — and none
+  /// of it ever reached a screen.
+  ///
+  /// So every refusal looked like an outage. A PIN that could not be changed because the current
+  /// one was wrong, a payment declined by the gateway with a reason, and a genuine 500 were three
+  /// different problems wearing one sentence, and the sentence told somebody to try again later
+  /// when trying again would never work.
+  ///
+  /// The envelope's own `status` comes back too, so a `003` or `004` arriving as a 4xx is still
+  /// the code the rest of the app tests for rather than a generic '01'.
+  ApiResponse<T> _fromError<T>(DioException e) {
+    final body = e.response?.data;
+    if (body is Map) {
+      final message = body['message']?.toString();
+      if (message != null && message.trim().isNotEmpty) {
+        return ApiResponse<T>(
+          status: body['status']?.toString() ?? ApiConstants.statusError,
+          message: message,
+        );
+      }
+    }
+    return ApiResponse<T>(status: ApiConstants.statusError, message: _fallbackMessage(e));
+  }
+
+  /// What to say when the server said nothing useful — a timeout, a dropped connection, or a
+  /// response with no envelope in it (a proxy's error page, a tunnel interstitial).
+  String _fallbackMessage(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
@@ -144,7 +171,16 @@ class ApiClient {
       case DioExceptionType.connectionError:
         return 'No internet connection. Please check your network.';
       case DioExceptionType.badResponse:
-        return 'Server error. Please try again later.';
+        final code = e.response?.statusCode;
+        // Distinguished because they call for different things from the person reading them:
+        // signing in again, asking for access, checking the address, or waiting.
+        if (code == 401) return 'Your session has ended. Sign in again.';
+        if (code == 403) return 'You do not have permission to do that.';
+        if (code == 404) return 'That was not found.';
+        if (code != null && code >= 500) {
+          return 'The server could not complete that. Please try again later.';
+        }
+        return 'That request was refused.';
       default:
         return 'Something went wrong. Please try again.';
     }

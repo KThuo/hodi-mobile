@@ -16,8 +16,26 @@ class ErrorInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    if (response.data is Map<String, dynamic>) {
-      final data = response.data as Map<String, dynamic>;
+    _inspect(response.data);
+    handler.next(response);
+  }
+
+  /// The same envelope, arriving as a failure.
+  ///
+  /// These codes travel in the body, and the body comes back on a 4xx as readily as on a 200 —
+  /// `PasswordChangeGate` and the session checks both refuse with a status line *and* an envelope.
+  /// Inspecting only successful responses meant a `003` or `004` delivered with a 401 or 403 was
+  /// never noticed: the session was never cleared and the password gate never fired, so the app
+  /// sat there showing whatever the screen made of a generic failure.
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    _inspect(err.response?.data);
+    handler.next(err);
+  }
+
+  void _inspect(dynamic body) {
+    if (body is Map) {
+      final data = body;
       final status = data['status']?.toString();
 
       if (status == ApiConstants.statusTokenExpired) {
@@ -46,13 +64,6 @@ class ErrorInterceptor extends Interceptor {
         ));
       }
     }
-
-    handler.next(response);
-  }
-
-  @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    handler.next(err);
   }
 
   void dispose() {
