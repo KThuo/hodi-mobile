@@ -19,6 +19,7 @@ import '../../features/more/presentation/more_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/visitors/presentation/visitors_screen.dart';
 import '../../features/expenses/presentation/expenses_screen.dart';
+import '../../features/reports/presentation/reports_screen.dart';
 import '../../features/maintenance/presentation/maintenance_screen.dart';
 import '../../features/maintenance/presentation/maintenance_detail_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
@@ -323,6 +324,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                         },
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: 'reports',
+                    name: RouteNames.reports,
+                    builder: (context, state) => const ReportsScreen(),
                   ),
                   GoRoute(
                     path: 'expenses',

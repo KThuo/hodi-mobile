@@ -181,4 +181,7 @@ abstract class ApiConstants {
   /// stored, and the row is projected over invoices, payments and expenses each time it is asked
   /// for. Behind `ROLE_REPORT_VIEW`, which is narrower than the property page itself.
   static const String propertyReports = '$reports/property-reports';
+
+  /// Where every tenancy stands: what was invoiced, what came in, what is owed.
+  static const String tenantReports = '$reports/tenant-reports';
 }

@@ -96,6 +96,12 @@ const _moduleItems = <_MenuItem>[
     route: '/more/expenses',
   ),
   _MenuItem(
+    label: 'Tenancy Report',
+    icon: Icons.fact_check_outlined,
+    permissions: [AppPermissions.reportView],
+    route: '/more/reports',
+  ),
+  _MenuItem(
     label: 'Vacate Notices',
     icon: Icons.description,
     permissions: [AppPermissions.tenantView],

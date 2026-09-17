@@ -4,6 +4,14 @@ Agreed scope: **notifications, maintenance, visitors, expenses, reports.** The t
 stays out — it is the one item on the pending list with no endpoint to reuse, and adding one is not
 this piece of work.
 
+**All five are built.** What follows is the plan they were built to, kept as the record of what
+each one covers and what it deliberately leaves out.
+
+One claim in it was checked rather than assumed, after the invoice payments turned out to be a
+wrong call rather than a gap: the web shows meters only on a **staff** unit page behind
+`ROLE_METRE_VIEW`, so there genuinely is no tenant-scoped meter path to reuse. That item stays
+blocked on `hodi-b`, and this time the claim has evidence behind it.
+
 Every endpoint named below already exists and is already serving `hodi-f`. Nothing here needs a
 change to `hodi-b`; where a shape looks like it is missing something, the first move is to find
 which endpoint the browser is calling, because that is how the invoice payments turned out to be a
