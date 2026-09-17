@@ -7,6 +7,7 @@ import '../data/invoice_repository.dart';
 import '../domain/invoice_model.dart';
 import '../domain/billing_period.dart';
 import '../domain/invoice_detail_model.dart';
+import '../domain/invoice_document_model.dart';
 
 part 'invoice_providers.g.dart';
 
@@ -107,6 +108,34 @@ class InvoiceList extends _$InvoiceList {
 }
 
 // Invoice detail
+/// The document, which is what the screen renders.
+final invoiceDocumentProvider =
+    FutureProvider.autoDispose.family<InvoiceDocumentModel?, String>((ref, rrn) async {
+  final repo = ref.watch(invoiceRepositoryProvider);
+  final response = await repo.getInvoiceDocument(rrn);
+  if (response.isEstateOverdue) {
+    return null; // Dialog handled globally via ErrorInterceptor
+  }
+  if (!response.isSuccess) {
+    throw Exception(
+        response.message.isNotEmpty ? response.message : 'Failed to load invoice');
+  }
+  return response.data;
+});
+
+/// The ids and the void record, for the actions — never for the figures.
+///
+/// **Null is a normal answer.** `/reference/{rrn}` is scoped, so a caretaker opening another
+/// property's invoice is refused it while still being served the document. `hodi-f` swallows the
+/// same failure for the same reason: the right outcome there is an invoice somebody can read and
+/// not act on, which is not an error worth taking the page away for.
+final invoiceActionsProvider =
+    FutureProvider.autoDispose.family<InvoiceDetailModel?, String>((ref, rrn) async {
+  final repo = ref.watch(invoiceRepositoryProvider);
+  final response = await repo.getInvoiceDetail(rrn);
+  return response.isSuccess ? response.data : null;
+});
+
 final invoiceDetailProvider =
     FutureProvider.autoDispose.family<InvoiceDetailModel?, String>((ref, rrn) async {
   final repo = ref.watch(invoiceRepositoryProvider);

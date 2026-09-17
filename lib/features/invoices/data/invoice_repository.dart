@@ -6,6 +6,7 @@ import '../../../core/utils/pdf_downloader.dart';
 import '../domain/invoice_model.dart';
 import '../domain/billing_period.dart';
 import '../domain/invoice_detail_model.dart';
+import '../domain/invoice_document_model.dart';
 import '../domain/payment_type_model.dart';
 
 class InvoiceRepository {
@@ -78,6 +79,22 @@ class InvoiceRepository {
     return _apiClient.get<BillingPeriod>(
       ApiConstants.currentPeriod,
       fromJsonT: (data) => BillingPeriod.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// The invoice **as a document** — what was charged, what has been paid, what is left.
+  ///
+  /// `/detail/{rrn}`, which is the read `hodi-f` builds its invoice page from. It carries the
+  /// payments and the balance and deliberately carries no ids: the reference is its only
+  /// protection, so a guessed one reveals nothing the tenant is not already holding on paper.
+  /// Public, because the tenant following a rent SMS has no session.
+  ///
+  /// Use this for anything shown. [getInvoiceDetail] is for the ids an action needs.
+  Future<ApiResponse<InvoiceDocumentModel>> getInvoiceDocument(String rrn) async {
+    return _apiClient.get<InvoiceDocumentModel>(
+      '${ApiConstants.invoiceDetail}/$rrn',
+      fromJsonT: (data) =>
+          InvoiceDocumentModel.fromJson(data as Map<String, dynamic>),
     );
   }
 

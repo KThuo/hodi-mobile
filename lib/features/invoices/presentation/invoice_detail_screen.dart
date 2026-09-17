@@ -13,9 +13,22 @@ import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/hodi_gradient_button.dart';
 import '../domain/invoice_detail_model.dart';
+import '../domain/invoice_document_model.dart';
 import '../providers/invoice_providers.dart';
 import 'widgets/make_payment_sheet.dart';
 
+/// One invoice.
+///
+/// **Two reads, as `hodi-f`'s invoice page does it.** `/invoices/detail/{rrn}` is the document —
+/// the charges, the payments against them, and what is left — and it drives everything on screen.
+/// `/invoices/reference/{rrn}` is fetched alongside it purely for the ids an action needs, and is
+/// allowed to fail: it is scoped, so a caretaker opening another property's invoice is refused it
+/// while still being served the document. They then read the invoice and cannot act on it, which
+/// is the right answer rather than an error.
+///
+/// The app used to read only the second one, which carries no payments — so it could show what
+/// was owed and never what had been paid towards it, while the browser showed both from an
+/// endpoint that was there all along.
 class InvoiceDetailScreen extends ConsumerWidget {
   final String rrn;
 
@@ -23,7 +36,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final detailAsync = ref.watch(invoiceDetailProvider(rrn));
+    final detailAsync = ref.watch(invoiceDocumentProvider(rrn));
 
     return Scaffold(
       backgroundColor: HodiColors.background,
@@ -33,7 +46,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
           if (detail == null) {
             return HodiErrorState(
               message: 'Invoice not found',
-              onRetry: () => ref.invalidate(invoiceDetailProvider(rrn)),
+              onRetry: () => ref.invalidate(invoiceDocumentProvider(rrn)),
             );
           }
 
@@ -64,35 +77,29 @@ class InvoiceDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        detail.rrn ?? rrn,
+                        detail.rrn,
                         style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
                       ),
                       const SizedBox(height: 8),
-                      _InvoiceStatusBadge(
-                        status: detail.invoice.status,
-                        label: detail.invoice.statusLabel,
-                      ),
+                      _InvoiceStatusBadge(label: detail.statusLabel),
                       const SizedBox(height: 12),
                       Text(
-                        detail.isVoided
-                            ? 'Voided'
-                            : detail.balance > 0
-                                ? 'Balance due'
-                                : 'Settled in full',
+                        detail.balanceDue > 0 ? 'Balance due' : 'Settled in full',
                         style: HodiTextStyles.bodySmall.copyWith(
                           color: HodiColors.white.withValues(alpha: 0.8),
                         ),
                       ),
                       const SizedBox(height: 2),
                       HodiAmountText(
-                        // A voided invoice owes nothing whatever its charges say.
-                        amount: detail.isVoided ? 0 : detail.balance,
+                        // The server's own figure. A voided invoice already reads nought here,
+                        // because `balanceDue` is its outstanding and a void clears it.
+                        amount: detail.balanceDue,
                         style: HodiTextStyles.currencyLarge.copyWith(color: HodiColors.white),
                       ),
-                      if (detail.charged != detail.balance) ...[
+                      if (detail.amount != detail.balanceDue) ...[
                         const SizedBox(height: 4),
                         Text(
-                          'Invoiced KES ${CurrencyFormatter.format(detail.charged)}',
+                          'Invoiced KES ${CurrencyFormatter.format(detail.amount)}',
                           style: HodiTextStyles.bodySmall.copyWith(
                             color: HodiColors.white.withValues(alpha: 0.75),
                           ),
@@ -131,7 +138,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
                         const Divider(height: 1),
                         _DocRow(
                           label: 'Total charged',
-                          amount: detail.charged,
+                          amount: detail.amount,
                           bold: true,
                         ),
 
@@ -161,7 +168,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
                           margin: const EdgeInsets.only(top: 10),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           decoration: BoxDecoration(
-                            color: detail.balance > 0 && !detail.isVoided
+                            color: detail.balanceDue > 0
                                 ? HodiColors.dangerBg
                                 : HodiColors.successBg,
                             borderRadius: HodiBorderRadius.small,
@@ -177,10 +184,10 @@ class InvoiceDetailScreen extends ConsumerWidget {
                               ),
                               const Spacer(),
                               HodiAmountText(
-                                amount: detail.isVoided ? 0 : detail.balance,
+                                amount: detail.balanceDue,
                                 style: HodiTextStyles.currency.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  color: detail.balance > 0 && !detail.isVoided
+                                  color: detail.balanceDue > 0
                                       ? HodiColors.errorStart
                                       : HodiColors.successEnd,
                                 ),
@@ -198,14 +205,14 @@ class InvoiceDetailScreen extends ConsumerWidget {
         loading: () => const HodiLoadingShimmer(itemCount: 2, itemHeight: 120),
         error: (e, _) => HodiErrorState(
           message: e is Exception ? e.toString().replaceFirst('Exception: ', '') : 'Failed to load invoice',
-          onRetry: () => ref.invalidate(invoiceDetailProvider(rrn)),
+          onRetry: () => ref.invalidate(invoiceDocumentProvider(rrn)),
         ),
       ),
       bottomNavigationBar: detailAsync.when(
-        data: (detail) {
-          if (detail == null) return const SizedBox.shrink();
+        data: (document) {
+          if (document == null) return const SizedBox.shrink();
           return _BottomActions(
-            detail: detail,
+            document: document,
             rrn: rrn,
           );
         },
@@ -216,29 +223,38 @@ class InvoiceDetailScreen extends ConsumerWidget {
   }
 }
 
+/// Download, and — where there is something to pay it with — Make Payment.
+///
+/// **Whether it can be paid is the document's answer, not a status integer.** `payable` is the
+/// server's own test, which is what the web puts its Pay button behind; deciding it here from a
+/// status code means keeping a second copy of a rule that already exists.
+///
+/// **Whether it can be paid *from here* is a second question.** Receiving a payment needs the
+/// tenancy and invoice ids, and those live only on the scoped read — so the button appears when
+/// the document says payable *and* that read succeeded. A caretaker looking at another property's
+/// invoice sees it and cannot pay it, which is exactly right.
 class _BottomActions extends ConsumerWidget {
-  final InvoiceDetailModel detail;
+  final InvoiceDocumentModel document;
   final String rrn;
 
-  const _BottomActions({required this.detail, required this.rrn});
+  const _BottomActions({required this.document, required this.rrn});
 
-  // Said in terms of what it means rather than of an integer: `flag < 2` happened to be right
-  // because UNPAID is 0 and PARTIAL is 1, and would have quietly become wrong the day a status was
-  // inserted between them. A voided invoice owes nothing whatever its amount says.
-  bool get _canPay =>
-      !detail.isPaid && !detail.isVoided && detail.balance > 0;
-
-  void _openPaymentSheet(BuildContext context) {
+  void _openPaymentSheet(BuildContext context, InvoiceDetailModel actions) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => MakePaymentSheet(invoice: detail),
+      builder: (_) => MakePaymentSheet(invoice: actions),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Null while it loads and null when it is refused — both mean "no actions yet", and neither
+    // is worth a spinner on a bar whose other button works regardless.
+    final actions = ref.watch(invoiceActionsProvider(rrn)).value;
+    final canPay = document.payable && document.balanceDue > 0 && actions != null;
+
     return Container(
       padding: EdgeInsets.only(
         left: 16,
@@ -254,7 +270,7 @@ class _BottomActions extends ConsumerWidget {
         children: [
           // Download PDF button
           Expanded(
-            flex: _canPay ? 1 : 2,
+            flex: canPay ? 1 : 2,
             child: OutlinedButton.icon(
               onPressed: () {
                 ref.read(invoiceRepositoryProvider).downloadInvoicePdf(rrn);
@@ -277,14 +293,14 @@ class _BottomActions extends ConsumerWidget {
               ),
             ),
           ),
-          if (_canPay) ...[
+          if (canPay) ...[
             const SizedBox(width: 12),
             Expanded(
               flex: 2,
               child: HodiGradientButton(
                 text: 'Make Payment',
                 icon: Icons.payment,
-                onPressed: () => _openPaymentSheet(context),
+                onPressed: () => _openPaymentSheet(context, actions),
               ),
             ),
           ],
@@ -294,52 +310,33 @@ class _BottomActions extends ConsumerWidget {
   }
 }
 
+/// The invoice's status, in the server's own words.
+///
+/// The label is all that is carried, and all that is needed. This took a status integer and kept
+/// its own switch translating it — a second copy of a vocabulary the server owns, which read
+/// "Unpaid" for any status added after the build shipped. The tone is matched on the wording
+/// because a colour is this screen's business; an unrecognised word gets the neutral one rather
+/// than being asserted as an error.
 class _InvoiceStatusBadge extends StatelessWidget {
-  const _InvoiceStatusBadge({required this.status, this.label});
+  const _InvoiceStatusBadge({this.label});
 
-  final int status;
-
-  /// The server's own wording, which is what gets shown. The switch below is only a fallback for a
-  /// response that predates the field — the app used to name every status itself, so a status added
-  /// on the server read "Unpaid" here until somebody shipped a new build.
   final String? label;
 
-  String get _label {
-    if (label != null && label!.isNotEmpty) return label!;
-    switch (status) {
-      case 2:
-        return 'Paid';
-      case 1:
-        return 'Partially Paid';
-      case 4:
-        return 'Voided';
-      case 3:
-        return 'Brought Forward';
-      default:
-        return 'Unpaid';
-    }
-  }
-
-  BadgeType get _type {
-    switch (status) {
-      case 2:
-        return BadgeType.success;
-      case 1:
-        return BadgeType.warning;
-      case 4:
-      case 3:
-        return BadgeType.info;
-      default:
-        return BadgeType.error;
-    }
-  }
+  BadgeType get _type => switch (label?.toLowerCase()) {
+        'paid' => BadgeType.success,
+        'partially paid' => BadgeType.warning,
+        'voided' || 'brought forward' => BadgeType.info,
+        'unpaid' || 'overdue' => BadgeType.error,
+        _ => BadgeType.info,
+      };
 
   @override
   Widget build(BuildContext context) {
-    return HodiStatusBadge(text: _label, type: _type);
+    final text = label;
+    if (text == null || text.isEmpty) return const SizedBox.shrink();
+    return HodiStatusBadge(text: text, type: _type);
   }
 }
-
 
 /// One line of the document — a charge, or a payment taking away from it.
 class _DocRow extends StatelessWidget {

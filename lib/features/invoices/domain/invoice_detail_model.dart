@@ -26,15 +26,6 @@ abstract class InvoiceDetailModel with _$InvoiceDetailModel {
     required InvoiceModel invoice,
     @Default([]) List<InvoiceLineItem> lines,
 
-    /// What has been paid against this invoice.
-    ///
-    /// An invoice with a balance is a subtraction, and a document showing only the charges asks
-    /// the reader to take the balance on trust. The public document carried these and the
-    /// signed-in one did not, so the app could show what was owed and never what had been paid
-    /// against it — which is the half somebody is actually checking when they open a bill they
-    /// have already sent money for.
-    @Default([]) List<InvoicePaymentLine> payments,
-
     /// Arrears carried into this invoice from earlier periods.
     ///
     /// Inside [InvoiceModel.amount] and outside the sum of [lines], which is why it is stated
@@ -65,34 +56,6 @@ abstract class InvoiceDetailModel with _$InvoiceDetailModel {
 
   /// What is still owed. [totalPayable] where the server sent one, the row's own figure otherwise.
   double get balance => totalPayable != 0 ? totalPayable : invoice.outstanding;
-
-  /// What the charges come to — the invoice's face value, brought-forward arrears included.
-  ///
-  /// Named for what it is rather than reused as "the amount". The headline on this screen is the
-  /// [balance]; this is the figure it was subtracted from, and the two being one word apart is
-  /// how a paid invoice came to shout its original total at somebody who owes nothing.
-  double get charged => invoice.amount;
-
-  /// The sum of what has been received. Read off the lines rather than off `paidAmount` so the
-  /// rows on screen add up to the figure printed under them — a total nobody can reproduce from
-  /// the rows above it is a total that gets queried.
-  double get paid => payments.fold(0, (sum, p) => sum + p.amount);
-}
-
-/// One payment credited to this invoice.
-@freezed
-abstract class InvoicePaymentLine with _$InvoicePaymentLine {
-  const InvoicePaymentLine._();
-
-  const factory InvoicePaymentLine({
-    String? narration,
-    @JsonKey(fromJson: parseDouble) @Default(0) double amount,
-  }) = _InvoicePaymentLine;
-
-  factory InvoicePaymentLine.fromJson(Map<String, dynamic> json) =>
-      _$InvoicePaymentLineFromJson(json);
-
-  String get label => (narration?.isNotEmpty ?? false) ? narration! : 'Payment';
 }
 
 /// One line on the document.
