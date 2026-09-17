@@ -90,6 +90,12 @@ const _moduleItems = <_MenuItem>[
     route: '/more/visitors',
   ),
   _MenuItem(
+    label: 'Expenses',
+    icon: Icons.account_balance_wallet_outlined,
+    permissions: [AppPermissions.expenseView],
+    route: '/more/expenses',
+  ),
+  _MenuItem(
     label: 'Vacate Notices',
     icon: Icons.description,
     permissions: [AppPermissions.tenantView],
