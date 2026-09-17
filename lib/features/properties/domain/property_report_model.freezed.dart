@@ -386,4 +386,671 @@ as double,
 
 }
 
+
+/// @nodoc
+mixin _$PropertyReportPageModel {
+
+ List<PropertyReportModel> get content; int get page; int get pageSize; int get totalElements; PropertyReportTotalsModel? get totals;
+/// Create a copy of PropertyReportPageModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PropertyReportPageModelCopyWith<PropertyReportPageModel> get copyWith => _$PropertyReportPageModelCopyWithImpl<PropertyReportPageModel>(this as PropertyReportPageModel, _$identity);
+
+  /// Serializes this PropertyReportPageModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PropertyReportPageModel&&const DeepCollectionEquality().equals(other.content, content)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.totalElements, totalElements) || other.totalElements == totalElements)&&(identical(other.totals, totals) || other.totals == totals));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(content),page,pageSize,totalElements,totals);
+
+@override
+String toString() {
+  return 'PropertyReportPageModel(content: $content, page: $page, pageSize: $pageSize, totalElements: $totalElements, totals: $totals)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PropertyReportPageModelCopyWith<$Res>  {
+  factory $PropertyReportPageModelCopyWith(PropertyReportPageModel value, $Res Function(PropertyReportPageModel) _then) = _$PropertyReportPageModelCopyWithImpl;
+@useResult
+$Res call({
+ List<PropertyReportModel> content, int page, int pageSize, int totalElements, PropertyReportTotalsModel? totals
+});
+
+
+$PropertyReportTotalsModelCopyWith<$Res>? get totals;
+
+}
+/// @nodoc
+class _$PropertyReportPageModelCopyWithImpl<$Res>
+    implements $PropertyReportPageModelCopyWith<$Res> {
+  _$PropertyReportPageModelCopyWithImpl(this._self, this._then);
+
+  final PropertyReportPageModel _self;
+  final $Res Function(PropertyReportPageModel) _then;
+
+/// Create a copy of PropertyReportPageModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? content = null,Object? page = null,Object? pageSize = null,Object? totalElements = null,Object? totals = freezed,}) {
+  return _then(_self.copyWith(
+content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as List<PropertyReportModel>,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,pageSize: null == pageSize ? _self.pageSize : pageSize // ignore: cast_nullable_to_non_nullable
+as int,totalElements: null == totalElements ? _self.totalElements : totalElements // ignore: cast_nullable_to_non_nullable
+as int,totals: freezed == totals ? _self.totals : totals // ignore: cast_nullable_to_non_nullable
+as PropertyReportTotalsModel?,
+  ));
+}
+/// Create a copy of PropertyReportPageModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PropertyReportTotalsModelCopyWith<$Res>? get totals {
+    if (_self.totals == null) {
+    return null;
+  }
+
+  return $PropertyReportTotalsModelCopyWith<$Res>(_self.totals!, (value) {
+    return _then(_self.copyWith(totals: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [PropertyReportPageModel].
+extension PropertyReportPageModelPatterns on PropertyReportPageModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PropertyReportPageModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PropertyReportPageModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PropertyReportPageModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _PropertyReportPageModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PropertyReportPageModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PropertyReportPageModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<PropertyReportModel> content,  int page,  int pageSize,  int totalElements,  PropertyReportTotalsModel? totals)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PropertyReportPageModel() when $default != null:
+return $default(_that.content,_that.page,_that.pageSize,_that.totalElements,_that.totals);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<PropertyReportModel> content,  int page,  int pageSize,  int totalElements,  PropertyReportTotalsModel? totals)  $default,) {final _that = this;
+switch (_that) {
+case _PropertyReportPageModel():
+return $default(_that.content,_that.page,_that.pageSize,_that.totalElements,_that.totals);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<PropertyReportModel> content,  int page,  int pageSize,  int totalElements,  PropertyReportTotalsModel? totals)?  $default,) {final _that = this;
+switch (_that) {
+case _PropertyReportPageModel() when $default != null:
+return $default(_that.content,_that.page,_that.pageSize,_that.totalElements,_that.totals);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PropertyReportPageModel extends PropertyReportPageModel {
+  const _PropertyReportPageModel({final  List<PropertyReportModel> content = const <PropertyReportModel>[], this.page = 0, this.pageSize = 0, this.totalElements = 0, this.totals}): _content = content,super._();
+  factory _PropertyReportPageModel.fromJson(Map<String, dynamic> json) => _$PropertyReportPageModelFromJson(json);
+
+ final  List<PropertyReportModel> _content;
+@override@JsonKey() List<PropertyReportModel> get content {
+  if (_content is EqualUnmodifiableListView) return _content;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_content);
+}
+
+@override@JsonKey() final  int page;
+@override@JsonKey() final  int pageSize;
+@override@JsonKey() final  int totalElements;
+@override final  PropertyReportTotalsModel? totals;
+
+/// Create a copy of PropertyReportPageModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PropertyReportPageModelCopyWith<_PropertyReportPageModel> get copyWith => __$PropertyReportPageModelCopyWithImpl<_PropertyReportPageModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PropertyReportPageModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PropertyReportPageModel&&const DeepCollectionEquality().equals(other._content, _content)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.totalElements, totalElements) || other.totalElements == totalElements)&&(identical(other.totals, totals) || other.totals == totals));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_content),page,pageSize,totalElements,totals);
+
+@override
+String toString() {
+  return 'PropertyReportPageModel(content: $content, page: $page, pageSize: $pageSize, totalElements: $totalElements, totals: $totals)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PropertyReportPageModelCopyWith<$Res> implements $PropertyReportPageModelCopyWith<$Res> {
+  factory _$PropertyReportPageModelCopyWith(_PropertyReportPageModel value, $Res Function(_PropertyReportPageModel) _then) = __$PropertyReportPageModelCopyWithImpl;
+@override @useResult
+$Res call({
+ List<PropertyReportModel> content, int page, int pageSize, int totalElements, PropertyReportTotalsModel? totals
+});
+
+
+@override $PropertyReportTotalsModelCopyWith<$Res>? get totals;
+
+}
+/// @nodoc
+class __$PropertyReportPageModelCopyWithImpl<$Res>
+    implements _$PropertyReportPageModelCopyWith<$Res> {
+  __$PropertyReportPageModelCopyWithImpl(this._self, this._then);
+
+  final _PropertyReportPageModel _self;
+  final $Res Function(_PropertyReportPageModel) _then;
+
+/// Create a copy of PropertyReportPageModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? content = null,Object? page = null,Object? pageSize = null,Object? totalElements = null,Object? totals = freezed,}) {
+  return _then(_PropertyReportPageModel(
+content: null == content ? _self._content : content // ignore: cast_nullable_to_non_nullable
+as List<PropertyReportModel>,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,pageSize: null == pageSize ? _self.pageSize : pageSize // ignore: cast_nullable_to_non_nullable
+as int,totalElements: null == totalElements ? _self.totalElements : totalElements // ignore: cast_nullable_to_non_nullable
+as int,totals: freezed == totals ? _self.totals : totals // ignore: cast_nullable_to_non_nullable
+as PropertyReportTotalsModel?,
+  ));
+}
+
+/// Create a copy of PropertyReportPageModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PropertyReportTotalsModelCopyWith<$Res>? get totals {
+    if (_self.totals == null) {
+    return null;
+  }
+
+  return $PropertyReportTotalsModelCopyWith<$Res>(_self.totals!, (value) {
+    return _then(_self.copyWith(totals: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$PropertyReportTotalsModel {
+
+ int get properties; int get totalUnits; int get occupiedUnits;@JsonKey(fromJson: parseDouble) double get invoiceAmount;/// The period's own charge — rent, service charge, utilities, deposits, penalties. **This is
+/// what the collected percentage is a percentage of**, and what the card labels "Invoiced".
+///
+/// Not [invoiceAmount], which is the invoices' face value with arrears brought forward inside
+/// it. The web had the band showing one and the ring computed against the other, so the two
+/// described different quantities and neither matched the dashboard.
+@JsonKey(fromJson: parseDouble) double get chargedAmount;@JsonKey(fromJson: parseDouble) double get rentAmount;@JsonKey(fromJson: parseDouble) double get serviceChargeAmount;@JsonKey(fromJson: parseDouble) double get utilityAmount;@JsonKey(fromJson: parseDouble) double get depositAmount;@JsonKey(fromJson: parseDouble) double get broughtForwardAmount;@JsonKey(fromJson: parseDouble) double get paymentAmount;@JsonKey(fromJson: parseDouble) double get openingArrears;@JsonKey(fromJson: parseDouble) double get closingArrears;/// The period's credit **total**, top-up included — legacy's "Total Overpayment".
+@JsonKey(fromJson: parseDouble) double get overpaymentAmount;/// Unallocated money standing across every live payment **today**. Not a period figure, and
+/// far larger than [overpaymentAmount] on real data. The card does not show it; it is here so
+/// nobody reaches for it thinking it is the credit held at month end.
+@JsonKey(fromJson: parseDouble) double get totalCredit;/// Money received with no invoice to put it against — part of [overpaymentAmount].
+@JsonKey(fromJson: parseDouble) double get topupAmount;/// Credit still **held** at the end of the period, as a running balance. A property can hold
+/// a balance in a month where none arose, which is why it sits apart from the monthly figures.
+@JsonKey(fromJson: parseDouble) double get cumulativeCredit;@JsonKey(fromJson: parseDouble) double get clearedAmount;@JsonKey(fromJson: parseDouble) double get forfeitedAmount;@JsonKey(fromJson: parseDouble) double get expenseAmount;@JsonKey(fromJson: parseDoubleNullable) double? get commissionAmount;@JsonKey(fromJson: parseDouble) double get netIncome;/// Computed by the server, so this card and the report agree to the decimal. Null where
+/// nothing was charged — a month nobody was billed for has no rate, which is not nought.
+@JsonKey(fromJson: parseDoubleNullable) double? get collectionRate;@JsonKey(fromJson: parseDouble) double get creditsAndAdjustments;
+/// Create a copy of PropertyReportTotalsModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PropertyReportTotalsModelCopyWith<PropertyReportTotalsModel> get copyWith => _$PropertyReportTotalsModelCopyWithImpl<PropertyReportTotalsModel>(this as PropertyReportTotalsModel, _$identity);
+
+  /// Serializes this PropertyReportTotalsModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PropertyReportTotalsModel&&(identical(other.properties, properties) || other.properties == properties)&&(identical(other.totalUnits, totalUnits) || other.totalUnits == totalUnits)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits)&&(identical(other.invoiceAmount, invoiceAmount) || other.invoiceAmount == invoiceAmount)&&(identical(other.chargedAmount, chargedAmount) || other.chargedAmount == chargedAmount)&&(identical(other.rentAmount, rentAmount) || other.rentAmount == rentAmount)&&(identical(other.serviceChargeAmount, serviceChargeAmount) || other.serviceChargeAmount == serviceChargeAmount)&&(identical(other.utilityAmount, utilityAmount) || other.utilityAmount == utilityAmount)&&(identical(other.depositAmount, depositAmount) || other.depositAmount == depositAmount)&&(identical(other.broughtForwardAmount, broughtForwardAmount) || other.broughtForwardAmount == broughtForwardAmount)&&(identical(other.paymentAmount, paymentAmount) || other.paymentAmount == paymentAmount)&&(identical(other.openingArrears, openingArrears) || other.openingArrears == openingArrears)&&(identical(other.closingArrears, closingArrears) || other.closingArrears == closingArrears)&&(identical(other.overpaymentAmount, overpaymentAmount) || other.overpaymentAmount == overpaymentAmount)&&(identical(other.totalCredit, totalCredit) || other.totalCredit == totalCredit)&&(identical(other.topupAmount, topupAmount) || other.topupAmount == topupAmount)&&(identical(other.cumulativeCredit, cumulativeCredit) || other.cumulativeCredit == cumulativeCredit)&&(identical(other.clearedAmount, clearedAmount) || other.clearedAmount == clearedAmount)&&(identical(other.forfeitedAmount, forfeitedAmount) || other.forfeitedAmount == forfeitedAmount)&&(identical(other.expenseAmount, expenseAmount) || other.expenseAmount == expenseAmount)&&(identical(other.commissionAmount, commissionAmount) || other.commissionAmount == commissionAmount)&&(identical(other.netIncome, netIncome) || other.netIncome == netIncome)&&(identical(other.collectionRate, collectionRate) || other.collectionRate == collectionRate)&&(identical(other.creditsAndAdjustments, creditsAndAdjustments) || other.creditsAndAdjustments == creditsAndAdjustments));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hashAll([runtimeType,properties,totalUnits,occupiedUnits,invoiceAmount,chargedAmount,rentAmount,serviceChargeAmount,utilityAmount,depositAmount,broughtForwardAmount,paymentAmount,openingArrears,closingArrears,overpaymentAmount,totalCredit,topupAmount,cumulativeCredit,clearedAmount,forfeitedAmount,expenseAmount,commissionAmount,netIncome,collectionRate,creditsAndAdjustments]);
+
+@override
+String toString() {
+  return 'PropertyReportTotalsModel(properties: $properties, totalUnits: $totalUnits, occupiedUnits: $occupiedUnits, invoiceAmount: $invoiceAmount, chargedAmount: $chargedAmount, rentAmount: $rentAmount, serviceChargeAmount: $serviceChargeAmount, utilityAmount: $utilityAmount, depositAmount: $depositAmount, broughtForwardAmount: $broughtForwardAmount, paymentAmount: $paymentAmount, openingArrears: $openingArrears, closingArrears: $closingArrears, overpaymentAmount: $overpaymentAmount, totalCredit: $totalCredit, topupAmount: $topupAmount, cumulativeCredit: $cumulativeCredit, clearedAmount: $clearedAmount, forfeitedAmount: $forfeitedAmount, expenseAmount: $expenseAmount, commissionAmount: $commissionAmount, netIncome: $netIncome, collectionRate: $collectionRate, creditsAndAdjustments: $creditsAndAdjustments)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PropertyReportTotalsModelCopyWith<$Res>  {
+  factory $PropertyReportTotalsModelCopyWith(PropertyReportTotalsModel value, $Res Function(PropertyReportTotalsModel) _then) = _$PropertyReportTotalsModelCopyWithImpl;
+@useResult
+$Res call({
+ int properties, int totalUnits, int occupiedUnits,@JsonKey(fromJson: parseDouble) double invoiceAmount,@JsonKey(fromJson: parseDouble) double chargedAmount,@JsonKey(fromJson: parseDouble) double rentAmount,@JsonKey(fromJson: parseDouble) double serviceChargeAmount,@JsonKey(fromJson: parseDouble) double utilityAmount,@JsonKey(fromJson: parseDouble) double depositAmount,@JsonKey(fromJson: parseDouble) double broughtForwardAmount,@JsonKey(fromJson: parseDouble) double paymentAmount,@JsonKey(fromJson: parseDouble) double openingArrears,@JsonKey(fromJson: parseDouble) double closingArrears,@JsonKey(fromJson: parseDouble) double overpaymentAmount,@JsonKey(fromJson: parseDouble) double totalCredit,@JsonKey(fromJson: parseDouble) double topupAmount,@JsonKey(fromJson: parseDouble) double cumulativeCredit,@JsonKey(fromJson: parseDouble) double clearedAmount,@JsonKey(fromJson: parseDouble) double forfeitedAmount,@JsonKey(fromJson: parseDouble) double expenseAmount,@JsonKey(fromJson: parseDoubleNullable) double? commissionAmount,@JsonKey(fromJson: parseDouble) double netIncome,@JsonKey(fromJson: parseDoubleNullable) double? collectionRate,@JsonKey(fromJson: parseDouble) double creditsAndAdjustments
+});
+
+
+
+
+}
+/// @nodoc
+class _$PropertyReportTotalsModelCopyWithImpl<$Res>
+    implements $PropertyReportTotalsModelCopyWith<$Res> {
+  _$PropertyReportTotalsModelCopyWithImpl(this._self, this._then);
+
+  final PropertyReportTotalsModel _self;
+  final $Res Function(PropertyReportTotalsModel) _then;
+
+/// Create a copy of PropertyReportTotalsModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? properties = null,Object? totalUnits = null,Object? occupiedUnits = null,Object? invoiceAmount = null,Object? chargedAmount = null,Object? rentAmount = null,Object? serviceChargeAmount = null,Object? utilityAmount = null,Object? depositAmount = null,Object? broughtForwardAmount = null,Object? paymentAmount = null,Object? openingArrears = null,Object? closingArrears = null,Object? overpaymentAmount = null,Object? totalCredit = null,Object? topupAmount = null,Object? cumulativeCredit = null,Object? clearedAmount = null,Object? forfeitedAmount = null,Object? expenseAmount = null,Object? commissionAmount = freezed,Object? netIncome = null,Object? collectionRate = freezed,Object? creditsAndAdjustments = null,}) {
+  return _then(_self.copyWith(
+properties: null == properties ? _self.properties : properties // ignore: cast_nullable_to_non_nullable
+as int,totalUnits: null == totalUnits ? _self.totalUnits : totalUnits // ignore: cast_nullable_to_non_nullable
+as int,occupiedUnits: null == occupiedUnits ? _self.occupiedUnits : occupiedUnits // ignore: cast_nullable_to_non_nullable
+as int,invoiceAmount: null == invoiceAmount ? _self.invoiceAmount : invoiceAmount // ignore: cast_nullable_to_non_nullable
+as double,chargedAmount: null == chargedAmount ? _self.chargedAmount : chargedAmount // ignore: cast_nullable_to_non_nullable
+as double,rentAmount: null == rentAmount ? _self.rentAmount : rentAmount // ignore: cast_nullable_to_non_nullable
+as double,serviceChargeAmount: null == serviceChargeAmount ? _self.serviceChargeAmount : serviceChargeAmount // ignore: cast_nullable_to_non_nullable
+as double,utilityAmount: null == utilityAmount ? _self.utilityAmount : utilityAmount // ignore: cast_nullable_to_non_nullable
+as double,depositAmount: null == depositAmount ? _self.depositAmount : depositAmount // ignore: cast_nullable_to_non_nullable
+as double,broughtForwardAmount: null == broughtForwardAmount ? _self.broughtForwardAmount : broughtForwardAmount // ignore: cast_nullable_to_non_nullable
+as double,paymentAmount: null == paymentAmount ? _self.paymentAmount : paymentAmount // ignore: cast_nullable_to_non_nullable
+as double,openingArrears: null == openingArrears ? _self.openingArrears : openingArrears // ignore: cast_nullable_to_non_nullable
+as double,closingArrears: null == closingArrears ? _self.closingArrears : closingArrears // ignore: cast_nullable_to_non_nullable
+as double,overpaymentAmount: null == overpaymentAmount ? _self.overpaymentAmount : overpaymentAmount // ignore: cast_nullable_to_non_nullable
+as double,totalCredit: null == totalCredit ? _self.totalCredit : totalCredit // ignore: cast_nullable_to_non_nullable
+as double,topupAmount: null == topupAmount ? _self.topupAmount : topupAmount // ignore: cast_nullable_to_non_nullable
+as double,cumulativeCredit: null == cumulativeCredit ? _self.cumulativeCredit : cumulativeCredit // ignore: cast_nullable_to_non_nullable
+as double,clearedAmount: null == clearedAmount ? _self.clearedAmount : clearedAmount // ignore: cast_nullable_to_non_nullable
+as double,forfeitedAmount: null == forfeitedAmount ? _self.forfeitedAmount : forfeitedAmount // ignore: cast_nullable_to_non_nullable
+as double,expenseAmount: null == expenseAmount ? _self.expenseAmount : expenseAmount // ignore: cast_nullable_to_non_nullable
+as double,commissionAmount: freezed == commissionAmount ? _self.commissionAmount : commissionAmount // ignore: cast_nullable_to_non_nullable
+as double?,netIncome: null == netIncome ? _self.netIncome : netIncome // ignore: cast_nullable_to_non_nullable
+as double,collectionRate: freezed == collectionRate ? _self.collectionRate : collectionRate // ignore: cast_nullable_to_non_nullable
+as double?,creditsAndAdjustments: null == creditsAndAdjustments ? _self.creditsAndAdjustments : creditsAndAdjustments // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PropertyReportTotalsModel].
+extension PropertyReportTotalsModelPatterns on PropertyReportTotalsModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PropertyReportTotalsModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PropertyReportTotalsModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PropertyReportTotalsModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _PropertyReportTotalsModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PropertyReportTotalsModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PropertyReportTotalsModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int properties,  int totalUnits,  int occupiedUnits, @JsonKey(fromJson: parseDouble)  double invoiceAmount, @JsonKey(fromJson: parseDouble)  double chargedAmount, @JsonKey(fromJson: parseDouble)  double rentAmount, @JsonKey(fromJson: parseDouble)  double serviceChargeAmount, @JsonKey(fromJson: parseDouble)  double utilityAmount, @JsonKey(fromJson: parseDouble)  double depositAmount, @JsonKey(fromJson: parseDouble)  double broughtForwardAmount, @JsonKey(fromJson: parseDouble)  double paymentAmount, @JsonKey(fromJson: parseDouble)  double openingArrears, @JsonKey(fromJson: parseDouble)  double closingArrears, @JsonKey(fromJson: parseDouble)  double overpaymentAmount, @JsonKey(fromJson: parseDouble)  double totalCredit, @JsonKey(fromJson: parseDouble)  double topupAmount, @JsonKey(fromJson: parseDouble)  double cumulativeCredit, @JsonKey(fromJson: parseDouble)  double clearedAmount, @JsonKey(fromJson: parseDouble)  double forfeitedAmount, @JsonKey(fromJson: parseDouble)  double expenseAmount, @JsonKey(fromJson: parseDoubleNullable)  double? commissionAmount, @JsonKey(fromJson: parseDouble)  double netIncome, @JsonKey(fromJson: parseDoubleNullable)  double? collectionRate, @JsonKey(fromJson: parseDouble)  double creditsAndAdjustments)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PropertyReportTotalsModel() when $default != null:
+return $default(_that.properties,_that.totalUnits,_that.occupiedUnits,_that.invoiceAmount,_that.chargedAmount,_that.rentAmount,_that.serviceChargeAmount,_that.utilityAmount,_that.depositAmount,_that.broughtForwardAmount,_that.paymentAmount,_that.openingArrears,_that.closingArrears,_that.overpaymentAmount,_that.totalCredit,_that.topupAmount,_that.cumulativeCredit,_that.clearedAmount,_that.forfeitedAmount,_that.expenseAmount,_that.commissionAmount,_that.netIncome,_that.collectionRate,_that.creditsAndAdjustments);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int properties,  int totalUnits,  int occupiedUnits, @JsonKey(fromJson: parseDouble)  double invoiceAmount, @JsonKey(fromJson: parseDouble)  double chargedAmount, @JsonKey(fromJson: parseDouble)  double rentAmount, @JsonKey(fromJson: parseDouble)  double serviceChargeAmount, @JsonKey(fromJson: parseDouble)  double utilityAmount, @JsonKey(fromJson: parseDouble)  double depositAmount, @JsonKey(fromJson: parseDouble)  double broughtForwardAmount, @JsonKey(fromJson: parseDouble)  double paymentAmount, @JsonKey(fromJson: parseDouble)  double openingArrears, @JsonKey(fromJson: parseDouble)  double closingArrears, @JsonKey(fromJson: parseDouble)  double overpaymentAmount, @JsonKey(fromJson: parseDouble)  double totalCredit, @JsonKey(fromJson: parseDouble)  double topupAmount, @JsonKey(fromJson: parseDouble)  double cumulativeCredit, @JsonKey(fromJson: parseDouble)  double clearedAmount, @JsonKey(fromJson: parseDouble)  double forfeitedAmount, @JsonKey(fromJson: parseDouble)  double expenseAmount, @JsonKey(fromJson: parseDoubleNullable)  double? commissionAmount, @JsonKey(fromJson: parseDouble)  double netIncome, @JsonKey(fromJson: parseDoubleNullable)  double? collectionRate, @JsonKey(fromJson: parseDouble)  double creditsAndAdjustments)  $default,) {final _that = this;
+switch (_that) {
+case _PropertyReportTotalsModel():
+return $default(_that.properties,_that.totalUnits,_that.occupiedUnits,_that.invoiceAmount,_that.chargedAmount,_that.rentAmount,_that.serviceChargeAmount,_that.utilityAmount,_that.depositAmount,_that.broughtForwardAmount,_that.paymentAmount,_that.openingArrears,_that.closingArrears,_that.overpaymentAmount,_that.totalCredit,_that.topupAmount,_that.cumulativeCredit,_that.clearedAmount,_that.forfeitedAmount,_that.expenseAmount,_that.commissionAmount,_that.netIncome,_that.collectionRate,_that.creditsAndAdjustments);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int properties,  int totalUnits,  int occupiedUnits, @JsonKey(fromJson: parseDouble)  double invoiceAmount, @JsonKey(fromJson: parseDouble)  double chargedAmount, @JsonKey(fromJson: parseDouble)  double rentAmount, @JsonKey(fromJson: parseDouble)  double serviceChargeAmount, @JsonKey(fromJson: parseDouble)  double utilityAmount, @JsonKey(fromJson: parseDouble)  double depositAmount, @JsonKey(fromJson: parseDouble)  double broughtForwardAmount, @JsonKey(fromJson: parseDouble)  double paymentAmount, @JsonKey(fromJson: parseDouble)  double openingArrears, @JsonKey(fromJson: parseDouble)  double closingArrears, @JsonKey(fromJson: parseDouble)  double overpaymentAmount, @JsonKey(fromJson: parseDouble)  double totalCredit, @JsonKey(fromJson: parseDouble)  double topupAmount, @JsonKey(fromJson: parseDouble)  double cumulativeCredit, @JsonKey(fromJson: parseDouble)  double clearedAmount, @JsonKey(fromJson: parseDouble)  double forfeitedAmount, @JsonKey(fromJson: parseDouble)  double expenseAmount, @JsonKey(fromJson: parseDoubleNullable)  double? commissionAmount, @JsonKey(fromJson: parseDouble)  double netIncome, @JsonKey(fromJson: parseDoubleNullable)  double? collectionRate, @JsonKey(fromJson: parseDouble)  double creditsAndAdjustments)?  $default,) {final _that = this;
+switch (_that) {
+case _PropertyReportTotalsModel() when $default != null:
+return $default(_that.properties,_that.totalUnits,_that.occupiedUnits,_that.invoiceAmount,_that.chargedAmount,_that.rentAmount,_that.serviceChargeAmount,_that.utilityAmount,_that.depositAmount,_that.broughtForwardAmount,_that.paymentAmount,_that.openingArrears,_that.closingArrears,_that.overpaymentAmount,_that.totalCredit,_that.topupAmount,_that.cumulativeCredit,_that.clearedAmount,_that.forfeitedAmount,_that.expenseAmount,_that.commissionAmount,_that.netIncome,_that.collectionRate,_that.creditsAndAdjustments);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PropertyReportTotalsModel extends PropertyReportTotalsModel {
+  const _PropertyReportTotalsModel({this.properties = 0, this.totalUnits = 0, this.occupiedUnits = 0, @JsonKey(fromJson: parseDouble) this.invoiceAmount = 0, @JsonKey(fromJson: parseDouble) this.chargedAmount = 0, @JsonKey(fromJson: parseDouble) this.rentAmount = 0, @JsonKey(fromJson: parseDouble) this.serviceChargeAmount = 0, @JsonKey(fromJson: parseDouble) this.utilityAmount = 0, @JsonKey(fromJson: parseDouble) this.depositAmount = 0, @JsonKey(fromJson: parseDouble) this.broughtForwardAmount = 0, @JsonKey(fromJson: parseDouble) this.paymentAmount = 0, @JsonKey(fromJson: parseDouble) this.openingArrears = 0, @JsonKey(fromJson: parseDouble) this.closingArrears = 0, @JsonKey(fromJson: parseDouble) this.overpaymentAmount = 0, @JsonKey(fromJson: parseDouble) this.totalCredit = 0, @JsonKey(fromJson: parseDouble) this.topupAmount = 0, @JsonKey(fromJson: parseDouble) this.cumulativeCredit = 0, @JsonKey(fromJson: parseDouble) this.clearedAmount = 0, @JsonKey(fromJson: parseDouble) this.forfeitedAmount = 0, @JsonKey(fromJson: parseDouble) this.expenseAmount = 0, @JsonKey(fromJson: parseDoubleNullable) this.commissionAmount, @JsonKey(fromJson: parseDouble) this.netIncome = 0, @JsonKey(fromJson: parseDoubleNullable) this.collectionRate, @JsonKey(fromJson: parseDouble) this.creditsAndAdjustments = 0}): super._();
+  factory _PropertyReportTotalsModel.fromJson(Map<String, dynamic> json) => _$PropertyReportTotalsModelFromJson(json);
+
+@override@JsonKey() final  int properties;
+@override@JsonKey() final  int totalUnits;
+@override@JsonKey() final  int occupiedUnits;
+@override@JsonKey(fromJson: parseDouble) final  double invoiceAmount;
+/// The period's own charge — rent, service charge, utilities, deposits, penalties. **This is
+/// what the collected percentage is a percentage of**, and what the card labels "Invoiced".
+///
+/// Not [invoiceAmount], which is the invoices' face value with arrears brought forward inside
+/// it. The web had the band showing one and the ring computed against the other, so the two
+/// described different quantities and neither matched the dashboard.
+@override@JsonKey(fromJson: parseDouble) final  double chargedAmount;
+@override@JsonKey(fromJson: parseDouble) final  double rentAmount;
+@override@JsonKey(fromJson: parseDouble) final  double serviceChargeAmount;
+@override@JsonKey(fromJson: parseDouble) final  double utilityAmount;
+@override@JsonKey(fromJson: parseDouble) final  double depositAmount;
+@override@JsonKey(fromJson: parseDouble) final  double broughtForwardAmount;
+@override@JsonKey(fromJson: parseDouble) final  double paymentAmount;
+@override@JsonKey(fromJson: parseDouble) final  double openingArrears;
+@override@JsonKey(fromJson: parseDouble) final  double closingArrears;
+/// The period's credit **total**, top-up included — legacy's "Total Overpayment".
+@override@JsonKey(fromJson: parseDouble) final  double overpaymentAmount;
+/// Unallocated money standing across every live payment **today**. Not a period figure, and
+/// far larger than [overpaymentAmount] on real data. The card does not show it; it is here so
+/// nobody reaches for it thinking it is the credit held at month end.
+@override@JsonKey(fromJson: parseDouble) final  double totalCredit;
+/// Money received with no invoice to put it against — part of [overpaymentAmount].
+@override@JsonKey(fromJson: parseDouble) final  double topupAmount;
+/// Credit still **held** at the end of the period, as a running balance. A property can hold
+/// a balance in a month where none arose, which is why it sits apart from the monthly figures.
+@override@JsonKey(fromJson: parseDouble) final  double cumulativeCredit;
+@override@JsonKey(fromJson: parseDouble) final  double clearedAmount;
+@override@JsonKey(fromJson: parseDouble) final  double forfeitedAmount;
+@override@JsonKey(fromJson: parseDouble) final  double expenseAmount;
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? commissionAmount;
+@override@JsonKey(fromJson: parseDouble) final  double netIncome;
+/// Computed by the server, so this card and the report agree to the decimal. Null where
+/// nothing was charged — a month nobody was billed for has no rate, which is not nought.
+@override@JsonKey(fromJson: parseDoubleNullable) final  double? collectionRate;
+@override@JsonKey(fromJson: parseDouble) final  double creditsAndAdjustments;
+
+/// Create a copy of PropertyReportTotalsModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PropertyReportTotalsModelCopyWith<_PropertyReportTotalsModel> get copyWith => __$PropertyReportTotalsModelCopyWithImpl<_PropertyReportTotalsModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PropertyReportTotalsModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PropertyReportTotalsModel&&(identical(other.properties, properties) || other.properties == properties)&&(identical(other.totalUnits, totalUnits) || other.totalUnits == totalUnits)&&(identical(other.occupiedUnits, occupiedUnits) || other.occupiedUnits == occupiedUnits)&&(identical(other.invoiceAmount, invoiceAmount) || other.invoiceAmount == invoiceAmount)&&(identical(other.chargedAmount, chargedAmount) || other.chargedAmount == chargedAmount)&&(identical(other.rentAmount, rentAmount) || other.rentAmount == rentAmount)&&(identical(other.serviceChargeAmount, serviceChargeAmount) || other.serviceChargeAmount == serviceChargeAmount)&&(identical(other.utilityAmount, utilityAmount) || other.utilityAmount == utilityAmount)&&(identical(other.depositAmount, depositAmount) || other.depositAmount == depositAmount)&&(identical(other.broughtForwardAmount, broughtForwardAmount) || other.broughtForwardAmount == broughtForwardAmount)&&(identical(other.paymentAmount, paymentAmount) || other.paymentAmount == paymentAmount)&&(identical(other.openingArrears, openingArrears) || other.openingArrears == openingArrears)&&(identical(other.closingArrears, closingArrears) || other.closingArrears == closingArrears)&&(identical(other.overpaymentAmount, overpaymentAmount) || other.overpaymentAmount == overpaymentAmount)&&(identical(other.totalCredit, totalCredit) || other.totalCredit == totalCredit)&&(identical(other.topupAmount, topupAmount) || other.topupAmount == topupAmount)&&(identical(other.cumulativeCredit, cumulativeCredit) || other.cumulativeCredit == cumulativeCredit)&&(identical(other.clearedAmount, clearedAmount) || other.clearedAmount == clearedAmount)&&(identical(other.forfeitedAmount, forfeitedAmount) || other.forfeitedAmount == forfeitedAmount)&&(identical(other.expenseAmount, expenseAmount) || other.expenseAmount == expenseAmount)&&(identical(other.commissionAmount, commissionAmount) || other.commissionAmount == commissionAmount)&&(identical(other.netIncome, netIncome) || other.netIncome == netIncome)&&(identical(other.collectionRate, collectionRate) || other.collectionRate == collectionRate)&&(identical(other.creditsAndAdjustments, creditsAndAdjustments) || other.creditsAndAdjustments == creditsAndAdjustments));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hashAll([runtimeType,properties,totalUnits,occupiedUnits,invoiceAmount,chargedAmount,rentAmount,serviceChargeAmount,utilityAmount,depositAmount,broughtForwardAmount,paymentAmount,openingArrears,closingArrears,overpaymentAmount,totalCredit,topupAmount,cumulativeCredit,clearedAmount,forfeitedAmount,expenseAmount,commissionAmount,netIncome,collectionRate,creditsAndAdjustments]);
+
+@override
+String toString() {
+  return 'PropertyReportTotalsModel(properties: $properties, totalUnits: $totalUnits, occupiedUnits: $occupiedUnits, invoiceAmount: $invoiceAmount, chargedAmount: $chargedAmount, rentAmount: $rentAmount, serviceChargeAmount: $serviceChargeAmount, utilityAmount: $utilityAmount, depositAmount: $depositAmount, broughtForwardAmount: $broughtForwardAmount, paymentAmount: $paymentAmount, openingArrears: $openingArrears, closingArrears: $closingArrears, overpaymentAmount: $overpaymentAmount, totalCredit: $totalCredit, topupAmount: $topupAmount, cumulativeCredit: $cumulativeCredit, clearedAmount: $clearedAmount, forfeitedAmount: $forfeitedAmount, expenseAmount: $expenseAmount, commissionAmount: $commissionAmount, netIncome: $netIncome, collectionRate: $collectionRate, creditsAndAdjustments: $creditsAndAdjustments)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PropertyReportTotalsModelCopyWith<$Res> implements $PropertyReportTotalsModelCopyWith<$Res> {
+  factory _$PropertyReportTotalsModelCopyWith(_PropertyReportTotalsModel value, $Res Function(_PropertyReportTotalsModel) _then) = __$PropertyReportTotalsModelCopyWithImpl;
+@override @useResult
+$Res call({
+ int properties, int totalUnits, int occupiedUnits,@JsonKey(fromJson: parseDouble) double invoiceAmount,@JsonKey(fromJson: parseDouble) double chargedAmount,@JsonKey(fromJson: parseDouble) double rentAmount,@JsonKey(fromJson: parseDouble) double serviceChargeAmount,@JsonKey(fromJson: parseDouble) double utilityAmount,@JsonKey(fromJson: parseDouble) double depositAmount,@JsonKey(fromJson: parseDouble) double broughtForwardAmount,@JsonKey(fromJson: parseDouble) double paymentAmount,@JsonKey(fromJson: parseDouble) double openingArrears,@JsonKey(fromJson: parseDouble) double closingArrears,@JsonKey(fromJson: parseDouble) double overpaymentAmount,@JsonKey(fromJson: parseDouble) double totalCredit,@JsonKey(fromJson: parseDouble) double topupAmount,@JsonKey(fromJson: parseDouble) double cumulativeCredit,@JsonKey(fromJson: parseDouble) double clearedAmount,@JsonKey(fromJson: parseDouble) double forfeitedAmount,@JsonKey(fromJson: parseDouble) double expenseAmount,@JsonKey(fromJson: parseDoubleNullable) double? commissionAmount,@JsonKey(fromJson: parseDouble) double netIncome,@JsonKey(fromJson: parseDoubleNullable) double? collectionRate,@JsonKey(fromJson: parseDouble) double creditsAndAdjustments
+});
+
+
+
+
+}
+/// @nodoc
+class __$PropertyReportTotalsModelCopyWithImpl<$Res>
+    implements _$PropertyReportTotalsModelCopyWith<$Res> {
+  __$PropertyReportTotalsModelCopyWithImpl(this._self, this._then);
+
+  final _PropertyReportTotalsModel _self;
+  final $Res Function(_PropertyReportTotalsModel) _then;
+
+/// Create a copy of PropertyReportTotalsModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? properties = null,Object? totalUnits = null,Object? occupiedUnits = null,Object? invoiceAmount = null,Object? chargedAmount = null,Object? rentAmount = null,Object? serviceChargeAmount = null,Object? utilityAmount = null,Object? depositAmount = null,Object? broughtForwardAmount = null,Object? paymentAmount = null,Object? openingArrears = null,Object? closingArrears = null,Object? overpaymentAmount = null,Object? totalCredit = null,Object? topupAmount = null,Object? cumulativeCredit = null,Object? clearedAmount = null,Object? forfeitedAmount = null,Object? expenseAmount = null,Object? commissionAmount = freezed,Object? netIncome = null,Object? collectionRate = freezed,Object? creditsAndAdjustments = null,}) {
+  return _then(_PropertyReportTotalsModel(
+properties: null == properties ? _self.properties : properties // ignore: cast_nullable_to_non_nullable
+as int,totalUnits: null == totalUnits ? _self.totalUnits : totalUnits // ignore: cast_nullable_to_non_nullable
+as int,occupiedUnits: null == occupiedUnits ? _self.occupiedUnits : occupiedUnits // ignore: cast_nullable_to_non_nullable
+as int,invoiceAmount: null == invoiceAmount ? _self.invoiceAmount : invoiceAmount // ignore: cast_nullable_to_non_nullable
+as double,chargedAmount: null == chargedAmount ? _self.chargedAmount : chargedAmount // ignore: cast_nullable_to_non_nullable
+as double,rentAmount: null == rentAmount ? _self.rentAmount : rentAmount // ignore: cast_nullable_to_non_nullable
+as double,serviceChargeAmount: null == serviceChargeAmount ? _self.serviceChargeAmount : serviceChargeAmount // ignore: cast_nullable_to_non_nullable
+as double,utilityAmount: null == utilityAmount ? _self.utilityAmount : utilityAmount // ignore: cast_nullable_to_non_nullable
+as double,depositAmount: null == depositAmount ? _self.depositAmount : depositAmount // ignore: cast_nullable_to_non_nullable
+as double,broughtForwardAmount: null == broughtForwardAmount ? _self.broughtForwardAmount : broughtForwardAmount // ignore: cast_nullable_to_non_nullable
+as double,paymentAmount: null == paymentAmount ? _self.paymentAmount : paymentAmount // ignore: cast_nullable_to_non_nullable
+as double,openingArrears: null == openingArrears ? _self.openingArrears : openingArrears // ignore: cast_nullable_to_non_nullable
+as double,closingArrears: null == closingArrears ? _self.closingArrears : closingArrears // ignore: cast_nullable_to_non_nullable
+as double,overpaymentAmount: null == overpaymentAmount ? _self.overpaymentAmount : overpaymentAmount // ignore: cast_nullable_to_non_nullable
+as double,totalCredit: null == totalCredit ? _self.totalCredit : totalCredit // ignore: cast_nullable_to_non_nullable
+as double,topupAmount: null == topupAmount ? _self.topupAmount : topupAmount // ignore: cast_nullable_to_non_nullable
+as double,cumulativeCredit: null == cumulativeCredit ? _self.cumulativeCredit : cumulativeCredit // ignore: cast_nullable_to_non_nullable
+as double,clearedAmount: null == clearedAmount ? _self.clearedAmount : clearedAmount // ignore: cast_nullable_to_non_nullable
+as double,forfeitedAmount: null == forfeitedAmount ? _self.forfeitedAmount : forfeitedAmount // ignore: cast_nullable_to_non_nullable
+as double,expenseAmount: null == expenseAmount ? _self.expenseAmount : expenseAmount // ignore: cast_nullable_to_non_nullable
+as double,commissionAmount: freezed == commissionAmount ? _self.commissionAmount : commissionAmount // ignore: cast_nullable_to_non_nullable
+as double?,netIncome: null == netIncome ? _self.netIncome : netIncome // ignore: cast_nullable_to_non_nullable
+as double,collectionRate: freezed == collectionRate ? _self.collectionRate : collectionRate // ignore: cast_nullable_to_non_nullable
+as double?,creditsAndAdjustments: null == creditsAndAdjustments ? _self.creditsAndAdjustments : creditsAndAdjustments // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
+}
+
 // dart format on

@@ -12,9 +12,10 @@ import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
-import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../domain/property_detail_model.dart';
 import '../domain/property_report_model.dart';
+import '../../invoices/domain/billing_period.dart';
 import '../providers/property_providers.dart';
 
 /// One property.
@@ -52,7 +53,7 @@ class PropertyDetailScreen extends ConsumerWidget {
               children: [
                 _PropertyHeaderCard(detail: detail),
                 const SizedBox(height: 16),
-                _QuickStatsGrid(detail: detail, propertyId: propertyId),
+                _QuickStatsGrid(detail: detail),
                 if (canSeeMoney) ...[
                   const SizedBox(height: 16),
                   _RentCollectionCard(propertyId: propertyId),
@@ -239,113 +240,45 @@ class _ContactRow extends StatelessWidget {
 
 // --- Quick Stats Grid ---
 
-/// Units and tenancies from the property; income and expense from the month's report.
+/// What the property *is* — units and tenancies. No money.
 ///
-/// The two halves come from different reads, so the money tiles carry their own loading and their
-/// own empty state. A property that was not invoiced last month has no report row at all, and the
-/// tile says so rather than printing a confident zero.
-class _QuickStatsGrid extends ConsumerWidget {
+/// It carried Collected and Expenses tiles until the rent-collection card below grew into the
+/// web's full layout, at which point the same two figures appeared twice on one screen, each
+/// labelled with a month only one of them named. Two answers to one question is worse than one,
+/// even when they agree.
+class _QuickStatsGrid extends StatelessWidget {
   final PropertyDetailModel detail;
-  final String propertyId;
 
-  const _QuickStatsGrid({required this.detail, required this.propertyId});
+  const _QuickStatsGrid({required this.detail});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final canSeeMoney = ref.watch(authProvider).user?.hasPermission(
-              AppPermissions.reportView,
-            ) ??
-        false;
-    final reportAsync =
-        canSeeMoney ? ref.watch(propertyReportProvider(propertyId)) : null;
-    final report = reportAsync?.value;
-
-    return Column(
+  Widget build(BuildContext context) {
+    return Row(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _StatTile(
-                icon: Icons.meeting_room_outlined,
-                iconColor: HodiColors.primaryStart,
-                label: 'Total Units',
-                value: '${detail.units}',
-                subtitle:
-                    '${detail.occupiedUnits} occupied / ${detail.vacantUnits} vacant',
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              // Tenancies, not occupied units. A unit is flagged occupied; a tenancy is a person
-              // with terms and a balance. They agree in practice and are not the same count.
-              child: _StatTile(
-                icon: Icons.people_outline,
-                iconColor: HodiColors.secondary,
-                label: 'Tenancies',
-                value: '${detail.tenancyCount}',
-                subtitle: detail.tenures.map(_tenureLabel).join(' · '),
-              ),
-            ),
-          ],
-        ),
-        if (canSeeMoney) ...[
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _StatTile(
-                  icon: Icons.payments_outlined,
-                  iconColor: HodiColors.successStart,
-                  label: 'Collected',
-                  valueWidget: report == null
-                      ? null
-                      : HodiAmountText(
-                          amount: report.paymentAmount,
-                          style: HodiTextStyles.currency.copyWith(fontSize: 14),
-                        ),
-                  value: report == null ? _pending(reportAsync) : null,
-                  subtitle: report == null ? '' : _periodLabel(report),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatTile(
-                  icon: Icons.receipt_long_outlined,
-                  iconColor: HodiColors.errorStart,
-                  label: 'Expenses',
-                  valueWidget: report == null
-                      ? null
-                      : HodiAmountText(
-                          amount: report.expenseAmount,
-                          style: HodiTextStyles.currency.copyWith(fontSize: 14),
-                        ),
-                  value: report == null ? _pending(reportAsync) : null,
-                  subtitle: report == null
-                      ? ''
-                      : '${report.expenseCount} recorded',
-                ),
-              ),
-            ],
+        Expanded(
+          child: _StatTile(
+            icon: Icons.meeting_room_outlined,
+            iconColor: HodiColors.primaryStart,
+            label: 'Total Units',
+            value: '${detail.units}',
+            subtitle:
+                '${detail.occupiedUnits} occupied / ${detail.vacantUnits} vacant',
           ),
-        ],
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          // Tenancies, not occupied units. A unit is flagged occupied; a tenancy is a person with
+          // terms and a balance. They agree in practice and are not the same count.
+          child: _StatTile(
+            icon: Icons.people_outline,
+            iconColor: HodiColors.secondary,
+            label: 'Tenancies',
+            value: '${detail.tenancyCount}',
+            subtitle: detail.tenures.map(_tenureLabel).join(' · '),
+          ),
+        ),
       ],
     );
-  }
-
-  /// Three states and three different things to say: still asking, asked and refused, asked and
-  /// there was no such month. A dash for all three would hide the difference.
-  static String _pending(AsyncValue<PropertyReportModel?>? async) {
-    if (async == null) return '-';
-    return async.when(
-      data: (_) => 'No data',
-      loading: () => '…',
-      error: (_, _) => 'Unavailable',
-    );
-  }
-
-  static String _periodLabel(PropertyReportModel r) {
-    final when = DateTime(r.periodYear, r.periodMonth);
-    return DateFormatter.formatMonthYear(when);
   }
 
   static String _tenureLabel(String tenure) => switch (tenure) {
@@ -361,7 +294,6 @@ class _StatTile extends StatelessWidget {
   final Color iconColor;
   final String label;
   final String? value;
-  final Widget? valueWidget;
   final String? subtitle;
 
   const _StatTile({
@@ -369,7 +301,6 @@ class _StatTile extends StatelessWidget {
     required this.iconColor,
     required this.label,
     this.value,
-    this.valueWidget,
     this.subtitle,
   });
 
@@ -400,13 +331,10 @@ class _StatTile extends StatelessWidget {
             style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textLight),
           ),
           const SizedBox(height: 4),
-          if (valueWidget != null)
-            valueWidget!
-          else
-            Text(
-              value ?? '-',
-              style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-            ),
+          Text(
+            value ?? '-',
+            style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+          ),
           if (subtitle != null && subtitle!.isNotEmpty) ...[
             const SizedBox(height: 2),
             Text(
@@ -423,19 +351,19 @@ class _StatTile extends StatelessWidget {
   }
 }
 
-// --- Rent Collection Card ---
+// --- Rent Collection Progress ---
 
-/// The property's month.
+/// How a month's rent is being collected, and what is still owed.
 ///
-/// Every figure here is the report's, and the report is a projection over invoices, payments and
-/// expenses rather than a stored total — so the rows below reconcile with each other by
-/// construction and are shown in an order that lets somebody add them up:
+/// **Laid out the way `hodi-f`'s `RentCollectionProgress.vue` lays it out**, minus the ring: the
+/// same three months, the same bands in the same order, the same wording. Two screens describing
+/// one month should not need translating between them.
 ///
-///   charged + brought forward + credits and adjustments = invoiced
-///
-/// The legacy screen showed "Invoice Amount" and "Total Collected" next to each other with the
-/// carried arrears invisible between them, which is why the same property could read as collecting
-/// well under 100% in a month it had settled everything raised.
+/// **Every figure is read, not computed here** — they come from `property_reports`, which is where
+/// the dashboard, the property report and the analytics charts read them too, so this card cannot
+/// disagree with the screens beside it. The two exceptions are `paymentOnInvoice` and
+/// `invoiceOverpayment`, derived on the model for the reason given there: subtracting them into
+/// stored columns would destroy the totals they come out of.
 class _RentCollectionCard extends ConsumerWidget {
   final String propertyId;
 
@@ -443,7 +371,8 @@ class _RentCollectionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final period = ref.watch(propertyReportPeriodProvider);
+    final window = ref.watch(propertyReportWindowProvider).value ?? const [];
+    final chosen = ref.watch(effectiveReportPeriodProvider);
     final reportAsync = ref.watch(propertyReportProvider(propertyId));
 
     return Container(
@@ -470,26 +399,33 @@ class _RentCollectionCard extends ConsumerWidget {
                     color: HodiColors.successStart, size: 18),
               ),
               const SizedBox(width: 10),
-              Text('Rent Collection',
+              Text('Rent Collection Progress',
                   style: HodiTextStyles.heading3.copyWith(fontSize: 16)),
             ],
           ),
           const SizedBox(height: 16),
 
-          _PeriodSelector(
-            active: period,
-            onSelect: (p) =>
-                ref.read(propertyReportPeriodProvider.notifier).set(p),
-          ),
+          // Three months, not a picker. Previous, the billing month, next — which is the question
+          // the card answers: is this month landing, did the last one, and has the next been
+          // raised yet.
+          if (window.length == 3 && chosen != null)
+            _PeriodSelector(
+              months: window,
+              chosen: chosen,
+              onSelect: (p) =>
+                  ref.read(propertyReportPeriodProvider.notifier).set(p),
+            ),
+
           const SizedBox(height: 16),
           const Divider(height: 1, color: HodiColors.divider),
           const SizedBox(height: 16),
 
           reportAsync.when(
-            data: (report) =>
-                report == null ? const _NoMonth() : _Figures(report: report),
+            data: (page) => page == null || page.nothingBilled
+                ? _NothingBilled(month: chosen?.label)
+                : _Figures(totals: page.totals!),
             loading: () => const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
+              padding: EdgeInsets.symmetric(vertical: 28),
               child: Center(child: CircularProgressIndicator()),
             ),
             error: (e, _) => Padding(
@@ -508,24 +444,29 @@ class _RentCollectionCard extends ConsumerWidget {
   }
 }
 
-/// A month in which nothing was invoiced and nothing arrived.
+/// A month in which nothing was invoiced.
 ///
-/// Said in a sentence rather than shown as a column of zeroes, because a zero in a money field
-/// reads as "nothing owed" when the truth here is "this property was not billed that month".
-class _NoMonth extends StatelessWidget {
-  const _NoMonth();
+/// Said in a sentence rather than shown as a column of zeroes. Nought is a real answer; "nothing
+/// invoiced" is not the same answer, and rendering it as a collection rate of zero would mark a
+/// month red that nobody has been asked to pay for.
+class _NothingBilled extends StatelessWidget {
+  final String? month;
+
+  const _NothingBilled({required this.month});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Icon(Icons.event_busy_outlined, size: 18, color: HodiColors.textLight),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Nothing was invoiced for this property in that month.',
+              'Nothing has been invoiced for ${month ?? 'this month'} yet, so there is nothing '
+              'to collect against. Figures appear once the month is raised.',
               style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textMedium),
             ),
           ),
@@ -536,139 +477,256 @@ class _NoMonth extends StatelessWidget {
 }
 
 class _Figures extends StatelessWidget {
-  final PropertyReportModel report;
+  final PropertyReportTotalsModel totals;
 
-  const _Figures({required this.report});
+  const _Figures({required this.totals});
 
   @override
   Widget build(BuildContext context) {
+    // The server's own figure, so this card and the report agree to the decimal. Null means
+    // nothing was charged, which the caller has already turned into the "nothing billed" state.
+    final rate = totals.collectionRate ?? 0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _CollectionProgressBar(percentage: report.collectionPercentage),
-        const SizedBox(height: 16),
+        _CollectionProgressBar(percentage: rate),
+        const SizedBox(height: 18),
 
-        // What was asked for, and what it is made of. The three components below the total add
-        // up to it exactly — the server computes the last as the remainder so they cannot drift.
-        _FinancialRow(
+        // The period's own charge, which is what the percentage above is a percentage of — not
+        // the invoices' face value, which carries arrears brought forward inside it.
+        _Band(
           label: 'Invoiced',
-          amount: report.invoiceAmount,
-          isBold: true,
+          amount: totals.chargedAmount,
+          tone: _BandTone.neutral,
         ),
-        _FinancialRow(label: 'Charged this month', amount: report.chargedAmount),
-        _FinancialRow(
-          label: 'Brought forward',
-          amount: report.broughtForwardAmount,
-        ),
-        _FinancialRow(
-          label: 'Credits & adjustments',
-          amount: report.creditsAndAdjustments,
-          color: report.creditsAndAdjustments < 0 ? HodiColors.textMedium : null,
-        ),
+        const SizedBox(height: 10),
 
+        // The four figures that explain the gap between what was billed and what settled it.
+        _Pairs(
+          rows: [
+            ('Invoice Overpayment', totals.invoiceOverpayment),
+            ('Payment on Invoice', totals.paymentOnInvoice),
+            ('Credit (Top-up)', totals.topupAmount),
+            ('Total Overpayment', totals.overpaymentAmount),
+          ],
+          // Held, not arisen — a running balance, and a different column from the four above it.
+          // A property can hold a balance in a month where nothing arose at all, which is why the
+          // web separates it with a rule rather than listing it among them.
+          footer: ('Cumulative Credit Balance', totals.cumulativeCredit),
+        ),
+        const SizedBox(height: 10),
+
+        _Band(
+          label: 'Total Collected',
+          amount: totals.paymentAmount,
+          tone: _BandTone.good,
+        ),
         const SizedBox(height: 8),
-        const Divider(height: 1, color: HodiColors.divider),
-        const SizedBox(height: 12),
-
-        // What the charge was made of. Rent is the rent here — the legacy report labelled the
-        // whole charge "Rent" and put "Utilities" beside it, which read as two siblings when the
-        // second is inside the first.
-        _FinancialRow(label: 'Rent', amount: report.rentAmount),
-        if (report.serviceChargeAmount != 0)
-          _FinancialRow(label: 'Service charge', amount: report.serviceChargeAmount),
-        _FinancialRow(label: 'Utilities', amount: report.utilityAmount),
-        if (report.depositAmount != 0)
-          _FinancialRow(label: 'Deposits', amount: report.depositAmount),
-
+        _Band(
+          label: 'Expenses',
+          amount: totals.expenseAmount,
+          tone: _BandTone.cost,
+        ),
         const SizedBox(height: 8),
-        const Divider(height: 1, color: HodiColors.divider),
-        const SizedBox(height: 12),
-
-        _FinancialRow(
-          label: 'Received',
-          amount: report.paymentAmount,
-          color: HodiColors.successStart,
-          isBold: true,
+        _Band(
+          label: 'Net Income',
+          note: 'collected less expenses',
+          amount: totals.netIncome,
+          tone: totals.netIncome < 0 ? _BandTone.bad : _BandTone.good,
         ),
-        _FinancialRow(label: 'Expenses', amount: report.expenseAmount),
-        _FinancialRow(
-          label: 'Net income',
-          amount: report.netIncome,
-          color: report.netIncome < 0 ? HodiColors.errorStart : null,
-          isBold: true,
-        ),
-
         const SizedBox(height: 8),
-        const Divider(height: 1, color: HodiColors.divider),
-        const SizedBox(height: 12),
-
-        // Opening and closing together, so the month reconciles on screen rather than inviting
-        // somebody to work out which of the two "Arrears" meant.
-        _FinancialRow(label: 'Opening arrears', amount: report.openingArrears),
-        _FinancialRow(
-          label: 'Closing arrears',
-          amount: report.closingArrears,
-          color: report.closingArrears > 0 ? HodiColors.errorStart : null,
-          isBold: true,
+        // Owed at the end of the month, however old — a running balance, not the month's own.
+        _Band(
+          label: 'Arrears',
+          amount: totals.closingArrears,
+          tone: totals.closingArrears > 0 ? _BandTone.bad : _BandTone.neutral,
         ),
-        _FinancialRow(label: 'Credit arising', amount: report.overpaymentAmount),
-        _FinancialRow(label: 'Credit held', amount: report.cumulativeCredit),
-        if (report.forfeitedAmount != 0)
-          _FinancialRow(label: 'Forfeited', amount: report.forfeitedAmount),
-        // Null is "HODI has not invoiced that month yet", which is not a commission of zero.
-        if (report.commissionAmount != null)
-          _FinancialRow(
-            label: report.commissionPercent == null
-                ? 'Commission'
-                : 'Commission (${report.commissionPercent!.toStringAsFixed(1)}%)',
-            amount: report.commissionAmount!,
-            isLast: true,
+
+        // Only when there is some. Money gone rather than owed, so it is said under the arrears it
+        // came out of rather than added into them.
+        if (totals.forfeitedAmount > 0) ...[
+          const SizedBox(height: 12),
+          Text(
+            '${CurrencyFormatter.format(totals.forfeitedAmount)} of arrears was forfeited when '
+            'tenants vacated owing, and is no longer collectable.',
+            style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textLight),
           ),
+        ],
       ],
     );
   }
 }
 
-/// Which month to report on.
-///
-/// Three real months ending with the one just gone, and no "Next". Legacy offered one, because
-/// its figures came off the property row and a future month simply read as zeroes; the report
-/// cannot report a month that has not happened, and offering it would be offering an empty answer.
-class _PeriodSelector extends StatelessWidget {
-  final ReportPeriod active;
-  final ValueChanged<ReportPeriod> onSelect;
+enum _BandTone { neutral, good, bad, cost }
 
-  const _PeriodSelector({required this.active, required this.onSelect});
+/// One figure on its own line, tinted by what it means.
+class _Band extends StatelessWidget {
+  final String label;
+  final String? note;
+  final double amount;
+  final _BandTone tone;
 
-  /// The month just ended, which is what the server defaults to and so what "Latest" selects.
-  static DateTime get _latest {
-    final now = DateTime.now();
-    return DateTime(now.year, now.month - 1);
-  }
+  const _Band({
+    required this.label,
+    required this.amount,
+    required this.tone,
+    this.note,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final months = [
-      DateTime(_latest.year, _latest.month - 2),
-      DateTime(_latest.year, _latest.month - 1),
-      _latest,
-    ];
+    final colour = switch (tone) {
+      _BandTone.neutral => HodiColors.textDark,
+      _BandTone.good => HodiColors.successEnd,
+      _BandTone.bad => HodiColors.errorStart,
+      _BandTone.cost => HodiColors.warningEnd,
+    };
+    final fill = switch (tone) {
+      _BandTone.neutral => HodiColors.surfaceInset,
+      _ => colour.withValues(alpha: 0.08),
+    };
 
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: HodiBorderRadius.small,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: HodiTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: HodiColors.textDark,
+                  ),
+                ),
+                if (note != null)
+                  Text(
+                    note!,
+                    style: HodiTextStyles.bodySmall.copyWith(
+                      fontSize: 11,
+                      color: HodiColors.textLight,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          HodiAmountText(
+            amount: amount,
+            style: HodiTextStyles.currency.copyWith(fontSize: 15, color: colour),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The four monthly credit figures, with the held balance ruled off below them.
+class _Pairs extends StatelessWidget {
+  final List<(String, double)> rows;
+  final (String, double) footer;
+
+  const _Pairs({required this.rows, required this.footer});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: HodiColors.surfaceLight,
+        borderRadius: HodiBorderRadius.small,
+        border: Border.all(color: HodiColors.divider),
+      ),
+      child: Column(
+        children: [
+          for (final (label, amount) in rows)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: HodiTextStyles.bodySmall
+                          .copyWith(color: HodiColors.textMedium),
+                    ),
+                  ),
+                  HodiAmountText(
+                    amount: amount,
+                    style: HodiTextStyles.currencySmall.copyWith(
+                      color: HodiColors.textDark,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          const Divider(height: 10, color: HodiColors.divider),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  footer.$1,
+                  style: HodiTextStyles.bodySmall.copyWith(
+                    color: HodiColors.textDark,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              HodiAmountText(
+                amount: footer.$2,
+                style: HodiTextStyles.currencySmall.copyWith(
+                  color: HodiColors.secondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Previous, the billing month, next.
+///
+/// Three fixed months rather than a picker, as the web has them. An earlier pass here dropped
+/// "next" on the reasoning that a report cannot report a month that has not happened — which was
+/// wrong, and wrong in an interesting way: the middle month is the **billing** month, not the
+/// calendar one, and past the invoice day the server is already raising invoices into the month
+/// ahead. "Has next month been raised yet" is a real question with a real answer.
+class _PeriodSelector extends StatelessWidget {
+  final List<BillingPeriod> months;
+  final BillingPeriod chosen;
+  final ValueChanged<BillingPeriod> onSelect;
+
+  const _PeriodSelector({
+    required this.months,
+    required this.chosen,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         for (var i = 0; i < months.length; i++) ...[
           if (i > 0) const SizedBox(width: 8),
           Expanded(
             child: _PeriodChip(
-              label: DateFormatter.formatMonthYear(months[i]).split(' ').first,
-              // The most recent chip is also what an unset period resolves to, so it reads as
-              // selected on arrival rather than leaving all three looking untouched.
-              isActive: active.isLatest
-                  ? i == months.length - 1
-                  : active.year == months[i].year && active.month == months[i].month,
-              onTap: () => onSelect(
-                ReportPeriod(year: months[i].year, month: months[i].month),
-              ),
+              // The month's name. The year is not on the chip — all three are within a month of
+              // each other, so it would repeat on two of them and differ on one, which reads as a
+              // difference that matters when it does not.
+              label: months[i].label,
+              isActive: months[i] == chosen,
+              onTap: () => onSelect(months[i]),
             ),
           ),
         ],
@@ -693,10 +751,10 @@ class _PeriodChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 9),
         decoration: BoxDecoration(
           gradient: isActive ? HodiGradients.primary : null,
-          color: isActive ? null : HodiColors.surfaceLight,
+          color: isActive ? null : HodiColors.surfaceInset,
           borderRadius: HodiBorderRadius.small,
         ),
         alignment: Alignment.center,
@@ -704,7 +762,7 @@ class _PeriodChip extends StatelessWidget {
           label,
           style: HodiTextStyles.bodySmall.copyWith(
             color: isActive ? HodiColors.white : HodiColors.textMedium,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -755,50 +813,6 @@ class _CollectionProgressBar extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _FinancialRow extends StatelessWidget {
-  final String label;
-  final double amount;
-  final Color? color;
-  final bool isBold;
-  final bool isLast;
-
-  const _FinancialRow({
-    required this.label,
-    required this.amount,
-    this.color,
-    this.isBold = false,
-    this.isLast = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: HodiTextStyles.bodySmall.copyWith(
-                color: HodiColors.textMedium,
-                fontWeight: isBold ? FontWeight.w500 : FontWeight.w400,
-              ),
-            ),
-          ),
-          HodiAmountText(
-            amount: amount,
-            style: HodiTextStyles.currencySmall.copyWith(
-              color: color ?? HodiColors.textDark,
-              fontWeight: isBold ? FontWeight.w600 : FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import '../../../core/filters/filter_provider.dart';
 import '../../../core/utils/pdf_downloader.dart';
 import '../data/invoice_repository.dart';
 import '../domain/invoice_model.dart';
+import '../domain/billing_period.dart';
 import '../domain/invoice_detail_model.dart';
 
 part 'invoice_providers.g.dart';
@@ -117,4 +118,20 @@ final invoiceDetailProvider =
     throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load invoice');
   }
   return response.data;
+});
+
+
+/// The month the platform is currently billing into.
+///
+/// Asked of the server rather than read off the clock — see [BillingPeriod]. Not auto-disposed:
+/// it changes once a month, and every screen that offers a month window wants the same answer.
+///
+/// Falls back to the calendar month rather than failing. `/invoices/current-period` needs
+/// `ROLE_INVOICE_VIEW`, which somebody holding only `ROLE_REPORT_VIEW` does not have, and a
+/// report card is not the place to refuse to draw because a billing endpoint said no.
+final currentBillingPeriodProvider = FutureProvider<BillingPeriod>((ref) async {
+  final response = await ref.watch(invoiceRepositoryProvider).currentPeriod();
+  return response.isSuccess && response.data != null
+      ? response.data!
+      : BillingPeriod.fromClock();
 });

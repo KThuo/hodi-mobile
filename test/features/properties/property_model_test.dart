@@ -222,4 +222,106 @@ void main() {
       expect(month.collectionPercentage, closeTo(79.35, 0.01));
     });
   });
+
+  group('the month, as the card reads it', () {
+    // A page of the report, which is what the card asks for. The figures live on `totals` — the
+    // server's own aggregate over the rows — not on the first row.
+    const page = <String, dynamic>{
+      'content': [
+        {
+          'id': 'ErqPNp7v5p',
+          'propertyName': 'Kilimani Heights',
+          'periodYear': 2026,
+          'periodMonth': 8,
+        },
+      ],
+      'page': 0,
+      'pageSize': 50,
+      'totalElements': 1,
+      'totals': {
+        'properties': 1,
+        'totalUnits': 24,
+        'occupiedUnits': 19,
+        'invoiceAmount': 1020800,
+        'chargedAmount': 500000,
+        'rentAmount': 380000,
+        'serviceChargeAmount': 0,
+        'utilityAmount': 90000,
+        'depositAmount': 30000,
+        'broughtForwardAmount': 672600,
+        'paymentAmount': 810000,
+        'openingArrears': 672600,
+        'closingArrears': 210800,
+        'overpaymentAmount': 22700,
+        'totalCredit': 800700,
+        'topupAmount': 18000,
+        'cumulativeCredit': 140,
+        'clearedAmount': 470000,
+        'forfeitedAmount': 0,
+        'expenseAmount': 120000,
+        'commissionAmount': 60750,
+        'netIncome': 690000,
+        'collectionRate': 162.0,
+        'creditsAndAdjustments': -151800,
+      },
+    };
+
+    test('the figures come off totals, not the first row', () {
+      final read = PropertyReportPageModel.fromJson(page);
+
+      // For one property these agree; for an estate the first row is one property of many, which
+      // is how the web came to label a single block's collection as the whole estate's.
+      expect(read.totals, isNotNull);
+      expect(read.totals!.paymentAmount, 810000);
+      expect(read.content.single.periodMonth, 8);
+    });
+
+    test('the rate is the server\'s, not a division done here', () {
+      // Against chargedAmount, which is what the card labels "Invoiced" — so the bar and the band
+      // above it describe the same quantity. Computing it here against invoiceAmount is what had
+      // the two disagreeing.
+      expect(PropertyReportPageModel.fromJson(page).totals!.collectionRate, 162.0);
+    });
+
+    test('payment on invoice excludes the credit that arose', () {
+      final t = PropertyReportPageModel.fromJson(page).totals!;
+
+      // Money sitting in credit has not settled anything yet.
+      expect(t.paymentOnInvoice, 810000 - 22700);
+    });
+
+    test('invoice overpayment is the credit that had an invoice to overshoot', () {
+      final t = PropertyReportPageModel.fromJson(page).totals!;
+
+      expect(t.invoiceOverpayment, 22700 - 18000);
+      // Both are derived from overpaymentAmount, which stays whole. Subtracting either into a
+      // stored column would destroy the total the other one needs.
+      expect(t.overpaymentAmount, 22700);
+    });
+
+    test('no rows is "nothing was billed", not figures of nought', () {
+      final empty = PropertyReportPageModel.fromJson(
+        {...page, 'content': <dynamic>[], 'totalElements': 0},
+      );
+
+      expect(empty.nothingBilled, isTrue);
+      expect(PropertyReportPageModel.fromJson(page).nothingBilled, isFalse);
+    });
+
+    test('rows with nothing charged is also nothing billed', () {
+      final unbilled = PropertyReportPageModel.fromJson({
+        ...page,
+        'totals': <String, dynamic>{
+          ...(page['totals']! as Map).cast<String, dynamic>(),
+          'chargedAmount': 0,
+          'collectionRate': null,
+        },
+      });
+
+      // A month raised with no charge on it has no rate either — the server sends null rather
+      // than dividing by nought, and the card says so in words.
+      expect(unbilled.nothingBilled, isTrue);
+      expect(unbilled.totals!.collectionRate, isNull);
+    });
+  });
 }

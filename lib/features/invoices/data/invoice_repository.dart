@@ -4,6 +4,7 @@ import '../../../core/api/api_response.dart';
 import '../../../core/api/paged_response.dart';
 import '../../../core/utils/pdf_downloader.dart';
 import '../domain/invoice_model.dart';
+import '../domain/billing_period.dart';
 import '../domain/invoice_detail_model.dart';
 import '../domain/payment_type_model.dart';
 
@@ -69,6 +70,14 @@ class InvoiceRepository {
         data as Map<String, dynamic>,
         (item) => InvoiceModel.fromJson(item),
       ),
+    );
+  }
+
+  /// The month the platform is billing into now.
+  Future<ApiResponse<BillingPeriod>> currentPeriod() async {
+    return _apiClient.get<BillingPeriod>(
+      ApiConstants.currentPeriod,
+      fromJsonT: (data) => BillingPeriod.fromJson(data as Map<String, dynamic>),
     );
   }
 

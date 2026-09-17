@@ -5,6 +5,8 @@ import '../data/property_repository.dart';
 import '../domain/property_model.dart';
 import '../domain/property_detail_model.dart';
 import '../domain/property_report_model.dart';
+import '../../invoices/domain/billing_period.dart';
+import '../../invoices/providers/invoice_providers.dart';
 
 final propertyRepositoryProvider = Provider<PropertyRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -102,39 +104,36 @@ final propertyListProvider = NotifierProvider<PropertyListNotifier, PropertyList
   PropertyListNotifier.new,
 );
 
-/// Which month the rent-collection card is showing.
+/// The three months the card offers: previous, billing, next.
 ///
-/// A year and a month rather than legacy's CURRENT/PREVIOUS/NEXT strings, because the report is
-/// asked for a real period and there is no such thing as a report of next month. Null means "the
-/// month just ended", which is what the server opens on and what the card labels accordingly.
-class ReportPeriod {
-  final int? year;
-  final int? month;
+/// Centred on the **billing** month from the server, not the calendar month from the handset. A
+/// billing month can be opened late or held open, and past the invoice day the server is already
+/// raising into the month ahead — so a client that decided for itself would offer a different
+/// month from the one invoices are going into.
+final propertyReportWindowProvider = FutureProvider<List<BillingPeriod>>((ref) async {
+  final now = await ref.watch(currentBillingPeriodProvider.future);
+  return now.window;
+});
 
-  const ReportPeriod({this.year, this.month});
-
-  static const latest = ReportPeriod();
-
-  bool get isLatest => year == null || month == null;
-
+/// Which of the three is showing. Null until the window resolves, then the middle one.
+class _ChosenPeriodNotifier extends Notifier<BillingPeriod?> {
   @override
-  bool operator ==(Object other) =>
-      other is ReportPeriod && other.year == year && other.month == month;
-
-  @override
-  int get hashCode => Object.hash(year, month);
-}
-
-class _PropertyReportPeriodNotifier extends Notifier<ReportPeriod> {
-  @override
-  ReportPeriod build() => ReportPeriod.latest;
-  void set(ReportPeriod value) => state = value;
+  BillingPeriod? build() => null;
+  void set(BillingPeriod value) => state = value;
 }
 
 final propertyReportPeriodProvider =
-    NotifierProvider<_PropertyReportPeriodNotifier, ReportPeriod>(
-  _PropertyReportPeriodNotifier.new,
+    NotifierProvider<_ChosenPeriodNotifier, BillingPeriod?>(
+  _ChosenPeriodNotifier.new,
 );
+
+/// The month actually on screen: whatever was picked, or the billing month until something is.
+final effectiveReportPeriodProvider = Provider<BillingPeriod?>((ref) {
+  final chosen = ref.watch(propertyReportPeriodProvider);
+  if (chosen != null) return chosen;
+  final window = ref.watch(propertyReportWindowProvider).value;
+  return window == null || window.length < 2 ? null : window[1];
+});
 
 // Property detail. The id is the hash the list row carried, passed through unchanged.
 final propertyDetailProvider = FutureProvider.autoDispose
@@ -151,11 +150,17 @@ final propertyDetailProvider = FutureProvider.autoDispose
 
 /// The money, which is a separate read behind a separate authority.
 ///
-/// Null data means the property has no row for that month — it was not invoiced and nothing
-/// arrived — which the card says rather than showing a column of zeroes.
-final propertyReportProvider =
-    FutureProvider.autoDispose.family<PropertyReportModel?, String>((ref, id) async {
-  final period = ref.watch(propertyReportPeriodProvider);
+/// Returns the whole page so the card can tell "nothing was billed that month" from "the figures
+/// are nought" — the first has no rows at all, and drawing it as a collection rate of zero would
+/// put a red mark against a month nobody has been asked to pay for.
+///
+/// A month that fails to load is a month with no figures, not a card that refuses to render: the
+/// three months load independently and one of them 403-ing should not blank the other two.
+final propertyReportProvider = FutureProvider.autoDispose
+    .family<PropertyReportPageModel?, String>((ref, id) async {
+  final period = ref.watch(effectiveReportPeriodProvider);
+  if (period == null) return null;
+
   final repo = ref.watch(propertyRepositoryProvider);
   final response = await repo.getPropertyReport(
     propertyId: id,

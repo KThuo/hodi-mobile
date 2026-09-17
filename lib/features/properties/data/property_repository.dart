@@ -47,33 +47,33 @@ class PropertyRepository {
     );
   }
 
-  /// One property's month.
+  /// One property's month, as a page of the report with its totals.
   ///
   /// Behind `ROLE_REPORT_VIEW`, which is a narrower gate than the property page itself — a
   /// caretaker can be allowed to see the block without being allowed to see what it collects. The
   /// caller checks the authority before asking; this returns the server's refusal otherwise.
   ///
-  /// Omitting [year] and [month] asks for the month just ended, which is what the report opens on:
-  /// a report of a month three days in is a report of three days.
-  Future<ApiResponse<PropertyReportModel?>> getPropertyReport({
+  /// The figures come off `totals` rather than the first row. For a single property the two agree,
+  /// but they are different quantities, and reading a row is what had the web's estate card
+  /// showing whichever property sorted first as the estate's collection.
+  Future<ApiResponse<PropertyReportPageModel>> getPropertyReport({
     required String propertyId,
-    int? year,
-    int? month,
+    required int year,
+    required int month,
   }) async {
-    return _apiClient.get<PropertyReportModel?>(
+    return _apiClient.get<PropertyReportPageModel>(
       ApiConstants.propertyReports,
       queryParameters: {
         'propertyId': propertyId,
-        'year': ?year,
-        'month': ?month,
+        'year': year,
+        'month': month,
         'page': 0,
-        'pageSize': 1,
+        // One property is one row per month. Asked for generously anyway, because the totals are
+        // totals of the rows on the page and a page that cut rows off would under-report.
+        'pageSize': 50,
       },
-      fromJsonT: (data) {
-        final rows = (data as Map<String, dynamic>)['content'] as List?;
-        if (rows == null || rows.isEmpty) return null;
-        return PropertyReportModel.fromJson(rows.first as Map<String, dynamic>);
-      },
+      fromJsonT: (data) =>
+          PropertyReportPageModel.fromJson(data as Map<String, dynamic>),
     );
   }
 }

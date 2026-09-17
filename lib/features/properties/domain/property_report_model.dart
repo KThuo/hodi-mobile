@@ -84,3 +84,97 @@ abstract class PropertyReportModel with _$PropertyReportModel {
   double get collectionPercentage =>
       invoiceAmount > 0 ? (paymentAmount / invoiceAmount) * 100 : 0;
 }
+
+
+/// A page of the property report, with the server's own aggregate over the rows on it.
+///
+/// **The card reads [totals], not `content.first`.** For one property those are the same figures,
+/// but they are not the same thing, and the web learnt this the expensive way: an estate's report
+/// has one row per property, so reading the first row showed whichever property sorted first and
+/// called it the estate's collection. `totals` is the same object the report screen prints under
+/// its table, so a card and a table looking at one month agree by construction.
+///
+/// An empty [content] is a month nobody has been billed for, which is a different answer from
+/// figures of nought and is said in words rather than drawn as a red ring.
+@freezed
+abstract class PropertyReportPageModel with _$PropertyReportPageModel {
+  const PropertyReportPageModel._();
+  const factory PropertyReportPageModel({
+    @Default(<PropertyReportModel>[]) List<PropertyReportModel> content,
+    @Default(0) int page,
+    @Default(0) int pageSize,
+    @Default(0) int totalElements,
+    PropertyReportTotalsModel? totals,
+  }) = _PropertyReportPageModel;
+
+  factory PropertyReportPageModel.fromJson(Map<String, dynamic> json) =>
+      _$PropertyReportPageModelFromJson(json);
+
+  /// Nothing was invoiced in this month for this scope.
+  bool get nothingBilled =>
+      content.isEmpty || totals == null || totals!.chargedAmount <= 0;
+}
+
+/// The totals of the rows on one page of the report.
+@freezed
+abstract class PropertyReportTotalsModel with _$PropertyReportTotalsModel {
+  const PropertyReportTotalsModel._();
+  const factory PropertyReportTotalsModel({
+    @Default(0) int properties,
+    @Default(0) int totalUnits,
+    @Default(0) int occupiedUnits,
+    @JsonKey(fromJson: parseDouble) @Default(0) double invoiceAmount,
+
+    /// The period's own charge — rent, service charge, utilities, deposits, penalties. **This is
+    /// what the collected percentage is a percentage of**, and what the card labels "Invoiced".
+    ///
+    /// Not [invoiceAmount], which is the invoices' face value with arrears brought forward inside
+    /// it. The web had the band showing one and the ring computed against the other, so the two
+    /// described different quantities and neither matched the dashboard.
+    @JsonKey(fromJson: parseDouble) @Default(0) double chargedAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double rentAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double serviceChargeAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double utilityAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double depositAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double broughtForwardAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double paymentAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double openingArrears,
+    @JsonKey(fromJson: parseDouble) @Default(0) double closingArrears,
+
+    /// The period's credit **total**, top-up included — legacy's "Total Overpayment".
+    @JsonKey(fromJson: parseDouble) @Default(0) double overpaymentAmount,
+
+    /// Unallocated money standing across every live payment **today**. Not a period figure, and
+    /// far larger than [overpaymentAmount] on real data. The card does not show it; it is here so
+    /// nobody reaches for it thinking it is the credit held at month end.
+    @JsonKey(fromJson: parseDouble) @Default(0) double totalCredit,
+
+    /// Money received with no invoice to put it against — part of [overpaymentAmount].
+    @JsonKey(fromJson: parseDouble) @Default(0) double topupAmount,
+
+    /// Credit still **held** at the end of the period, as a running balance. A property can hold
+    /// a balance in a month where none arose, which is why it sits apart from the monthly figures.
+    @JsonKey(fromJson: parseDouble) @Default(0) double cumulativeCredit,
+    @JsonKey(fromJson: parseDouble) @Default(0) double clearedAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double forfeitedAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double expenseAmount,
+    @JsonKey(fromJson: parseDoubleNullable) double? commissionAmount,
+    @JsonKey(fromJson: parseDouble) @Default(0) double netIncome,
+
+    /// Computed by the server, so this card and the report agree to the decimal. Null where
+    /// nothing was charged — a month nobody was billed for has no rate, which is not nought.
+    @JsonKey(fromJson: parseDoubleNullable) double? collectionRate,
+    @JsonKey(fromJson: parseDouble) @Default(0) double creditsAndAdjustments,
+  }) = _PropertyReportTotalsModel;
+
+  factory PropertyReportTotalsModel.fromJson(Map<String, dynamic> json) =>
+      _$PropertyReportTotalsModelFromJson(json);
+
+  /// What came in, less the credit that arose — money sitting in credit has not settled anything
+  /// yet. Derived where it is shown, exactly as the web and legacy both do it: subtracting it into
+  /// a stored column would destroy [overpaymentAmount], and the two cannot come out of one figure.
+  double get paymentOnInvoice => paymentAmount - overpaymentAmount;
+
+  /// The credit that arose, less the part that had no invoice. What is left overshot an invoice.
+  double get invoiceOverpayment => overpaymentAmount - topupAmount;
+}
