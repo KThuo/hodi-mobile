@@ -10,6 +10,7 @@ import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_gradients.dart';
 import '../../../core/theme/hodi_shadows.dart';
 import '../../../core/theme/hodi_text_styles.dart';
+import '../../notifications/providers/notification_providers.dart';
 
 class _MenuItem {
   final String label;
@@ -121,13 +122,22 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Menu',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: HodiColors.white,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Menu',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: HodiColors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      // In the header rather than as a menu row: a bell that has to be scrolled
+                      // to is a bell nobody looks at, and the count is the only thing on this
+                      // screen that changes on its own.
+                      const _NotificationBell(),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -608,5 +618,63 @@ class _MenuRow extends StatelessWidget {
     if (column == null) return false;
     final nonDividerChildren = column.children.whereType<_MenuRow>().toList();
     return nonDividerChildren.isNotEmpty && nonDividerChildren.last.item.label == item.label;
+  }
+}
+
+
+/// The bell, with what is waiting behind it.
+///
+/// The count comes from `/notifications/unread-count`, which exists because every screen wants the
+/// number and none of them want twenty rows to get it. Nothing polls: it is read when this screen
+/// builds, which is the moment somebody is looking at it.
+class _NotificationBell extends ConsumerWidget {
+  const _NotificationBell();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Zero while it loads and zero if it fails — a bell that cannot say how many is still a bell,
+    // and a badge that flickers a number in on arrival is worse than one that appears with it.
+    final unread = ref.watch(unreadCountProvider).value ?? 0;
+
+    return Semantics(
+      label: unread == 0
+          ? 'Notifications'
+          : 'Notifications, $unread unread',
+      button: true,
+      child: IconButton(
+        onPressed: () => context.push('/more/notifications'),
+        icon: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Icon(Icons.notifications_none, color: HodiColors.white, size: 26),
+            if (unread > 0)
+              Positioned(
+                right: -3,
+                top: -3,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  constraints: const BoxConstraints(minWidth: 18),
+                  decoration: BoxDecoration(
+                    color: HodiColors.errorStart,
+                    borderRadius: BorderRadius.circular(9),
+                    border: Border.all(color: HodiColors.white, width: 1.5),
+                  ),
+                  child: Text(
+                    // Past ninety-nine the exact number stops being information.
+                    unread > 99 ? '99+' : '$unread',
+                    textAlign: TextAlign.center,
+                    style: HodiTextStyles.bodySmall.copyWith(
+                      color: HodiColors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

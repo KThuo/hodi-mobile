@@ -154,6 +154,12 @@ abstract class ApiConstants {
   static const String stays = '$apiPrefix/stays';
   static const String mapConfig = '$apiPrefix/map-config';
 
+  // ── Notifications ─────────────────────────────────────────────────────────
+  //
+  // No authority on any of these. The controller gates on being signed in and the service scopes
+  // every query to the caller, so there is nothing in AppPermissions to gate the screen on either.
+  static const String notifications = '$apiPrefix/notifications';
+
   // ── Reports ───────────────────────────────────────────────────────────────
   static const String reports = '$apiPrefix/reports';
 

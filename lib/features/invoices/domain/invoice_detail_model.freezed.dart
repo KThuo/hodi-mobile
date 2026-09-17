@@ -20,7 +20,16 @@ mixin _$InvoiceDetailModel {
 /// Inside [InvoiceModel.amount] and outside the sum of [lines], which is why it is stated
 /// separately: a detail screen that added the lines and expected the total would be short by
 /// exactly this, and would look like an arithmetic bug rather than a brought-forward balance.
-@JsonKey(fromJson: parseDouble) double get broughtForward;/// What is actually due — the amount less what has been paid.
+@JsonKey(fromJson: parseDouble) double get broughtForward;/// **The figure the tenant is asked for, which is the face value — not what is left.**
+///
+/// `Invoice.totalPayable()` on the server is `return amount;`, and its comment says why:
+/// arrears are a line on this invoice and already inside the amount, so the amount and the
+/// total must not be two different answers to "what does this tenant owe".
+///
+/// It is emphatically **not** amount-less-paid, which is what this was documented as and read
+/// as. [balance] used it, so every screen asking what was still owed got the original total
+/// back — the payment sheet opened prefilled with the whole invoice for a tenant who had paid
+/// most of it.
 @JsonKey(fromJson: parseDouble) double get totalPayable; String? get voidReason; String? get voidedBy; String? get voidedOn;/// How to pay, and the footer — both resolved server-side from the property and the estate, so
 /// a document the app renders says what the printed one says.
  String? get paymentInstructions; String? get footer;
@@ -251,7 +260,16 @@ class _InvoiceDetailModel extends InvoiceDetailModel {
 /// separately: a detail screen that added the lines and expected the total would be short by
 /// exactly this, and would look like an arithmetic bug rather than a brought-forward balance.
 @override@JsonKey(fromJson: parseDouble) final  double broughtForward;
-/// What is actually due — the amount less what has been paid.
+/// **The figure the tenant is asked for, which is the face value — not what is left.**
+///
+/// `Invoice.totalPayable()` on the server is `return amount;`, and its comment says why:
+/// arrears are a line on this invoice and already inside the amount, so the amount and the
+/// total must not be two different answers to "what does this tenant owe".
+///
+/// It is emphatically **not** amount-less-paid, which is what this was documented as and read
+/// as. [balance] used it, so every screen asking what was still owed got the original total
+/// back — the payment sheet opened prefilled with the whole invoice for a tenant who had paid
+/// most of it.
 @override@JsonKey(fromJson: parseDouble) final  double totalPayable;
 @override final  String? voidReason;
 @override final  String? voidedBy;
