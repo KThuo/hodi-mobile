@@ -11,6 +11,7 @@ import '../../../core/widgets/hodi_status_badge.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/document_actions.dart';
 import '../../../core/widgets/hodi_gradient_button.dart';
 import '../domain/invoice_detail_model.dart';
 import '../domain/invoice_document_model.dart';
@@ -233,11 +234,38 @@ class InvoiceDetailScreen extends ConsumerWidget {
 /// tenancy and invoice ids, and those live only on the scoped read — so the button appears when
 /// the document says payable *and* that read succeeded. A caretaker looking at another property's
 /// invoice sees it and cannot pay it, which is exactly right.
-class _BottomActions extends ConsumerWidget {
+class _BottomActions extends ConsumerStatefulWidget {
   final InvoiceDocumentModel document;
   final String rrn;
 
   const _BottomActions({required this.document, required this.rrn});
+
+  @override
+  ConsumerState<_BottomActions> createState() => _BottomActionsState();
+}
+
+class _BottomActionsState extends ConsumerState<_BottomActions> {
+  bool _busy = false;
+
+  InvoiceDocumentModel get document => widget.document;
+  String get rrn => widget.rrn;
+
+  /// The browser first, because the invoice endpoint is public and a browser is where people
+  /// already know how to save, print and share. The download is the fallback for a handset with
+  /// no browser able to take the link.
+  Future<void> _openPdf() async {
+    final repo = ref.read(invoiceRepositoryProvider);
+    final opened = await DocumentActions.openInBrowser(repo.invoicePdfUrl(rrn));
+    if (opened || !mounted) return;
+
+    await DocumentActions.run(
+      context,
+      () => repo.downloadInvoicePdf(rrn),
+      onBusy: (busy) {
+        if (mounted) setState(() => _busy = busy);
+      },
+    );
+  }
 
   void _openPaymentSheet(BuildContext context, InvoiceDetailModel actions) {
     showModalBottomSheet(
@@ -249,7 +277,7 @@ class _BottomActions extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     // Null while it loads and null when it is refused — both mean "no actions yet", and neither
     // is worth a spinner on a bar whose other button works regardless.
     final actions = ref.watch(invoiceActionsProvider(rrn)).value;
@@ -272,12 +300,16 @@ class _BottomActions extends ConsumerWidget {
           Expanded(
             flex: canPay ? 1 : 2,
             child: OutlinedButton.icon(
-              onPressed: () {
-                ref.read(invoiceRepositoryProvider).downloadInvoicePdf(rrn);
-              },
-              icon: const Icon(Icons.download, size: 18),
+              onPressed: _busy ? null : _openPdf,
+              icon: _busy
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.picture_as_pdf_outlined, size: 18),
               label: Text(
-                'Download',
+                'Open PDF',
                 style: HodiTextStyles.bodyMedium.copyWith(
                   color: HodiColors.primaryStart,
                   fontWeight: FontWeight.w600,

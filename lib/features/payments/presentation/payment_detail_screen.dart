@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/hodi_colors.dart';
+import '../../../core/utils/document_actions.dart';
 import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/theme/hodi_border_radius.dart';
 import '../../../core/theme/hodi_shadows.dart';
@@ -37,13 +38,37 @@ import '../providers/payment_providers.dart';
 /// One payment can clear several months. Each one is its own line naming the month and the invoice,
 /// and a partial settlement says so — "part payment" beside a bill still standing is the difference
 /// between a tenant who is up to date and one who is not.
-class PaymentDetailScreen extends ConsumerWidget {
+class PaymentDetailScreen extends ConsumerStatefulWidget {
   final String rrn;
 
   const PaymentDetailScreen({super.key, required this.rrn});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PaymentDetailScreen> createState() => _PaymentDetailScreenState();
+}
+
+class _PaymentDetailScreenState extends ConsumerState<PaymentDetailScreen> {
+  bool _busy = false;
+
+  String get rrn => widget.rrn;
+
+  /// Downloaded, not opened in a browser.
+  ///
+  /// `/payments/receipt/{rrn}/receipt.pdf` is behind ROLE_PAYMENT_VIEW, and an external browser
+  /// carries no Authorization header — it would be refused. The invoice opens in the browser
+  /// because its endpoint is deliberately public; a receipt is proof money changed hands and
+  /// there is no flow that hands one to a stranger, so it stays behind the session and comes
+  /// through the authenticated client instead.
+  Future<void> _receipt() => DocumentActions.run(
+        context,
+        () => ref.read(paymentRepositoryProvider).downloadReceiptPdf(rrn),
+        onBusy: (busy) {
+          if (mounted) setState(() => _busy = busy);
+        },
+      );
+
+  @override
+  Widget build(BuildContext context) {
     final detailAsync = ref.watch(paymentDetailProvider(rrn));
 
     return Scaffold(
@@ -68,10 +93,17 @@ class PaymentDetailScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => ref.read(paymentRepositoryProvider).downloadReceiptPdf(rrn),
+        onPressed: _busy ? null : _receipt,
         backgroundColor: HodiColors.successStart,
-        icon: const Icon(Icons.download, color: HodiColors.white),
-        label: Text('Download', style: HodiTextStyles.button.copyWith(fontSize: 14)),
+        icon: _busy
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: HodiColors.white),
+              )
+            : const Icon(Icons.receipt_long_outlined, color: HodiColors.white),
+        label: Text('Receipt', style: HodiTextStyles.button.copyWith(fontSize: 14)),
       ),
     );
   }

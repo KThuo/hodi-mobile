@@ -7,6 +7,7 @@ import '../../../core/theme/hodi_shadows.dart';
 import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/document_actions.dart';
 import '../../../core/widgets/hodi_app_bar.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
@@ -26,22 +27,15 @@ class LeaseDetailScreen extends ConsumerStatefulWidget {
 class _LeaseDetailScreenState extends ConsumerState<LeaseDetailScreen> {
   bool _busy = false;
 
-  Future<void> _download(Future<void> Function() action) async {
-    setState(() => _busy = true);
-    try {
-      await action();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(e is Exception
-            ? e.toString().replaceFirst('Exception: ', '')
-            : 'That document could not be opened.'),
-        backgroundColor: HodiColors.errorStart,
-      ));
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
+  /// One behaviour for every document in the app — busy while it works, the server's own words
+  /// when it does not. See [DocumentActions].
+  Future<void> _download(Future<void> Function() action) => DocumentActions.run(
+        context,
+        action,
+        onBusy: (busy) {
+          if (mounted) setState(() => _busy = busy);
+        },
+      );
 
   @override
   Widget build(BuildContext context) {

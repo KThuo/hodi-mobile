@@ -121,6 +121,15 @@ class InvoiceRepository {
   /// name, so the file downloaded and then would not open, because it was never a PDF. The server
   /// renders one now, from the same `PublicInvoice` the screen shows, so the paper and the screen
   /// cannot disagree.
+  /// Where the invoice PDF lives, as a plain URL.
+  ///
+  /// `/api/v1/invoices/detail/**` is in the server's public allowlist — the reference is its only
+  /// protection, deliberately, because an invoice goes to somebody before they have an account.
+  /// So this opens in the phone's own browser, where saving, printing and sharing are tools
+  /// people already know.
+  String invoicePdfUrl(String rrn) =>
+      '${ApiConstants.baseUrl}${ApiConstants.invoiceDetail}/$rrn/invoice.pdf';
+
   Future<void> downloadInvoicePdf(String rrn) async {
     await _pdfDownloader.downloadAndOpen(
       '${ApiConstants.invoiceDetail}/$rrn/invoice.pdf',
