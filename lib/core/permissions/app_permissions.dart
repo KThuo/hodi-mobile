@@ -109,6 +109,27 @@ abstract class AppPermissions {
   // ── Reports ───────────────────────────────────────────────────────────────
   static const reportView = 'ROLE_REPORT_VIEW';
 
+  // ── Leases ────────────────────────────────────────────────────────────────
+  //
+  // No tenant authority here, and there does not need to be: the `/mine` paths carry none and the
+  // server scopes them to the caller, honouring the property's own `tenantCanViewLease` setting.
+  // So holding [leaseView] is what marks somebody as reading these as staff.
+  //
+  // DOCUMENT_EDIT is named and gates nothing the app renders. Attaching a signed scan is the
+  // office's job and not a thing to do from a phone between other jobs.
+  static const leaseView = 'ROLE_LEASE_VIEW';
+  static const leaseDocumentView = 'ROLE_LEASE_DOCUMENT_VIEW';
+  static const leaseDocumentEdit = 'ROLE_LEASE_DOCUMENT_EDIT';
+
+  // ── Penalties ─────────────────────────────────────────────────────────────
+  //
+  // A late-payment charge somebody has to decide about: apply it, waive it, or reverse one
+  // applied in error. WAIVE covers reversing too, which is the server's grouping.
+  static const penaltyView = 'ROLE_PENALTY_VIEW';
+  static const penaltyApply = 'ROLE_PENALTY_APPLY';
+  static const penaltyWaive = 'ROLE_PENALTY_WAIVE';
+  static const penaltyEdit = 'ROLE_PENALTY_EDIT';
+
   // ── Vacate notices ────────────────────────────────────────────────────────
   static const vacateView = 'ROLE_VACATE_VIEW';
 
@@ -124,6 +145,8 @@ abstract class AppPermissions {
     expenseView, expenseNew, expenseEdit, expenseDelete,
     maintView, maintNew, maintEdit, maintAssign, maintResolve,
     visitView, visitNew, visitDecide,
+    leaseView, leaseDocumentView, leaseDocumentEdit,
+    penaltyView, penaltyApply, penaltyWaive, penaltyEdit,
     estateView,
     reportView,
     vacateView,

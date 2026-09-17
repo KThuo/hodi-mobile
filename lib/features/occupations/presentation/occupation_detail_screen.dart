@@ -72,6 +72,11 @@ class OccupationDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       _TermsCard(occupation: occupation!),
                     ],
+                    // A lease *is* an occupation — `/leases/mine/{id}` takes this very id. So the
+                    // agreement belongs here, where the tenancy it describes already is, rather
+                    // than behind a list a tenant is not allowed to load.
+                    const SizedBox(height: 16),
+                    _AgreementLink(occupationId: occupationId),
                   ],
                 ),
               ),
@@ -202,6 +207,73 @@ class _BalanceCard extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// The tenancy agreement, from the tenant's own path.
+///
+/// Rendered without asking first whether it exists. `tenantCanViewLease` is a property setting and
+/// the server honours it on `/leases/mine/{id}`, so the honest sequence is to offer the link and
+/// let the page say no — a pre-flight request to decide whether to show a row is a second call
+/// that can disagree with the first.
+class _AgreementLink extends StatelessWidget {
+  const _AgreementLink({required this.occupationId});
+
+  final String occupationId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: HodiColors.cardBackground,
+        borderRadius: HodiBorderRadius.card,
+        boxShadow: HodiShadows.cardLight,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: HodiBorderRadius.card,
+        child: InkWell(
+          borderRadius: HodiBorderRadius.card,
+          onTap: () => context.push('/more/agreements/\$occupationId'),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: HodiColors.primaryStart.withValues(alpha: 0.1),
+                    borderRadius: HodiBorderRadius.small,
+                  ),
+                  child: Icon(Icons.description_outlined,
+                      color: HodiColors.primaryStart, size: 19),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tenancy agreement',
+                        style: HodiTextStyles.bodyLarge
+                            .copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Your terms, and a copy to keep',
+                        style: HodiTextStyles.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: HodiColors.textLight),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

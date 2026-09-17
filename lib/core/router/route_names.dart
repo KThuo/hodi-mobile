@@ -32,6 +32,8 @@ abstract class RouteNames {
   static const visitors = 'visitors';
   static const expenses = 'expenses';
   static const reports = 'reports';
+  static const leases = 'agreements';
+  static const leaseDetail = 'agreement-detail';
   static const maintenance = 'maintenance';
   static const maintenanceDetail = 'maintenance-detail';
   static const metres = 'metres';

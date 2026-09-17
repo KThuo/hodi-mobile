@@ -163,6 +163,15 @@ abstract class ApiConstants {
   static const String privacyPolicyUrl = '$baseUrl/privacy';
   static const String termsUrl = '$baseUrl/terms';
 
+  // ── Leases ────────────────────────────────────────────────────────────────
+  //
+  // Every read has a staff path and a `/mine` path. The tenant one carries no authority — the
+  // server scopes it to the caller and honours the property's `tenantCanViewLease` setting.
+  static const String leases = '$apiPrefix/leases';
+
+  // ── Penalties ─────────────────────────────────────────────────────────────
+  static const String penalties = '$apiPrefix/penalties';
+
   // ── Maintenance ───────────────────────────────────────────────────────────
   //
   // ROLE_MAINT_{VIEW,NEW} is held by tenants and caretakers alike, which is why this module is in

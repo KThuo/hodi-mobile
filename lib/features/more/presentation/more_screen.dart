@@ -101,6 +101,16 @@ const _moduleItems = <_MenuItem>[
     permissions: [AppPermissions.reportView],
     route: '/more/reports',
   ),
+  // Staff only. `GET /leases` needs ROLE_LEASE_VIEW, and there is no tenant-facing *list* of
+  // agreements — only `/leases/mine/{occupationId}`, one at a time. A tenant reaches theirs from
+  // My Houses, where the tenancy it belongs to already is. Offering this row on tenantSelf would
+  // be the Houses mistake again: a door that opens onto a refusal.
+  _MenuItem(
+    label: 'Agreements',
+    icon: Icons.description_outlined,
+    permissions: [AppPermissions.leaseView],
+    route: '/more/agreements',
+  ),
   _MenuItem(
     label: 'Vacate Notices',
     icon: Icons.description,

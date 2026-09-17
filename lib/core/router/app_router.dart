@@ -22,6 +22,8 @@ import '../../core/widgets/hodi_webview_page.dart';
 import '../../features/visitors/presentation/visitors_screen.dart';
 import '../../features/expenses/presentation/expenses_screen.dart';
 import '../../features/reports/presentation/reports_screen.dart';
+import '../../features/leases/presentation/leases_screen.dart';
+import '../../features/leases/presentation/lease_detail_screen.dart';
 import '../../features/maintenance/presentation/maintenance_screen.dart';
 import '../../features/maintenance/presentation/maintenance_detail_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
@@ -356,6 +358,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                       title: 'Terms & Conditions',
                       url: ApiConstants.termsUrl,
                     ),
+                  ),
+                  GoRoute(
+                    path: 'agreements',
+                    name: RouteNames.leases,
+                    builder: (context, state) => const LeasesScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        name: RouteNames.leaseDetail,
+                        builder: (context, state) => LeaseDetailScreen(
+                          id: state.pathParameters['id'] ?? '',
+                        ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'reports',
