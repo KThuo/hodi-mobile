@@ -73,6 +73,35 @@ abstract class AppPermissions {
   //
   // Legacy carried both ROLE_EXPENDITURES_VIEW and ROLE_EXPENSES_VIEW for one idea. One now.
   static const expenseView = 'ROLE_EXPENSE_VIEW';
+  static const expenseNew = 'ROLE_EXPENSE_NEW';
+  static const expenseEdit = 'ROLE_EXPENSE_EDIT';
+  static const expenseDelete = 'ROLE_EXPENSE_DELETE';
+
+  // ── Maintenance ───────────────────────────────────────────────────────────
+  //
+  // The reason this module is in the app: a tenant holds VIEW and NEW, a caretaker holds NEW and
+  // RESOLVE, and neither had a screen to use them on.
+  //
+  // ASSIGN and EDIT are named here for completeness and gate nothing the app renders — giving a
+  // job to somebody, and setting what it cost, are decisions made where the rota and the budget
+  // are. A button neither audience can press is a button that fails.
+  static const maintView = 'ROLE_MAINT_VIEW';
+  static const maintNew = 'ROLE_MAINT_NEW';
+  static const maintEdit = 'ROLE_MAINT_EDIT';
+  static const maintAssign = 'ROLE_MAINT_ASSIGN';
+  static const maintResolve = 'ROLE_MAINT_RESOLVE';
+
+  // ── Visitors ──────────────────────────────────────────────────────────────
+  //
+  // A tenant holds VIEW and DECIDE: somebody is at the gate and the answer is yes or no. NEW is
+  // the gate's own — checking a visitor in and out.
+  //
+  // REVEAL is deliberately absent rather than named: it uncovers a visitor's identity document
+  // number, neither audience holds it, and an id number is not something to pull onto a handset
+  // speculatively. OVERRIDE and BLOCK are the office's.
+  static const visitView = 'ROLE_VISIT_VIEW';
+  static const visitNew = 'ROLE_VISIT_NEW';
+  static const visitDecide = 'ROLE_VISIT_DECIDE';
 
   // ── Estates ───────────────────────────────────────────────────────────────
   static const estateView = 'ROLE_ESTATE_VIEW';
@@ -92,7 +121,9 @@ abstract class AppPermissions {
     invoiceView, invoiceNew,
     paymentView, paymentNew,
     metreView, metreNew, metreEdit,
-    expenseView,
+    expenseView, expenseNew, expenseEdit, expenseDelete,
+    maintView, maintNew, maintEdit, maintAssign, maintResolve,
+    visitView, visitNew, visitDecide,
     estateView,
     reportView,
     vacateView,

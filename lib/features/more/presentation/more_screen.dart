@@ -74,6 +74,14 @@ const _moduleItems = <_MenuItem>[
     permissions: [AppPermissions.metreView],
     route: '/more/metres',
   ),
+  // Both audiences hold ROLE_MAINT_VIEW, so this row is offered on the authority itself rather
+  // than on being staff — which is the point of the module being in the app.
+  _MenuItem(
+    label: 'Repairs',
+    icon: Icons.build_outlined,
+    permissions: [AppPermissions.maintView],
+    route: '/more/maintenance',
+  ),
   _MenuItem(
     label: 'Vacate Notices',
     icon: Icons.description,

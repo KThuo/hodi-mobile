@@ -17,6 +17,8 @@ import '../../features/properties/presentation/properties_screen.dart';
 import '../../features/properties/presentation/property_detail_screen.dart';
 import '../../features/more/presentation/more_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/maintenance/presentation/maintenance_screen.dart';
+import '../../features/maintenance/presentation/maintenance_detail_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
 import '../../features/tenants/presentation/tenant_detail_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
@@ -317,6 +319,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                           final id = state.pathParameters['id'] ?? '';
                           return VacateNoticeDetailScreen(noticeId: id);
                         },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'maintenance',
+                    name: RouteNames.maintenance,
+                    builder: (context, state) => const MaintenanceScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        name: RouteNames.maintenanceDetail,
+                        builder: (context, state) => MaintenanceDetailScreen(
+                          id: state.pathParameters['id'] ?? '',
+                        ),
                       ),
                     ],
                   ),

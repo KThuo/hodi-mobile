@@ -154,6 +154,18 @@ abstract class ApiConstants {
   static const String stays = '$apiPrefix/stays';
   static const String mapConfig = '$apiPrefix/map-config';
 
+  // ── Maintenance ───────────────────────────────────────────────────────────
+  //
+  // ROLE_MAINT_{VIEW,NEW} is held by tenants and caretakers alike, which is why this module is in
+  // the app at all: both audiences hold the rights and had no screen to use them on.
+  static const String maintenance = '$apiPrefix/maintenance';
+
+  // ── Visits ────────────────────────────────────────────────────────────────
+  static const String visits = '$apiPrefix/visits';
+
+  // ── Expenses ──────────────────────────────────────────────────────────────
+  static const String expenses = '$apiPrefix/expenses';
+
   // ── Notifications ─────────────────────────────────────────────────────────
   //
   // No authority on any of these. The controller gates on being signed in and the service scopes

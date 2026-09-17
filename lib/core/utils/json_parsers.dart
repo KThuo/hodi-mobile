@@ -26,3 +26,9 @@ double? parseDoubleNullable(dynamic value) {
   if (value is String) return double.tryParse(value);
   return null;
 }
+
+/// Like [parseIntNullable], but for a count, where "not sent" and "none" are the same thing.
+///
+/// A summary of counts is the case for it: a header saying "— open" where the server simply had
+/// nothing to report is worse than one saying "0 open", which is both true and readable.
+int parseIntOrZero(dynamic value) => parseIntNullable(value) ?? 0;
