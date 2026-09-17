@@ -74,6 +74,10 @@ abstract class ApiConstants {
   static const String me = '$apiPrefix/auth/me';
   static const String preferences = '$apiPrefix/auth/me/preferences';
   static const String changePassword = '$apiPrefix/auth/change-password';
+
+  /// The rules a new password must satisfy, so the screen can state them rather than guess.
+  /// A client that invents its own rules disagrees with the server the first time either changes.
+  static const String passwordPolicy = '$apiPrefix/auth/password-policy';
   static const String deleteAccount = '$apiPrefix/auth/delete-account';
   static const String forgotPassword = '$apiPrefix/auth/forgot-password';
 
@@ -152,4 +156,11 @@ abstract class ApiConstants {
 
   // ── Reports ───────────────────────────────────────────────────────────────
   static const String reports = '$apiPrefix/reports';
+
+  /// One property's month: what was invoiced, what arrived, what is still owed.
+  ///
+  /// The property detail endpoint used to carry these figures and no longer does — nothing is
+  /// stored, and the row is projected over invoices, payments and expenses each time it is asked
+  /// for. Behind `ROLE_REPORT_VIEW`, which is narrower than the property page itself.
+  static const String propertyReports = '$reports/property-reports';
 }

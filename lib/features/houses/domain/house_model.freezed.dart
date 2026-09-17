@@ -15,7 +15,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HouseModel {
 
- int get id; String? get houseName; String? get houseCode; String? get houseNumber; int get floor; double get rent; double? get squareFt;@JsonKey(name: 'property') String? get propertyName;@JsonKey(name: 'estate') String? get estateName;@JsonKey(name: 'category') String? get categoryName;@JsonKey(name: 'houseType') String? get typeName; String? get location; bool get occupied; int get status;@JsonKey(name: 'features') int get featureCount; String? get imageFilename;
+ String get id; String get houseCode; String? get houseNumber; int? get floor;/// Floor 0 as well, so this is what tells a mezzanine unit from a ground-floor one.
+ bool get mezzanine;/// The floor in words — "Ground Floor", "First Floor", "Basement".
+ String? get floorLabel;/// Number and floor together, which is how somebody reads a unit out.
+ String? get label; String? get propertyId; String? get propertyName; String? get estateId; String? get estateName; String? get categoryName;/// Residential, Commercial — the legacy list's "House Type" column.
+ String? get usageClassName; String? get tenure;/// Null where the category does not allow bedrooms — an office, a stall. Render nothing
+/// rather than "0 beds", which is wrong rather than empty.
+ int? get beds; int? get baths; int? get ensuite; bool get dsq; int? get parking; double? get squareFt;/// Null for an owned unit, which carries a service charge instead.
+ double? get rent; bool get occupied; int get status; String? get createdOn;
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +35,16 @@ $HouseModelCopyWith<HouseModel> get copyWith => _$HouseModelCopyWithImpl<HouseMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.typeName, typeName) || other.typeName == typeName)&&(identical(other.location, location) || other.location == location)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.featureCount, featureCount) || other.featureCount == featureCount)&&(identical(other.imageFilename, imageFilename) || other.imageFilename == imageFilename));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.mezzanine, mezzanine) || other.mezzanine == mezzanine)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.label, label) || other.label == label)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.beds, beds) || other.beds == beds)&&(identical(other.baths, baths) || other.baths == baths)&&(identical(other.ensuite, ensuite) || other.ensuite == ensuite)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parking, parking) || other.parking == parking)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,houseName,houseCode,houseNumber,floor,rent,squareFt,propertyName,estateName,categoryName,typeName,location,occupied,status,featureCount,imageFilename);
+int get hashCode => Object.hashAll([runtimeType,id,houseCode,houseNumber,floor,mezzanine,floorLabel,label,propertyId,propertyName,estateId,estateName,categoryName,usageClassName,tenure,beds,baths,ensuite,dsq,parking,squareFt,rent,occupied,status,createdOn]);
 
 @override
 String toString() {
-  return 'HouseModel(id: $id, houseName: $houseName, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, rent: $rent, squareFt: $squareFt, propertyName: $propertyName, estateName: $estateName, categoryName: $categoryName, typeName: $typeName, location: $location, occupied: $occupied, status: $status, featureCount: $featureCount, imageFilename: $imageFilename)';
+  return 'HouseModel(id: $id, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, mezzanine: $mezzanine, floorLabel: $floorLabel, label: $label, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, categoryName: $categoryName, usageClassName: $usageClassName, tenure: $tenure, beds: $beds, baths: $baths, ensuite: $ensuite, dsq: $dsq, parking: $parking, squareFt: $squareFt, rent: $rent, occupied: $occupied, status: $status, createdOn: $createdOn)';
 }
 
 
@@ -48,7 +55,7 @@ abstract mixin class $HouseModelCopyWith<$Res>  {
   factory $HouseModelCopyWith(HouseModel value, $Res Function(HouseModel) _then) = _$HouseModelCopyWithImpl;
 @useResult
 $Res call({
- int id, String? houseName, String? houseCode, String? houseNumber, int floor, double rent, double? squareFt,@JsonKey(name: 'property') String? propertyName,@JsonKey(name: 'estate') String? estateName,@JsonKey(name: 'category') String? categoryName,@JsonKey(name: 'houseType') String? typeName, String? location, bool occupied, int status,@JsonKey(name: 'features') int featureCount, String? imageFilename
+ String id, String houseCode, String? houseNumber, int? floor, bool mezzanine, String? floorLabel, String? label, String? propertyId, String? propertyName, String? estateId, String? estateName, String? categoryName, String? usageClassName, String? tenure, int? beds, int? baths, int? ensuite, bool dsq, int? parking, double? squareFt, double? rent, bool occupied, int status, String? createdOn
 });
 
 
@@ -65,24 +72,32 @@ class _$HouseModelCopyWithImpl<$Res>
 
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? houseName = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? floor = null,Object? rent = null,Object? squareFt = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? typeName = freezed,Object? location = freezed,Object? occupied = null,Object? status = null,Object? featureCount = null,Object? imageFilename = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? houseCode = null,Object? houseNumber = freezed,Object? floor = freezed,Object? mezzanine = null,Object? floorLabel = freezed,Object? label = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? usageClassName = freezed,Object? tenure = freezed,Object? beds = freezed,Object? baths = freezed,Object? ensuite = freezed,Object? dsq = null,Object? parking = freezed,Object? squareFt = freezed,Object? rent = freezed,Object? occupied = null,Object? status = null,Object? createdOn = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,floor: null == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
-as double,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
-as double?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,floor: freezed == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
+as int?,mezzanine: null == mezzanine ? _self.mezzanine : mezzanine // ignore: cast_nullable_to_non_nullable
+as bool,floorLabel: freezed == floorLabel ? _self.floorLabel : floorLabel // ignore: cast_nullable_to_non_nullable
+as String?,label: freezed == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String?,propertyId: freezed == propertyId ? _self.propertyId : propertyId // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
 as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
 as String?,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
-as String?,typeName: freezed == typeName ? _self.typeName : typeName // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,occupied: null == occupied ? _self.occupied : occupied // ignore: cast_nullable_to_non_nullable
+as String?,usageClassName: freezed == usageClassName ? _self.usageClassName : usageClassName // ignore: cast_nullable_to_non_nullable
+as String?,tenure: freezed == tenure ? _self.tenure : tenure // ignore: cast_nullable_to_non_nullable
+as String?,beds: freezed == beds ? _self.beds : beds // ignore: cast_nullable_to_non_nullable
+as int?,baths: freezed == baths ? _self.baths : baths // ignore: cast_nullable_to_non_nullable
+as int?,ensuite: freezed == ensuite ? _self.ensuite : ensuite // ignore: cast_nullable_to_non_nullable
+as int?,dsq: null == dsq ? _self.dsq : dsq // ignore: cast_nullable_to_non_nullable
+as bool,parking: freezed == parking ? _self.parking : parking // ignore: cast_nullable_to_non_nullable
+as int?,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
+as double?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double?,occupied: null == occupied ? _self.occupied : occupied // ignore: cast_nullable_to_non_nullable
 as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int,featureCount: null == featureCount ? _self.featureCount : featureCount // ignore: cast_nullable_to_non_nullable
-as int,imageFilename: freezed == imageFilename ? _self.imageFilename : imageFilename // ignore: cast_nullable_to_non_nullable
+as int,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -168,10 +183,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String? houseName,  String? houseCode,  String? houseNumber,  int floor,  double rent,  double? squareFt, @JsonKey(name: 'property')  String? propertyName, @JsonKey(name: 'estate')  String? estateName, @JsonKey(name: 'category')  String? categoryName, @JsonKey(name: 'houseType')  String? typeName,  String? location,  bool occupied,  int status, @JsonKey(name: 'features')  int featureCount,  String? imageFilename)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HouseModel() when $default != null:
-return $default(_that.id,_that.houseName,_that.houseCode,_that.houseNumber,_that.floor,_that.rent,_that.squareFt,_that.propertyName,_that.estateName,_that.categoryName,_that.typeName,_that.location,_that.occupied,_that.status,_that.featureCount,_that.imageFilename);case _:
+return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn);case _:
   return orElse();
 
 }
@@ -189,10 +204,10 @@ return $default(_that.id,_that.houseName,_that.houseCode,_that.houseNumber,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String? houseName,  String? houseCode,  String? houseNumber,  int floor,  double rent,  double? squareFt, @JsonKey(name: 'property')  String? propertyName, @JsonKey(name: 'estate')  String? estateName, @JsonKey(name: 'category')  String? categoryName, @JsonKey(name: 'houseType')  String? typeName,  String? location,  bool occupied,  int status, @JsonKey(name: 'features')  int featureCount,  String? imageFilename)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn)  $default,) {final _that = this;
 switch (_that) {
 case _HouseModel():
-return $default(_that.id,_that.houseName,_that.houseCode,_that.houseNumber,_that.floor,_that.rent,_that.squareFt,_that.propertyName,_that.estateName,_that.categoryName,_that.typeName,_that.location,_that.occupied,_that.status,_that.featureCount,_that.imageFilename);case _:
+return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +224,10 @@ return $default(_that.id,_that.houseName,_that.houseCode,_that.houseNumber,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String? houseName,  String? houseCode,  String? houseNumber,  int floor,  double rent,  double? squareFt, @JsonKey(name: 'property')  String? propertyName, @JsonKey(name: 'estate')  String? estateName, @JsonKey(name: 'category')  String? categoryName, @JsonKey(name: 'houseType')  String? typeName,  String? location,  bool occupied,  int status, @JsonKey(name: 'features')  int featureCount,  String? imageFilename)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn)?  $default,) {final _that = this;
 switch (_that) {
 case _HouseModel() when $default != null:
-return $default(_that.id,_that.houseName,_that.houseCode,_that.houseNumber,_that.floor,_that.rent,_that.squareFt,_that.propertyName,_that.estateName,_that.categoryName,_that.typeName,_that.location,_that.occupied,_that.status,_that.featureCount,_that.imageFilename);case _:
+return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn);case _:
   return null;
 
 }
@@ -224,25 +239,40 @@ return $default(_that.id,_that.houseName,_that.houseCode,_that.houseNumber,_that
 @JsonSerializable()
 
 class _HouseModel extends HouseModel {
-  const _HouseModel({required this.id, this.houseName, this.houseCode, this.houseNumber, this.floor = 0, this.rent = 0, this.squareFt, @JsonKey(name: 'property') this.propertyName, @JsonKey(name: 'estate') this.estateName, @JsonKey(name: 'category') this.categoryName, @JsonKey(name: 'houseType') this.typeName, this.location, this.occupied = false, this.status = 0, @JsonKey(name: 'features') this.featureCount = 0, this.imageFilename}): super._();
+  const _HouseModel({required this.id, required this.houseCode, this.houseNumber, this.floor, this.mezzanine = false, this.floorLabel, this.label, this.propertyId, this.propertyName, this.estateId, this.estateName, this.categoryName, this.usageClassName, this.tenure, this.beds, this.baths, this.ensuite, this.dsq = false, this.parking, this.squareFt, this.rent, this.occupied = false, this.status = 0, this.createdOn}): super._();
   factory _HouseModel.fromJson(Map<String, dynamic> json) => _$HouseModelFromJson(json);
 
-@override final  int id;
-@override final  String? houseName;
-@override final  String? houseCode;
+@override final  String id;
+@override final  String houseCode;
 @override final  String? houseNumber;
-@override@JsonKey() final  int floor;
-@override@JsonKey() final  double rent;
+@override final  int? floor;
+/// Floor 0 as well, so this is what tells a mezzanine unit from a ground-floor one.
+@override@JsonKey() final  bool mezzanine;
+/// The floor in words — "Ground Floor", "First Floor", "Basement".
+@override final  String? floorLabel;
+/// Number and floor together, which is how somebody reads a unit out.
+@override final  String? label;
+@override final  String? propertyId;
+@override final  String? propertyName;
+@override final  String? estateId;
+@override final  String? estateName;
+@override final  String? categoryName;
+/// Residential, Commercial — the legacy list's "House Type" column.
+@override final  String? usageClassName;
+@override final  String? tenure;
+/// Null where the category does not allow bedrooms — an office, a stall. Render nothing
+/// rather than "0 beds", which is wrong rather than empty.
+@override final  int? beds;
+@override final  int? baths;
+@override final  int? ensuite;
+@override@JsonKey() final  bool dsq;
+@override final  int? parking;
 @override final  double? squareFt;
-@override@JsonKey(name: 'property') final  String? propertyName;
-@override@JsonKey(name: 'estate') final  String? estateName;
-@override@JsonKey(name: 'category') final  String? categoryName;
-@override@JsonKey(name: 'houseType') final  String? typeName;
-@override final  String? location;
+/// Null for an owned unit, which carries a service charge instead.
+@override final  double? rent;
 @override@JsonKey() final  bool occupied;
 @override@JsonKey() final  int status;
-@override@JsonKey(name: 'features') final  int featureCount;
-@override final  String? imageFilename;
+@override final  String? createdOn;
 
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
@@ -257,16 +287,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseName, houseName) || other.houseName == houseName)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.typeName, typeName) || other.typeName == typeName)&&(identical(other.location, location) || other.location == location)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.featureCount, featureCount) || other.featureCount == featureCount)&&(identical(other.imageFilename, imageFilename) || other.imageFilename == imageFilename));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.mezzanine, mezzanine) || other.mezzanine == mezzanine)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.label, label) || other.label == label)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.beds, beds) || other.beds == beds)&&(identical(other.baths, baths) || other.baths == baths)&&(identical(other.ensuite, ensuite) || other.ensuite == ensuite)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parking, parking) || other.parking == parking)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,houseName,houseCode,houseNumber,floor,rent,squareFt,propertyName,estateName,categoryName,typeName,location,occupied,status,featureCount,imageFilename);
+int get hashCode => Object.hashAll([runtimeType,id,houseCode,houseNumber,floor,mezzanine,floorLabel,label,propertyId,propertyName,estateId,estateName,categoryName,usageClassName,tenure,beds,baths,ensuite,dsq,parking,squareFt,rent,occupied,status,createdOn]);
 
 @override
 String toString() {
-  return 'HouseModel(id: $id, houseName: $houseName, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, rent: $rent, squareFt: $squareFt, propertyName: $propertyName, estateName: $estateName, categoryName: $categoryName, typeName: $typeName, location: $location, occupied: $occupied, status: $status, featureCount: $featureCount, imageFilename: $imageFilename)';
+  return 'HouseModel(id: $id, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, mezzanine: $mezzanine, floorLabel: $floorLabel, label: $label, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, categoryName: $categoryName, usageClassName: $usageClassName, tenure: $tenure, beds: $beds, baths: $baths, ensuite: $ensuite, dsq: $dsq, parking: $parking, squareFt: $squareFt, rent: $rent, occupied: $occupied, status: $status, createdOn: $createdOn)';
 }
 
 
@@ -277,7 +307,7 @@ abstract mixin class _$HouseModelCopyWith<$Res> implements $HouseModelCopyWith<$
   factory _$HouseModelCopyWith(_HouseModel value, $Res Function(_HouseModel) _then) = __$HouseModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String? houseName, String? houseCode, String? houseNumber, int floor, double rent, double? squareFt,@JsonKey(name: 'property') String? propertyName,@JsonKey(name: 'estate') String? estateName,@JsonKey(name: 'category') String? categoryName,@JsonKey(name: 'houseType') String? typeName, String? location, bool occupied, int status,@JsonKey(name: 'features') int featureCount, String? imageFilename
+ String id, String houseCode, String? houseNumber, int? floor, bool mezzanine, String? floorLabel, String? label, String? propertyId, String? propertyName, String? estateId, String? estateName, String? categoryName, String? usageClassName, String? tenure, int? beds, int? baths, int? ensuite, bool dsq, int? parking, double? squareFt, double? rent, bool occupied, int status, String? createdOn
 });
 
 
@@ -294,24 +324,32 @@ class __$HouseModelCopyWithImpl<$Res>
 
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? houseName = freezed,Object? houseCode = freezed,Object? houseNumber = freezed,Object? floor = null,Object? rent = null,Object? squareFt = freezed,Object? propertyName = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? typeName = freezed,Object? location = freezed,Object? occupied = null,Object? status = null,Object? featureCount = null,Object? imageFilename = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? houseCode = null,Object? houseNumber = freezed,Object? floor = freezed,Object? mezzanine = null,Object? floorLabel = freezed,Object? label = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? usageClassName = freezed,Object? tenure = freezed,Object? beds = freezed,Object? baths = freezed,Object? ensuite = freezed,Object? dsq = null,Object? parking = freezed,Object? squareFt = freezed,Object? rent = freezed,Object? occupied = null,Object? status = null,Object? createdOn = freezed,}) {
   return _then(_HouseModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,houseName: freezed == houseName ? _self.houseName : houseName // ignore: cast_nullable_to_non_nullable
-as String?,houseCode: freezed == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
-as String?,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
-as String?,floor: null == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
-as int,rent: null == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
-as double,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
-as double?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
+as String,houseNumber: freezed == houseNumber ? _self.houseNumber : houseNumber // ignore: cast_nullable_to_non_nullable
+as String?,floor: freezed == floor ? _self.floor : floor // ignore: cast_nullable_to_non_nullable
+as int?,mezzanine: null == mezzanine ? _self.mezzanine : mezzanine // ignore: cast_nullable_to_non_nullable
+as bool,floorLabel: freezed == floorLabel ? _self.floorLabel : floorLabel // ignore: cast_nullable_to_non_nullable
+as String?,label: freezed == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String?,propertyId: freezed == propertyId ? _self.propertyId : propertyId // ignore: cast_nullable_to_non_nullable
+as String?,propertyName: freezed == propertyName ? _self.propertyName : propertyName // ignore: cast_nullable_to_non_nullable
+as String?,estateId: freezed == estateId ? _self.estateId : estateId // ignore: cast_nullable_to_non_nullable
 as String?,estateName: freezed == estateName ? _self.estateName : estateName // ignore: cast_nullable_to_non_nullable
 as String?,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
-as String?,typeName: freezed == typeName ? _self.typeName : typeName // ignore: cast_nullable_to_non_nullable
-as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,occupied: null == occupied ? _self.occupied : occupied // ignore: cast_nullable_to_non_nullable
+as String?,usageClassName: freezed == usageClassName ? _self.usageClassName : usageClassName // ignore: cast_nullable_to_non_nullable
+as String?,tenure: freezed == tenure ? _self.tenure : tenure // ignore: cast_nullable_to_non_nullable
+as String?,beds: freezed == beds ? _self.beds : beds // ignore: cast_nullable_to_non_nullable
+as int?,baths: freezed == baths ? _self.baths : baths // ignore: cast_nullable_to_non_nullable
+as int?,ensuite: freezed == ensuite ? _self.ensuite : ensuite // ignore: cast_nullable_to_non_nullable
+as int?,dsq: null == dsq ? _self.dsq : dsq // ignore: cast_nullable_to_non_nullable
+as bool,parking: freezed == parking ? _self.parking : parking // ignore: cast_nullable_to_non_nullable
+as int?,squareFt: freezed == squareFt ? _self.squareFt : squareFt // ignore: cast_nullable_to_non_nullable
+as double?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to_non_nullable
+as double?,occupied: null == occupied ? _self.occupied : occupied // ignore: cast_nullable_to_non_nullable
 as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as int,featureCount: null == featureCount ? _self.featureCount : featureCount // ignore: cast_nullable_to_non_nullable
-as int,imageFilename: freezed == imageFilename ? _self.imageFilename : imageFilename // ignore: cast_nullable_to_non_nullable
+as int,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

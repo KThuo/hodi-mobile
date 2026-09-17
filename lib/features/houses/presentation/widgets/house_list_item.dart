@@ -41,7 +41,7 @@ class HouseListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  house.houseName ?? house.houseCode ?? 'House',
+                  house.displayName,
                   style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -56,10 +56,18 @@ class HouseListItem extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    HodiAmountText(
-                      amount: house.rent,
-                      style: HodiTextStyles.currency.copyWith(fontSize: 14),
-                    ),
+                    // Null rent is an owned unit, which carries a service charge rather than rent.
+                    // "KES 0" there would claim it is let for nothing.
+                    if (house.rent != null)
+                      HodiAmountText(
+                        amount: house.rent!,
+                        style: HodiTextStyles.currency.copyWith(fontSize: 14),
+                      )
+                    else
+                      Text(
+                        house.tenure == 'OWNED' ? 'Owned' : '—',
+                        style: HodiTextStyles.bodySmall,
+                      ),
                     const Spacer(),
                     HodiStatusBadge(
                       text: house.occupied ? 'Occupied' : 'Vacant',

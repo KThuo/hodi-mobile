@@ -10,17 +10,32 @@ import '../../../core/widgets/hodi_amount_text.dart';
 import '../../../core/widgets/hodi_status_badge.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
+import '../../../core/auth/providers/auth_provider.dart';
+import '../../../core/permissions/app_permissions.dart';
+import '../../../core/utils/date_formatter.dart';
 import '../domain/property_detail_model.dart';
+import '../domain/property_report_model.dart';
 import '../providers/property_providers.dart';
 
+/// One property.
+///
+/// Two reads behind two authorities. `GET /properties/{id}` is the property — what it is, who to
+/// call, how it is set up — and anybody with `ROLE_PROPERTY_VIEW` may have it. The money is a
+/// report, behind `ROLE_REPORT_VIEW`, and the card carrying it is not rendered at all for somebody
+/// who does not hold that: a caretaker can be trusted with the block without being trusted with
+/// what it collects.
 class PropertyDetailScreen extends ConsumerWidget {
-  final int propertyId;
+  final String propertyId;
 
   const PropertyDetailScreen({super.key, required this.propertyId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(propertyDetailProvider(propertyId));
+    final canSeeMoney = ref.watch(authProvider).user?.hasPermission(
+              AppPermissions.reportView,
+            ) ??
+        false;
 
     return Scaffold(
       backgroundColor: HodiColors.background,
@@ -37,12 +52,11 @@ class PropertyDetailScreen extends ConsumerWidget {
               children: [
                 _PropertyHeaderCard(detail: detail),
                 const SizedBox(height: 16),
-                _QuickStatsGrid(detail: detail),
-                const SizedBox(height: 16),
-                _RentCollectionCard(
-                  detail: detail,
-                  propertyId: propertyId,
-                ),
+                _QuickStatsGrid(detail: detail, propertyId: propertyId),
+                if (canSeeMoney) ...[
+                  const SizedBox(height: 16),
+                  _RentCollectionCard(propertyId: propertyId),
+                ],
                 const SizedBox(height: 16),
                 _AutomationSettingsCard(detail: detail),
                 if (detail.paymentInstructions != null &&
@@ -99,7 +113,7 @@ class _PropertyHeaderCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            detail.name ?? 'Property',
+            detail.name,
             style: HodiTextStyles.heading2.copyWith(color: HodiColors.white),
             textAlign: TextAlign.center,
           ),
@@ -107,15 +121,24 @@ class _PropertyHeaderCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (detail.floors > 0)
+              if ((detail.floors ?? 0) > 0) ...[
                 _HeaderBadge(
                   icon: Icons.layers_outlined,
                   text: '${detail.floors} Floor${detail.floors == 1 ? '' : 's'}',
                 ),
-              if (detail.floors > 0) const SizedBox(width: 8),
+                const SizedBox(width: 8),
+              ],
+              // An integer now, not a word. 1 is active, 0 inactive, 2 deleted — and 2 is the
+              // same integer an invoice uses for PAID, which is why this reads the record
+              // lifecycle explicitly rather than testing a bare number somewhere else.
               HodiStatusBadge(
-                text: detail.status ?? 'Unknown',
-                type: detail.status == 'ACTIVE' ? BadgeType.success : BadgeType.warning,
+                text: switch (detail.status) {
+                  1 => 'Active',
+                  0 => 'Inactive',
+                  2 => 'Deleted',
+                  _ => 'Unknown',
+                },
+                type: detail.status == 1 ? BadgeType.success : BadgeType.warning,
               ),
             ],
           ),
@@ -129,17 +152,24 @@ class _PropertyHeaderCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
           ],
-          if (detail.adminMail != null) ...[
+          if (detail.contactName != null) ...[
             _ContactRow(
-              icon: Icons.email_outlined,
-              text: detail.adminMail!,
+              icon: Icons.person_outline,
+              text: detail.contactName!,
             ),
             const SizedBox(height: 8),
           ],
-          if (detail.adminPhone != null)
+          if (detail.email != null) ...[
+            _ContactRow(
+              icon: Icons.email_outlined,
+              text: detail.email!,
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (detail.phone != null)
             _ContactRow(
               icon: Icons.phone_outlined,
-              text: detail.adminPhone!,
+              text: detail.phone!,
             ),
         ],
       ),
@@ -209,13 +239,27 @@ class _ContactRow extends StatelessWidget {
 
 // --- Quick Stats Grid ---
 
-class _QuickStatsGrid extends StatelessWidget {
+/// Units and tenancies from the property; income and expense from the month's report.
+///
+/// The two halves come from different reads, so the money tiles carry their own loading and their
+/// own empty state. A property that was not invoiced last month has no report row at all, and the
+/// tile says so rather than printing a confident zero.
+class _QuickStatsGrid extends ConsumerWidget {
   final PropertyDetailModel detail;
+  final String propertyId;
 
-  const _QuickStatsGrid({required this.detail});
+  const _QuickStatsGrid({required this.detail, required this.propertyId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final canSeeMoney = ref.watch(authProvider).user?.hasPermission(
+              AppPermissions.reportView,
+            ) ??
+        false;
+    final reportAsync =
+        canSeeMoney ? ref.watch(propertyReportProvider(propertyId)) : null;
+    final report = reportAsync?.value;
+
     return Column(
       children: [
         Row(
@@ -232,47 +276,84 @@ class _QuickStatsGrid extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
+              // Tenancies, not occupied units. A unit is flagged occupied; a tenancy is a person
+              // with terms and a balance. They agree in practice and are not the same count.
               child: _StatTile(
-                icon: Icons.payments_outlined,
-                iconColor: HodiColors.successStart,
-                label: 'Total Income',
-                valueWidget: HodiAmountText(
-                  amount: detail.totalCollection,
-                  style: HodiTextStyles.currency.copyWith(fontSize: 14),
-                ),
-                subtitle: detail.monthName ?? '',
+                icon: Icons.people_outline,
+                iconColor: HodiColors.secondary,
+                label: 'Tenancies',
+                value: '${detail.tenancyCount}',
+                subtitle: detail.tenures.map(_tenureLabel).join(' · '),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _StatTile(
-                icon: Icons.receipt_long_outlined,
-                iconColor: HodiColors.errorStart,
-                label: 'Total Expenses',
-                valueWidget: HodiAmountText(
-                  amount: detail.totalExpense,
-                  style: HodiTextStyles.currency.copyWith(fontSize: 14),
+        if (canSeeMoney) ...[
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.payments_outlined,
+                  iconColor: HodiColors.successStart,
+                  label: 'Collected',
+                  valueWidget: report == null
+                      ? null
+                      : HodiAmountText(
+                          amount: report.paymentAmount,
+                          style: HodiTextStyles.currency.copyWith(fontSize: 14),
+                        ),
+                  value: report == null ? _pending(reportAsync) : null,
+                  subtitle: report == null ? '' : _periodLabel(report),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _StatTile(
-                icon: Icons.percent_outlined,
-                iconColor: HodiColors.warningStart,
-                label: 'Commission',
-                value: '${detail.chargeableCommission.toStringAsFixed(1)}%',
+              const SizedBox(width: 12),
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.receipt_long_outlined,
+                  iconColor: HodiColors.errorStart,
+                  label: 'Expenses',
+                  valueWidget: report == null
+                      ? null
+                      : HodiAmountText(
+                          amount: report.expenseAmount,
+                          style: HodiTextStyles.currency.copyWith(fontSize: 14),
+                        ),
+                  value: report == null ? _pending(reportAsync) : null,
+                  subtitle: report == null
+                      ? ''
+                      : '${report.expenseCount} recorded',
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ],
     );
   }
+
+  /// Three states and three different things to say: still asking, asked and refused, asked and
+  /// there was no such month. A dash for all three would hide the difference.
+  static String _pending(AsyncValue<PropertyReportModel?>? async) {
+    if (async == null) return '-';
+    return async.when(
+      data: (_) => 'No data',
+      loading: () => '…',
+      error: (_, _) => 'Unavailable',
+    );
+  }
+
+  static String _periodLabel(PropertyReportModel r) {
+    final when = DateTime(r.periodYear, r.periodMonth);
+    return DateFormatter.formatMonthYear(when);
+  }
+
+  static String _tenureLabel(String tenure) => switch (tenure) {
+        'RENTAL' => 'Rental',
+        'OWNED' => 'Owned',
+        'BNB' => 'Short stay',
+        _ => tenure,
+      };
 }
 
 class _StatTile extends StatelessWidget {
@@ -344,19 +425,26 @@ class _StatTile extends StatelessWidget {
 
 // --- Rent Collection Card ---
 
+/// The property's month.
+///
+/// Every figure here is the report's, and the report is a projection over invoices, payments and
+/// expenses rather than a stored total — so the rows below reconcile with each other by
+/// construction and are shown in an order that lets somebody add them up:
+///
+///   charged + brought forward + credits and adjustments = invoiced
+///
+/// The legacy screen showed "Invoice Amount" and "Total Collected" next to each other with the
+/// carried arrears invisible between them, which is why the same property could read as collecting
+/// well under 100% in a month it had settled everything raised.
 class _RentCollectionCard extends ConsumerWidget {
-  final PropertyDetailModel detail;
-  final int propertyId;
+  final String propertyId;
 
-  const _RentCollectionCard({
-    required this.detail,
-    required this.propertyId,
-  });
+  const _RentCollectionCard({required this.propertyId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedPeriod = ref.watch(propertyDetailPeriodProvider);
-    final activePeriod = selectedPeriod ?? detail.period ?? 'CURRENT';
+    final period = ref.watch(propertyReportPeriodProvider);
+    final reportAsync = ref.watch(propertyReportProvider(propertyId));
 
     return Container(
       width: double.infinity,
@@ -388,68 +476,31 @@ class _RentCollectionCard extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // Period selector chips
           _PeriodSelector(
-            activePeriod: activePeriod,
-            previousLabel: detail.previousMonthName ?? 'Previous',
-            currentLabel: detail.currentMonthName ?? 'Current',
-            nextLabel: detail.nextMonthName ?? 'Next',
-            onSelect: (period) {
-              ref.read(propertyDetailPeriodProvider.notifier).set(period);
-            },
+            active: period,
+            onSelect: (p) =>
+                ref.read(propertyReportPeriodProvider.notifier).set(p),
           ),
           const SizedBox(height: 16),
           const Divider(height: 1, color: HodiColors.divider),
           const SizedBox(height: 16),
 
-          // Collection percentage
-          _CollectionProgressBar(percentage: detail.collectionPercentage),
-          const SizedBox(height: 16),
-
-          // Financial breakdown
-          _FinancialRow(
-            label: 'Invoice Amount',
-            amount: detail.totalInvoiced,
-            isBold: true,
-          ),
-          _FinancialRow(
-            label: 'Total Collected',
-            amount: detail.totalCollection,
-            color: HodiColors.successStart,
-            isBold: true,
-          ),
-          _FinancialRow(
-            label: 'Arrears',
-            amount: detail.totalArrears,
-            color: detail.totalArrears > 0 ? HodiColors.errorStart : null,
-            isBold: true,
-          ),
-
-          const SizedBox(height: 8),
-          const Divider(height: 1, color: HodiColors.divider),
-          const SizedBox(height: 12),
-
-          // Detail rows
-          _FinancialRow(
-            label: 'Payment on Invoice',
-            amount: detail.paymentOnInvoice,
-          ),
-          _FinancialRow(
-            label: 'Invoice Overpayment',
-            amount: detail.invoiceOverpayment,
-          ),
-          _FinancialRow(
-            label: 'Credit (Top-up)',
-            amount: detail.totalTopup,
-          ),
-          _FinancialRow(
-            label: 'Total Overpayment',
-            amount: detail.totalOverpayment,
-          ),
-          _FinancialRow(
-            label: 'Cumulative Credit Balance',
-            amount: detail.cumulativeOverpayment,
-            isLast: true,
+          reportAsync.when(
+            data: (report) =>
+                report == null ? const _NoMonth() : _Figures(report: report),
+            loading: () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                e is Exception
+                    ? e.toString().replaceFirst('Exception: ', '')
+                    : 'Could not read the month',
+                style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.errorStart),
+              ),
+            ),
           ),
         ],
       ),
@@ -457,48 +508,170 @@ class _RentCollectionCard extends ConsumerWidget {
   }
 }
 
-class _PeriodSelector extends StatelessWidget {
-  final String activePeriod;
-  final String previousLabel;
-  final String currentLabel;
-  final String nextLabel;
-  final ValueChanged<String> onSelect;
-
-  const _PeriodSelector({
-    required this.activePeriod,
-    required this.previousLabel,
-    required this.currentLabel,
-    required this.nextLabel,
-    required this.onSelect,
-  });
+/// A month in which nothing was invoiced and nothing arrived.
+///
+/// Said in a sentence rather than shown as a column of zeroes, because a zero in a money field
+/// reads as "nothing owed" when the truth here is "this property was not billed that month".
+class _NoMonth extends StatelessWidget {
+  const _NoMonth();
 
   @override
   Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        children: [
+          const Icon(Icons.event_busy_outlined, size: 18, color: HodiColors.textLight),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Nothing was invoiced for this property in that month.',
+              style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.textMedium),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Figures extends StatelessWidget {
+  final PropertyReportModel report;
+
+  const _Figures({required this.report});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _CollectionProgressBar(percentage: report.collectionPercentage),
+        const SizedBox(height: 16),
+
+        // What was asked for, and what it is made of. The three components below the total add
+        // up to it exactly — the server computes the last as the remainder so they cannot drift.
+        _FinancialRow(
+          label: 'Invoiced',
+          amount: report.invoiceAmount,
+          isBold: true,
+        ),
+        _FinancialRow(label: 'Charged this month', amount: report.chargedAmount),
+        _FinancialRow(
+          label: 'Brought forward',
+          amount: report.broughtForwardAmount,
+        ),
+        _FinancialRow(
+          label: 'Credits & adjustments',
+          amount: report.creditsAndAdjustments,
+          color: report.creditsAndAdjustments < 0 ? HodiColors.textMedium : null,
+        ),
+
+        const SizedBox(height: 8),
+        const Divider(height: 1, color: HodiColors.divider),
+        const SizedBox(height: 12),
+
+        // What the charge was made of. Rent is the rent here — the legacy report labelled the
+        // whole charge "Rent" and put "Utilities" beside it, which read as two siblings when the
+        // second is inside the first.
+        _FinancialRow(label: 'Rent', amount: report.rentAmount),
+        if (report.serviceChargeAmount != 0)
+          _FinancialRow(label: 'Service charge', amount: report.serviceChargeAmount),
+        _FinancialRow(label: 'Utilities', amount: report.utilityAmount),
+        if (report.depositAmount != 0)
+          _FinancialRow(label: 'Deposits', amount: report.depositAmount),
+
+        const SizedBox(height: 8),
+        const Divider(height: 1, color: HodiColors.divider),
+        const SizedBox(height: 12),
+
+        _FinancialRow(
+          label: 'Received',
+          amount: report.paymentAmount,
+          color: HodiColors.successStart,
+          isBold: true,
+        ),
+        _FinancialRow(label: 'Expenses', amount: report.expenseAmount),
+        _FinancialRow(
+          label: 'Net income',
+          amount: report.netIncome,
+          color: report.netIncome < 0 ? HodiColors.errorStart : null,
+          isBold: true,
+        ),
+
+        const SizedBox(height: 8),
+        const Divider(height: 1, color: HodiColors.divider),
+        const SizedBox(height: 12),
+
+        // Opening and closing together, so the month reconciles on screen rather than inviting
+        // somebody to work out which of the two "Arrears" meant.
+        _FinancialRow(label: 'Opening arrears', amount: report.openingArrears),
+        _FinancialRow(
+          label: 'Closing arrears',
+          amount: report.closingArrears,
+          color: report.closingArrears > 0 ? HodiColors.errorStart : null,
+          isBold: true,
+        ),
+        _FinancialRow(label: 'Credit arising', amount: report.overpaymentAmount),
+        _FinancialRow(label: 'Credit held', amount: report.cumulativeCredit),
+        if (report.forfeitedAmount != 0)
+          _FinancialRow(label: 'Forfeited', amount: report.forfeitedAmount),
+        // Null is "HODI has not invoiced that month yet", which is not a commission of zero.
+        if (report.commissionAmount != null)
+          _FinancialRow(
+            label: report.commissionPercent == null
+                ? 'Commission'
+                : 'Commission (${report.commissionPercent!.toStringAsFixed(1)}%)',
+            amount: report.commissionAmount!,
+            isLast: true,
+          ),
+      ],
+    );
+  }
+}
+
+/// Which month to report on.
+///
+/// Three real months ending with the one just gone, and no "Next". Legacy offered one, because
+/// its figures came off the property row and a future month simply read as zeroes; the report
+/// cannot report a month that has not happened, and offering it would be offering an empty answer.
+class _PeriodSelector extends StatelessWidget {
+  final ReportPeriod active;
+  final ValueChanged<ReportPeriod> onSelect;
+
+  const _PeriodSelector({required this.active, required this.onSelect});
+
+  /// The month just ended, which is what the server defaults to and so what "Latest" selects.
+  static DateTime get _latest {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month - 1);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final months = [
+      DateTime(_latest.year, _latest.month - 2),
+      DateTime(_latest.year, _latest.month - 1),
+      _latest,
+    ];
+
     return Row(
       children: [
-        Expanded(
-          child: _PeriodChip(
-            label: previousLabel,
-            isActive: activePeriod == 'PREVIOUS',
-            onTap: () => onSelect('PREVIOUS'),
+        for (var i = 0; i < months.length; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          Expanded(
+            child: _PeriodChip(
+              label: DateFormatter.formatMonthYear(months[i]).split(' ').first,
+              // The most recent chip is also what an unset period resolves to, so it reads as
+              // selected on arrival rather than leaving all three looking untouched.
+              isActive: active.isLatest
+                  ? i == months.length - 1
+                  : active.year == months[i].year && active.month == months[i].month,
+              onTap: () => onSelect(
+                ReportPeriod(year: months[i].year, month: months[i].month),
+              ),
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _PeriodChip(
-            label: currentLabel,
-            isActive: activePeriod == 'CURRENT',
-            onTap: () => onSelect('CURRENT'),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _PeriodChip(
-            label: nextLabel,
-            isActive: activePeriod == 'NEXT',
-            onTap: () => onSelect('NEXT'),
-          ),
-        ),
+        ],
       ],
     );
   }
@@ -673,19 +846,19 @@ class _AutomationSettingsCard extends StatelessWidget {
           _SettingRow(
             icon: Icons.receipt_outlined,
             label: 'Invoice auto-gen',
-            value: detail.invoiceDay != null
-                ? 'Day ${detail.invoiceDay}'
+            value: detail.invoiceGenerationDay != null
+                ? 'Day ${detail.invoiceGenerationDay}'
                 : 'Not configured',
-            isConfigured: detail.invoiceDay != null,
+            isConfigured: detail.invoiceGenerationDay != null,
           ),
           const SizedBox(height: 12),
           _SettingRow(
             icon: Icons.receipt_long_outlined,
             label: 'Expense auto-gen',
-            value: detail.expenseDay != null
-                ? 'Day ${detail.expenseDay}'
+            value: detail.expenseGenerationDay != null
+                ? 'Day ${detail.expenseGenerationDay}'
                 : 'Not configured',
-            isConfigured: detail.expenseDay != null,
+            isConfigured: detail.expenseGenerationDay != null,
           ),
         ],
       ),

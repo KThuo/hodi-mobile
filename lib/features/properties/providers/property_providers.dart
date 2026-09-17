@@ -4,6 +4,7 @@ import '../../../core/filters/filter_provider.dart';
 import '../data/property_repository.dart';
 import '../domain/property_model.dart';
 import '../domain/property_detail_model.dart';
+import '../domain/property_report_model.dart';
 
 final propertyRepositoryProvider = Provider<PropertyRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -101,27 +102,69 @@ final propertyListProvider = NotifierProvider<PropertyListNotifier, PropertyList
   PropertyListNotifier.new,
 );
 
-// Property detail period toggling
-class _PropertyDetailPeriodNotifier extends Notifier<String?> {
+/// Which month the rent-collection card is showing.
+///
+/// A year and a month rather than legacy's CURRENT/PREVIOUS/NEXT strings, because the report is
+/// asked for a real period and there is no such thing as a report of next month. Null means "the
+/// month just ended", which is what the server opens on and what the card labels accordingly.
+class ReportPeriod {
+  final int? year;
+  final int? month;
+
+  const ReportPeriod({this.year, this.month});
+
+  static const latest = ReportPeriod();
+
+  bool get isLatest => year == null || month == null;
+
   @override
-  String? build() => null;
-  void set(String? value) => state = value;
+  bool operator ==(Object other) =>
+      other is ReportPeriod && other.year == year && other.month == month;
+
+  @override
+  int get hashCode => Object.hash(year, month);
 }
 
-final propertyDetailPeriodProvider =
-    NotifierProvider<_PropertyDetailPeriodNotifier, String?>(
-  _PropertyDetailPeriodNotifier.new,
+class _PropertyReportPeriodNotifier extends Notifier<ReportPeriod> {
+  @override
+  ReportPeriod build() => ReportPeriod.latest;
+  void set(ReportPeriod value) => state = value;
+}
+
+final propertyReportPeriodProvider =
+    NotifierProvider<_PropertyReportPeriodNotifier, ReportPeriod>(
+  _PropertyReportPeriodNotifier.new,
 );
 
-// Property detail
+// Property detail. The id is the hash the list row carried, passed through unchanged.
 final propertyDetailProvider = FutureProvider.autoDispose
-    .family<PropertyDetailModel?, int>((ref, id) async {
-  final period = ref.watch(propertyDetailPeriodProvider);
+    .family<PropertyDetailModel?, String>((ref, id) async {
   final repo = ref.watch(propertyRepositoryProvider);
-  final response = await repo.getPropertyDetail(id, period: period);
+  final response = await repo.getPropertyDetail(id);
   if (!response.isSuccess) {
     throw Exception(
       response.message.isNotEmpty ? response.message : 'Failed to load property',
+    );
+  }
+  return response.data;
+});
+
+/// The money, which is a separate read behind a separate authority.
+///
+/// Null data means the property has no row for that month — it was not invoiced and nothing
+/// arrived — which the card says rather than showing a column of zeroes.
+final propertyReportProvider =
+    FutureProvider.autoDispose.family<PropertyReportModel?, String>((ref, id) async {
+  final period = ref.watch(propertyReportPeriodProvider);
+  final repo = ref.watch(propertyRepositoryProvider);
+  final response = await repo.getPropertyReport(
+    propertyId: id,
+    year: period.year,
+    month: period.month,
+  );
+  if (!response.isSuccess) {
+    throw Exception(
+      response.message.isNotEmpty ? response.message : 'Could not read the month',
     );
   }
   return response.data;

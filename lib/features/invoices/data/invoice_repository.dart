@@ -29,6 +29,9 @@ class InvoiceRepository {
 
     /// The caller's own, as a tenant. Whose rows is read from the session, never from an id here.
     bool mine = false,
+
+    /// One tenancy's invoices. Narrows within the caller's scope; it cannot widen it.
+    String? occupationId,
   }) async {
     /*
      * "Unpaid" means anything still owed, which is not the same as status 0.
@@ -40,6 +43,11 @@ class InvoiceRepository {
      */
     final unpaidTab = status == '0';
 
+    // An empty status is "every status", which is what one tenancy's own list wants: inside a
+    // tenancy the question is what have I been billed, not what is still owed. It has to be
+    // omitted rather than sent blank — the parameter binds to an Integer, and "" is not one.
+    final allStatuses = status.isEmpty;
+
     return _apiClient.get<PagedResponse<InvoiceModel>>(
       ApiConstants.invoices,
       queryParameters: {
@@ -47,7 +55,7 @@ class InvoiceRepository {
         'pageSize': pageSize,
         if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
         if (unpaidTab) 'outstanding': true,
-        if (!unpaidTab) 'status': int.tryParse(status),
+        if (!unpaidTab && !allStatuses) 'status': int.tryParse(status),
         'estateId': ?estateId,
         'propertyId': ?propertyId,
         // Invoices belong to a billing period, not to a date range: there is no start and end date
@@ -55,6 +63,7 @@ class InvoiceRepository {
         'periodMonth': ?periodMonth,
         'periodYear': ?periodYear,
         if (mine) 'mine': true,
+        'occupationId': ?occupationId,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

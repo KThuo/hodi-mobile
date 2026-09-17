@@ -26,6 +26,11 @@ class PaymentRepository {
     required String status,
     String? estateId,
     String? propertyId,
+
+    /// One tenancy's payments. Narrows within the caller's scope and never widens it — a tenant
+    /// is answered with their own rows whatever id is sent, and the ids are salted per user, so
+    /// somebody else's hash does not decode to somebody else's tenancy.
+    String? occupationId,
   }) async {
     return _apiClient.get<PagedResponse<PaymentModel>>(
       ApiConstants.payments,
@@ -39,9 +44,12 @@ class PaymentRepository {
         // Inclusive at both ends, and either may be omitted — `from` alone reads "since".
         'from': ?startDate,
         'to': ?endDate,
-        'status': status,
+        // Omitted when empty, which asks for every status. Sending "" would bind nothing on one
+        // endpoint and fail on another, and neither is the list somebody wanted.
+        if (status.isNotEmpty) 'status': status,
         'estateId': ?estateId,
         'propertyId': ?propertyId,
+        'occupationId': ?occupationId,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

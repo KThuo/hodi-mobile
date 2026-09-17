@@ -8,59 +8,70 @@ part of 'house_detail_model.dart';
 
 _HouseDetailModel _$HouseDetailModelFromJson(Map<String, dynamic> json) =>
     _HouseDetailModel(
-      houseName: json['houseName'] as String?,
-      houseCode: json['houseCode'] as String?,
-      floor: json['floor'] as String?,
-      status: (json['status'] as num?)?.toInt() ?? 0,
-      isOccupied: json['isOccupied'] as bool? ?? false,
-      rent: (json['rent'] as num?)?.toDouble() ?? 0,
+      id: json['id'] as String,
+      houseCode: json['houseCode'] as String,
+      houseNumber: json['houseNumber'] as String?,
+      floor: (json['floor'] as num?)?.toInt(),
+      mezzanine: json['mezzanine'] as bool? ?? false,
+      floorLabel: json['floorLabel'] as String?,
+      propertyId: json['propertyId'] as String?,
+      propertyName: json['propertyName'] as String?,
+      estateId: json['estateId'] as String?,
+      estateName: json['estateName'] as String?,
       location: json['location'] as String?,
+      categoryName: json['categoryName'] as String?,
+      usageClassName: json['usageClassName'] as String?,
+      tenure: json['tenure'] as String?,
+      beds: (json['beds'] as num?)?.toInt(),
+      baths: (json['baths'] as num?)?.toInt(),
+      ensuite: (json['ensuite'] as num?)?.toInt(),
+      dsq: json['dsq'] as bool? ?? false,
+      parking: (json['parking'] as num?)?.toInt(),
       squareFt: (json['squareFt'] as num?)?.toDouble(),
-      property: json['property'] as String?,
-      category: json['category'] as String?,
-      houseType: json['houseType'] as String?,
-      estate: json['estate'] as String?,
-      tenant: json['tenant'] == null
-          ? null
-          : HouseTenant.fromJson(json['tenant'] as Map<String, dynamic>),
+      rent: (json['rent'] as num?)?.toDouble(),
+      occupied: json['occupied'] as bool? ?? false,
+      lastOccupied: json['lastOccupied'] as String?,
+      status: (json['status'] as num?)?.toInt() ?? 0,
+      createdOn: json['createdOn'] as String?,
+      features:
+          (json['features'] as List<dynamic>?)
+              ?.map((e) => NamedRef.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <NamedRef>[],
+      pending:
+          (json['pending'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
     );
 
 Map<String, dynamic> _$HouseDetailModelToJson(_HouseDetailModel instance) =>
     <String, dynamic>{
-      'houseName': instance.houseName,
+      'id': instance.id,
       'houseCode': instance.houseCode,
+      'houseNumber': instance.houseNumber,
       'floor': instance.floor,
-      'status': instance.status,
-      'isOccupied': instance.isOccupied,
-      'rent': instance.rent,
+      'mezzanine': instance.mezzanine,
+      'floorLabel': instance.floorLabel,
+      'propertyId': instance.propertyId,
+      'propertyName': instance.propertyName,
+      'estateId': instance.estateId,
+      'estateName': instance.estateName,
       'location': instance.location,
+      'categoryName': instance.categoryName,
+      'usageClassName': instance.usageClassName,
+      'tenure': instance.tenure,
+      'beds': instance.beds,
+      'baths': instance.baths,
+      'ensuite': instance.ensuite,
+      'dsq': instance.dsq,
+      'parking': instance.parking,
       'squareFt': instance.squareFt,
-      'property': instance.property,
-      'category': instance.category,
-      'houseType': instance.houseType,
-      'estate': instance.estate,
-      'tenant': instance.tenant,
-    };
-
-_HouseTenant _$HouseTenantFromJson(Map<String, dynamic> json) => _HouseTenant(
-  name: json['name'] as String?,
-  phone: json['phone'] as String?,
-  rentOwed: (json['rentOwed'] as num?)?.toDouble() ?? 0,
-  invoiceRrn: json['invoiceRrn'] as String?,
-  invoiceMonth: json['invoiceMonth'] as String?,
-  dueDate: json['dueDate'] as String?,
-  occupiedOn: json['occupiedOn'] as String?,
-  refundableAmount: (json['refundableAmount'] as num?)?.toDouble() ?? 0,
-);
-
-Map<String, dynamic> _$HouseTenantToJson(_HouseTenant instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'phone': instance.phone,
-      'rentOwed': instance.rentOwed,
-      'invoiceRrn': instance.invoiceRrn,
-      'invoiceMonth': instance.invoiceMonth,
-      'dueDate': instance.dueDate,
-      'occupiedOn': instance.occupiedOn,
-      'refundableAmount': instance.refundableAmount,
+      'rent': instance.rent,
+      'occupied': instance.occupied,
+      'lastOccupied': instance.lastOccupied,
+      'status': instance.status,
+      'createdOn': instance.createdOn,
+      'features': instance.features,
+      'pending': instance.pending,
     };

@@ -35,7 +35,7 @@ class PropertyListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  property.name ?? 'Property',
+                  property.name,
                   style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -58,7 +58,7 @@ class PropertyListItem extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '${property.occupied} occupied',
+                      '${property.occupiedUnits} occupied',
                       style: HodiTextStyles.bodySmall.copyWith(
                         color: HodiColors.successStart,
                       ),

@@ -14,6 +14,10 @@ abstract class RouteNames {
   static const propertyDetail = 'property-detail';
   static const houses = 'houses';
   static const houseDetail = 'house-detail';
+
+  // A tenant's own tenancies. A different endpoint from [houses], not a filter on it.
+  static const myHouses = 'my-houses';
+  static const myHouseDetail = 'my-house-detail';
   static const tenants = 'tenants';
   static const tenantDetail = 'tenant-detail';
   static const invoices = 'invoices';

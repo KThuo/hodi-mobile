@@ -135,7 +135,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: ':id',
                     name: RouteNames.houseDetail,
                     builder: (context, state) {
-                      final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                      // A HashId, passed through as the server sent it. Parsing it as an integer
+                      // turned every real id into 0 and every unit page into "not found".
+                      final id = state.pathParameters['id'] ?? '';
                       return HouseDetailScreen(houseId: id);
                     },
                   ),
@@ -156,7 +158,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: ':id',
                     name: RouteNames.propertyDetail,
                     builder: (context, state) {
-                      final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                      final id = state.pathParameters['id'] ?? '';
                       return PropertyDetailScreen(propertyId: id);
                     },
                   ),

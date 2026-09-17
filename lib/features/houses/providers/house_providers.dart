@@ -4,7 +4,6 @@ import '../../../core/filters/filter_provider.dart';
 import '../data/house_repository.dart';
 import '../domain/house_model.dart';
 import '../domain/house_detail_model.dart';
-import '../domain/house_feature_model.dart';
 
 final houseRepositoryProvider = Provider<HouseRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -113,22 +112,13 @@ final houseListProvider = NotifierProvider<HouseListNotifier, HouseListState>(
   HouseListNotifier.new,
 );
 
-// House detail
-final houseDetailProvider = FutureProvider.autoDispose.family<HouseDetailModel?, int>((ref, id) async {
+// House detail. The id is the hash the list row carried, passed through unchanged.
+final houseDetailProvider =
+    FutureProvider.autoDispose.family<HouseDetailModel?, String>((ref, id) async {
   final repo = ref.watch(houseRepositoryProvider);
   final response = await repo.getHouseDetail(id);
   if (!response.isSuccess) {
     throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load house');
   }
   return response.data;
-});
-
-// House features
-final houseFeaturesProvider = FutureProvider.autoDispose.family<List<HouseFeatureModel>, int>((ref, houseId) async {
-  final repo = ref.watch(houseRepositoryProvider);
-  final response = await repo.getHouseFeatures(houseId);
-  if (!response.isSuccess) {
-    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load features');
-  }
-  return response.data ?? [];
 });
