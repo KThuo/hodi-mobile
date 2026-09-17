@@ -22,6 +22,7 @@ import '../../core/widgets/hodi_webview_page.dart';
 import '../../features/visitors/presentation/visitors_screen.dart';
 import '../../features/expenses/presentation/expenses_screen.dart';
 import '../../features/reports/presentation/reports_screen.dart';
+import '../../features/penalties/presentation/penalties_screen.dart';
 import '../../features/leases/presentation/leases_screen.dart';
 import '../../features/leases/presentation/lease_detail_screen.dart';
 import '../../features/maintenance/presentation/maintenance_screen.dart';
@@ -358,6 +359,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                       title: 'Terms & Conditions',
                       url: ApiConstants.termsUrl,
                     ),
+                  ),
+                  GoRoute(
+                    path: 'penalties',
+                    name: RouteNames.penalties,
+                    builder: (context, state) => const PenaltiesScreen(),
                   ),
                   GoRoute(
                     path: 'agreements',

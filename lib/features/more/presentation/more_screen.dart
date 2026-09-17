@@ -112,6 +112,12 @@ const _moduleItems = <_MenuItem>[
     route: '/more/agreements',
   ),
   _MenuItem(
+    label: 'Penalties',
+    icon: Icons.gavel_outlined,
+    permissions: [AppPermissions.penaltyView],
+    route: '/more/penalties',
+  ),
+  _MenuItem(
     label: 'Vacate Notices',
     icon: Icons.description,
     permissions: [AppPermissions.tenantView],
