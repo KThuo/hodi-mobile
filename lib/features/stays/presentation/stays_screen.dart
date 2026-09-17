@@ -11,6 +11,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/hodi_app_bar.dart';
 import '../../../core/widgets/hodi_empty_state.dart';
 import '../../../core/widgets/hodi_error_state.dart';
+import '../../../core/widgets/hodi_webview_page.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_search_bar.dart';
 import '../domain/stay_model.dart';
@@ -129,6 +130,22 @@ class _StayCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(stay.area!, style: HodiTextStyles.bodySmall),
                 ],
+                // A link rather than a rendered map.
+                //
+                // Every static map is a billed request, and this is a list — twenty cards would
+                // be twenty of them, drawn at thumbnail size beside a photograph that is already
+                // doing the work of showing the place. The listing page for a vacant unit gets a
+                // real map because it is one listing, opened deliberately.
+                if (stay.latitude != null && stay.longitude != null) ...[
+                  const SizedBox(height: 6),
+                  _MapLink(
+                    latitude: stay.latitude!,
+                    longitude: stay.longitude!,
+                    label: stay.title.isEmpty
+                        ? (stay.propertyName ?? 'Stay')
+                        : stay.title,
+                  ),
+                ],
                 if (stay.summary.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(
@@ -162,6 +179,52 @@ class _StayCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// "Where is this", answered by the maps app the handset already has.
+class _MapLink extends StatelessWidget {
+  const _MapLink({
+    required this.latitude,
+    required this.longitude,
+    required this.label,
+  });
+
+  final double latitude;
+  final double longitude;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => HodiWebviewPage(
+            title: label,
+            url: 'https://www.google.com/maps/search/'
+                '?api=1&query=$latitude,$longitude',
+          ),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.place_outlined, size: 14, color: HodiColors.primaryStart),
+            const SizedBox(width: 4),
+            Text(
+              'View on map',
+              style: HodiTextStyles.bodySmall.copyWith(
+                color: HodiColors.primaryStart,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

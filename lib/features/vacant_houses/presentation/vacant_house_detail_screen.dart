@@ -10,6 +10,7 @@ import '../../../core/widgets/hodi_app_bar.dart';
 import '../../../core/widgets/hodi_amount_text.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
+import '../../../core/map/static_map_view.dart';
 import '../domain/vacant_house_detail_model.dart';
 import '../providers/vacant_house_providers.dart';
 
@@ -39,6 +40,15 @@ class VacantHouseDetailScreen extends ConsumerWidget {
                 _HouseHeaderCard(detail: detail),
                 const SizedBox(height: 16),
                 _HouseInfoCard(detail: detail),
+                // Collapses to nothing when the listing has no coordinates, or the deployment
+                // has no maps key. Neither is a fault worth a grey box on somebody's listing.
+                StaticMapView(
+                  latitude: detail.latitude,
+                  longitude: detail.longitude,
+                  label: detail.houseName ?? detail.location ?? 'Location',
+                ),
+                if (detail.latitude != null && detail.longitude != null)
+                  const SizedBox(height: 16),
                 if (detail.houseFeatures.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   _AmenitiesCard(features: detail.houseFeatures),
