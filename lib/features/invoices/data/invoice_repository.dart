@@ -121,14 +121,13 @@ class InvoiceRepository {
   /// name, so the file downloaded and then would not open, because it was never a PDF. The server
   /// renders one now, from the same `PublicInvoice` the screen shows, so the paper and the screen
   /// cannot disagree.
-  /// Where the invoice PDF lives, as a plain URL.
+  /// The invoice document, as the **web** renders it.
   ///
-  /// `/api/v1/invoices/detail/**` is in the server's public allowlist — the reference is its only
-  /// protection, deliberately, because an invoice goes to somebody before they have an account.
-  /// So this opens in the phone's own browser, where saving, printing and sharing are tools
-  /// people already know.
-  String invoicePdfUrl(String rrn) =>
-      '${ApiConstants.baseUrl}${ApiConstants.invoiceDetail}/$rrn/invoice.pdf';
+  /// `hodi-f` serves `/invoices/detail/:rrn` publicly, and that page carries its own Download —
+  /// so a document downloaded from a handset and one downloaded from a laptop are the same
+  /// document, produced by the same code. That consistency is the reason this is the web page and
+  /// not the server's `invoice.pdf`: two renderers would be two documents, however close.
+  String webInvoiceUrl(String rrn) => ApiConstants.webInvoiceUrl(rrn);
 
   Future<void> downloadInvoicePdf(String rrn) async {
     await _pdfDownloader.downloadAndOpen(

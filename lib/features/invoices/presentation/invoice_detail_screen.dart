@@ -250,12 +250,17 @@ class _BottomActionsState extends ConsumerState<_BottomActions> {
   InvoiceDocumentModel get document => widget.document;
   String get rrn => widget.rrn;
 
-  /// The browser first, because the invoice endpoint is public and a browser is where people
-  /// already know how to save, print and share. The download is the fallback for a handset with
-  /// no browser able to take the link.
+  /// Opens the **web's** invoice page in the browser.
+  ///
+  /// The page `hodi-f` serves at `/invoices/detail/{rrn}`, publicly and by reference, with its own
+  /// Download on it. So the document somebody saves from a phone is the document somebody saves
+  /// from a laptop — the same page, the same button, the same output.
+  ///
+  /// The server's `invoice.pdf` is the fallback, for a handset with no browser able to take the
+  /// link. It is a different document, which is exactly why it is second rather than first.
   Future<void> _openPdf() async {
     final repo = ref.read(invoiceRepositoryProvider);
-    final opened = await DocumentActions.openInBrowser(repo.invoicePdfUrl(rrn));
+    final opened = await DocumentActions.openInBrowser(repo.webInvoiceUrl(rrn));
     if (opened || !mounted) return;
 
     await DocumentActions.run(
@@ -309,7 +314,7 @@ class _BottomActionsState extends ConsumerState<_BottomActions> {
                     )
                   : const Icon(Icons.picture_as_pdf_outlined, size: 18),
               label: Text(
-                'Open PDF',
+                'Invoice',
                 style: HodiTextStyles.bodyMedium.copyWith(
                   color: HodiColors.primaryStart,
                   fontWeight: FontWeight.w600,

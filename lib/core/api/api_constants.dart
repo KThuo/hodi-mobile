@@ -163,6 +163,19 @@ abstract class ApiConstants {
   static const String privacyPolicyUrl = '$baseUrl/privacy';
   static const String termsUrl = '$baseUrl/terms';
 
+  /// The invoice **as the web renders it**, not as the server renders it.
+  ///
+  /// `hodi-f` serves this page publicly and addresses it by reference — its own router note says
+  /// why: hashed ids are salted per user, so a link pasted into a group chat would be undecodable
+  /// for everyone but the sender. A reference survives being shared, which is the whole point of
+  /// an invoice link.
+  ///
+  /// Opening this rather than `/invoices/detail/{rrn}/invoice.pdf` is deliberate. **Whoever
+  /// downloads it — on a laptop or on a handset — gets the same document**, because it is the
+  /// same page with the same Download button. A server PDF would be a second document, and a
+  /// Flutter template would be a third.
+  static String webInvoiceUrl(String rrn) => '$baseUrl/invoices/detail/$rrn';
+
   // ── Leases ────────────────────────────────────────────────────────────────
   //
   // Every read has a staff path and a `/mine` path. The tenant one carries no authority — the

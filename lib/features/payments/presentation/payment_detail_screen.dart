@@ -52,13 +52,18 @@ class _PaymentDetailScreenState extends ConsumerState<PaymentDetailScreen> {
 
   String get rrn => widget.rrn;
 
-  /// Downloaded, not opened in a browser.
+  /// Downloaded, not opened in a browser — **and this one is inconsistent with the invoice.**
   ///
-  /// `/payments/receipt/{rrn}/receipt.pdf` is behind ROLE_PAYMENT_VIEW, and an external browser
-  /// carries no Authorization header — it would be refused. The invoice opens in the browser
-  /// because its endpoint is deliberately public; a receipt is proof money changed hands and
-  /// there is no flow that hands one to a stranger, so it stays behind the session and comes
-  /// through the authenticated client instead.
+  /// The invoice opens `hodi-f`'s own page, so a phone and a laptop produce the same document.
+  /// A receipt cannot do that yet: the web has no public receipt page. `payments/:id` sits behind
+  /// ROLE_PAYMENT_VIEW inside the authenticated layout, and an external browser carrying no
+  /// session would land on the login screen.
+  ///
+  /// So this falls back to the server's `receipt.pdf`, fetched through the authenticated client —
+  /// a *different* document from the one the web prints. Closing that gap needs a public
+  /// `/payments/receipt/:rrn` route in `hodi-f`, mirroring the invoice one, addressed by
+  /// reference for the same reason: a hashed id is salted per user and will not survive being
+  /// shared.
   Future<void> _receipt() => DocumentActions.run(
         context,
         () => ref.read(paymentRepositoryProvider).downloadReceiptPdf(rrn),
