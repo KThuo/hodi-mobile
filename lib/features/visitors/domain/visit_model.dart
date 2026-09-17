@@ -110,3 +110,60 @@ abstract class OnSiteSummaryModel with _$OnSiteSummaryModel {
   factory OnSiteSummaryModel.fromJson(Map<String, dynamic> json) =>
       _$OnSiteSummaryModelFromJson(json);
 }
+
+
+/// Somebody the gate has seen before — the server's `KnownVisitor`.
+///
+/// **The whole point of the check-in flow.** The first thing asked at a gate is a phone number,
+/// and if that person has been here before their name, identification and vehicle are already on
+/// file. Asking again is how one visitor becomes three spellings and a history that never joins
+/// up — and it is a great deal of typing for somebody standing at a barrier.
+///
+/// Scoped like the visit list: it answers with visitors to properties the caller already holds.
+/// An unscoped version would turn any phone number into a name for anybody who can open the gate
+/// screen.
+@freezed
+abstract class KnownVisitorModel with _$KnownVisitorModel {
+  const KnownVisitorModel._();
+
+  const factory KnownVisitorModel({
+    required String visitorName,
+    String? visitorPhone,
+    String? idType,
+    String? idNumber,
+    String? vehicleReg,
+
+    /// How many times they have been. Worth showing: a regular is waved through, a first-timer
+    /// is not.
+    @Default(0) int visits,
+    String? lastSeenOn,
+  }) = _KnownVisitorModel;
+
+  factory KnownVisitorModel.fromJson(Map<String, dynamic> json) =>
+      _$KnownVisitorModelFromJson(json);
+}
+
+/// What happened when somebody was checked in — the server's `CheckInResult`.
+///
+/// `outcome` is the answer: admitted, waiting on the host, or barred. A barred visitor comes back
+/// with a reason, and the gate needs to see it — that is the case the blocklist exists for.
+@freezed
+abstract class CheckInResultModel with _$CheckInResultModel {
+  const CheckInResultModel._();
+
+  const factory CheckInResultModel({
+    VisitModel? visit,
+    required String outcome,
+    required String message,
+
+    /// Why they are barred, where they are.
+    String? barReason,
+  }) = _CheckInResultModel;
+
+  factory CheckInResultModel.fromJson(Map<String, dynamic> json) =>
+      _$CheckInResultModelFromJson(json);
+
+  bool get barred => outcome == 'BARRED' || barReason != null;
+  bool get admitted => outcome == 'ADMITTED';
+  bool get awaitingHost => outcome == 'PENDING' || outcome == 'AWAITING_APPROVAL';
+}

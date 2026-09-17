@@ -30,6 +30,7 @@ abstract class RouteNames {
   static const more = 'more';
   static const notifications = 'notifications';
   static const visitors = 'visitors';
+  static const checkIn = 'check-in';
   static const expenses = 'expenses';
   static const reports = 'reports';
   static const penalties = 'penalties';

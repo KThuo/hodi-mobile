@@ -121,4 +121,71 @@ void main() {
       2,
     );
   });
+
+  group('checking somebody in', () {
+    test('a known visitor comes back with what is already on file', () {
+      final k = KnownVisitorModel.fromJson(const {
+        'visitorName': 'Amina Yusuf',
+        'visitorPhone': '254700111222',
+        'idType': 'National ID',
+        'idNumber': '12345678',
+        'vehicleReg': 'KDA 123X',
+        'visits': 4,
+        'lastSeenOn': '2026-09-10T14:00:00Z',
+      });
+
+      // The point of the lookup: a regular is two taps rather than a form, and asking again is
+      // how one visitor becomes three spellings.
+      expect(k.visitorName, 'Amina Yusuf');
+      expect(k.idNumber, '12345678');
+      expect(k.visits, 4);
+    });
+
+    group('the outcome', () {
+      test('admitted is admitted', () {
+        final r = CheckInResultModel.fromJson(const {
+          'outcome': 'ADMITTED',
+          'message': 'Amina may go in.',
+        });
+
+        expect(r.admitted, isTrue);
+        expect(r.barred, isFalse);
+        expect(r.awaitingHost, isFalse);
+      });
+
+      test('waiting on the host is not admitted', () {
+        final r = CheckInResultModel.fromJson(const {
+          'outcome': 'PENDING',
+          'message': 'The host has been asked.',
+        });
+
+        expect(r.awaitingHost, isTrue);
+        expect(r.admitted, isFalse);
+      });
+
+      test('barred carries its reason, and that is the case the gate needs', () {
+        final r = CheckInResultModel.fromJson(const {
+          'outcome': 'BARRED',
+          'message': 'Do not admit.',
+          'barReason': 'Barred after an incident on 3 August.',
+        });
+
+        expect(r.barred, isTrue);
+        expect(r.admitted, isFalse);
+        expect(r.barReason, contains('3 August'));
+      });
+
+      test('a reason without the outcome word still reads as barred', () {
+        // Belt and braces: the reason is only ever set when somebody is barred, so it is enough
+        // on its own. A gate letting somebody in because an enum spelling changed would be bad.
+        final r = CheckInResultModel.fromJson(const {
+          'outcome': 'SOMETHING_NEW',
+          'message': 'No.',
+          'barReason': 'Barred.',
+        });
+
+        expect(r.barred, isTrue);
+      });
+    });
+  });
 }

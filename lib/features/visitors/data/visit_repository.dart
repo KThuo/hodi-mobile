@@ -41,6 +41,64 @@ class VisitRepository {
     );
   }
 
+  /// Somebody the gate has seen before, by the number they just gave.
+  ///
+  /// Empty rather than an error when nobody matches — most visitors are new, and that is not a
+  /// failure of anything.
+  Future<ApiResponse<KnownVisitorModel?>> known(String phone) async {
+    return _apiClient.get<KnownVisitorModel?>(
+      '${ApiConstants.visits}/known',
+      queryParameters: {'phone': phone},
+      fromJsonT: (data) => data == null
+          ? null
+          : KnownVisitorModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// Lets somebody in at the gate.
+  ///
+  /// The answer says what happened: admitted, waiting on the host to say yes, or barred with a
+  /// reason. The gate needs all three, and the difference between them is the feature.
+  Future<ApiResponse<CheckInResultModel>> checkIn({
+    required String visitorName,
+    required String purpose,
+    String? houseId,
+    String? visitorPhone,
+    String? idType,
+    String? idNumber,
+    int visitorCount = 1,
+    String? vehicleReg,
+    String? vehicleMake,
+    String? vehicleColour,
+    String? purposeNotes,
+    String? gateName,
+  }) async {
+    return _apiClient.post<CheckInResultModel>(
+      ApiConstants.visits,
+      data: {
+        'visitorName': visitorName,
+        'purpose': purpose,
+        'visitorCount': visitorCount,
+        if (houseId != null && houseId.isNotEmpty) 'houseId': houseId,
+        if (visitorPhone != null && visitorPhone.isNotEmpty)
+          'visitorPhone': visitorPhone,
+        if (idType != null && idType.isNotEmpty) 'idType': idType,
+        if (idNumber != null && idNumber.isNotEmpty) 'idNumber': idNumber,
+        if (vehicleReg != null && vehicleReg.trim().isNotEmpty)
+          'vehicleReg': vehicleReg.trim().toUpperCase(),
+        if (vehicleMake != null && vehicleMake.trim().isNotEmpty)
+          'vehicleMake': vehicleMake.trim(),
+        if (vehicleColour != null && vehicleColour.trim().isNotEmpty)
+          'vehicleColour': vehicleColour.trim(),
+        if (purposeNotes != null && purposeNotes.trim().isNotEmpty)
+          'purposeNotes': purposeNotes.trim(),
+        if (gateName != null && gateName.isNotEmpty) 'gateName': gateName,
+      },
+      fromJsonT: (data) =>
+          CheckInResultModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
   Future<ApiResponse<VisitModel>> one(String id) async {
     return _apiClient.get<VisitModel>(
       '${ApiConstants.visits}/$id',

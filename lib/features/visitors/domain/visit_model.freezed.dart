@@ -639,4 +639,587 @@ as int,
 
 }
 
+
+/// @nodoc
+mixin _$KnownVisitorModel {
+
+ String get visitorName; String? get visitorPhone; String? get idType; String? get idNumber; String? get vehicleReg;/// How many times they have been. Worth showing: a regular is waved through, a first-timer
+/// is not.
+ int get visits; String? get lastSeenOn;
+/// Create a copy of KnownVisitorModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$KnownVisitorModelCopyWith<KnownVisitorModel> get copyWith => _$KnownVisitorModelCopyWithImpl<KnownVisitorModel>(this as KnownVisitorModel, _$identity);
+
+  /// Serializes this KnownVisitorModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KnownVisitorModel&&(identical(other.visitorName, visitorName) || other.visitorName == visitorName)&&(identical(other.visitorPhone, visitorPhone) || other.visitorPhone == visitorPhone)&&(identical(other.idType, idType) || other.idType == idType)&&(identical(other.idNumber, idNumber) || other.idNumber == idNumber)&&(identical(other.vehicleReg, vehicleReg) || other.vehicleReg == vehicleReg)&&(identical(other.visits, visits) || other.visits == visits)&&(identical(other.lastSeenOn, lastSeenOn) || other.lastSeenOn == lastSeenOn));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,visitorName,visitorPhone,idType,idNumber,vehicleReg,visits,lastSeenOn);
+
+@override
+String toString() {
+  return 'KnownVisitorModel(visitorName: $visitorName, visitorPhone: $visitorPhone, idType: $idType, idNumber: $idNumber, vehicleReg: $vehicleReg, visits: $visits, lastSeenOn: $lastSeenOn)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $KnownVisitorModelCopyWith<$Res>  {
+  factory $KnownVisitorModelCopyWith(KnownVisitorModel value, $Res Function(KnownVisitorModel) _then) = _$KnownVisitorModelCopyWithImpl;
+@useResult
+$Res call({
+ String visitorName, String? visitorPhone, String? idType, String? idNumber, String? vehicleReg, int visits, String? lastSeenOn
+});
+
+
+
+
+}
+/// @nodoc
+class _$KnownVisitorModelCopyWithImpl<$Res>
+    implements $KnownVisitorModelCopyWith<$Res> {
+  _$KnownVisitorModelCopyWithImpl(this._self, this._then);
+
+  final KnownVisitorModel _self;
+  final $Res Function(KnownVisitorModel) _then;
+
+/// Create a copy of KnownVisitorModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? visitorName = null,Object? visitorPhone = freezed,Object? idType = freezed,Object? idNumber = freezed,Object? vehicleReg = freezed,Object? visits = null,Object? lastSeenOn = freezed,}) {
+  return _then(_self.copyWith(
+visitorName: null == visitorName ? _self.visitorName : visitorName // ignore: cast_nullable_to_non_nullable
+as String,visitorPhone: freezed == visitorPhone ? _self.visitorPhone : visitorPhone // ignore: cast_nullable_to_non_nullable
+as String?,idType: freezed == idType ? _self.idType : idType // ignore: cast_nullable_to_non_nullable
+as String?,idNumber: freezed == idNumber ? _self.idNumber : idNumber // ignore: cast_nullable_to_non_nullable
+as String?,vehicleReg: freezed == vehicleReg ? _self.vehicleReg : vehicleReg // ignore: cast_nullable_to_non_nullable
+as String?,visits: null == visits ? _self.visits : visits // ignore: cast_nullable_to_non_nullable
+as int,lastSeenOn: freezed == lastSeenOn ? _self.lastSeenOn : lastSeenOn // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [KnownVisitorModel].
+extension KnownVisitorModelPatterns on KnownVisitorModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _KnownVisitorModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _KnownVisitorModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _KnownVisitorModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _KnownVisitorModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _KnownVisitorModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _KnownVisitorModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String visitorName,  String? visitorPhone,  String? idType,  String? idNumber,  String? vehicleReg,  int visits,  String? lastSeenOn)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _KnownVisitorModel() when $default != null:
+return $default(_that.visitorName,_that.visitorPhone,_that.idType,_that.idNumber,_that.vehicleReg,_that.visits,_that.lastSeenOn);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String visitorName,  String? visitorPhone,  String? idType,  String? idNumber,  String? vehicleReg,  int visits,  String? lastSeenOn)  $default,) {final _that = this;
+switch (_that) {
+case _KnownVisitorModel():
+return $default(_that.visitorName,_that.visitorPhone,_that.idType,_that.idNumber,_that.vehicleReg,_that.visits,_that.lastSeenOn);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String visitorName,  String? visitorPhone,  String? idType,  String? idNumber,  String? vehicleReg,  int visits,  String? lastSeenOn)?  $default,) {final _that = this;
+switch (_that) {
+case _KnownVisitorModel() when $default != null:
+return $default(_that.visitorName,_that.visitorPhone,_that.idType,_that.idNumber,_that.vehicleReg,_that.visits,_that.lastSeenOn);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _KnownVisitorModel extends KnownVisitorModel {
+  const _KnownVisitorModel({required this.visitorName, this.visitorPhone, this.idType, this.idNumber, this.vehicleReg, this.visits = 0, this.lastSeenOn}): super._();
+  factory _KnownVisitorModel.fromJson(Map<String, dynamic> json) => _$KnownVisitorModelFromJson(json);
+
+@override final  String visitorName;
+@override final  String? visitorPhone;
+@override final  String? idType;
+@override final  String? idNumber;
+@override final  String? vehicleReg;
+/// How many times they have been. Worth showing: a regular is waved through, a first-timer
+/// is not.
+@override@JsonKey() final  int visits;
+@override final  String? lastSeenOn;
+
+/// Create a copy of KnownVisitorModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$KnownVisitorModelCopyWith<_KnownVisitorModel> get copyWith => __$KnownVisitorModelCopyWithImpl<_KnownVisitorModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$KnownVisitorModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KnownVisitorModel&&(identical(other.visitorName, visitorName) || other.visitorName == visitorName)&&(identical(other.visitorPhone, visitorPhone) || other.visitorPhone == visitorPhone)&&(identical(other.idType, idType) || other.idType == idType)&&(identical(other.idNumber, idNumber) || other.idNumber == idNumber)&&(identical(other.vehicleReg, vehicleReg) || other.vehicleReg == vehicleReg)&&(identical(other.visits, visits) || other.visits == visits)&&(identical(other.lastSeenOn, lastSeenOn) || other.lastSeenOn == lastSeenOn));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,visitorName,visitorPhone,idType,idNumber,vehicleReg,visits,lastSeenOn);
+
+@override
+String toString() {
+  return 'KnownVisitorModel(visitorName: $visitorName, visitorPhone: $visitorPhone, idType: $idType, idNumber: $idNumber, vehicleReg: $vehicleReg, visits: $visits, lastSeenOn: $lastSeenOn)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$KnownVisitorModelCopyWith<$Res> implements $KnownVisitorModelCopyWith<$Res> {
+  factory _$KnownVisitorModelCopyWith(_KnownVisitorModel value, $Res Function(_KnownVisitorModel) _then) = __$KnownVisitorModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String visitorName, String? visitorPhone, String? idType, String? idNumber, String? vehicleReg, int visits, String? lastSeenOn
+});
+
+
+
+
+}
+/// @nodoc
+class __$KnownVisitorModelCopyWithImpl<$Res>
+    implements _$KnownVisitorModelCopyWith<$Res> {
+  __$KnownVisitorModelCopyWithImpl(this._self, this._then);
+
+  final _KnownVisitorModel _self;
+  final $Res Function(_KnownVisitorModel) _then;
+
+/// Create a copy of KnownVisitorModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? visitorName = null,Object? visitorPhone = freezed,Object? idType = freezed,Object? idNumber = freezed,Object? vehicleReg = freezed,Object? visits = null,Object? lastSeenOn = freezed,}) {
+  return _then(_KnownVisitorModel(
+visitorName: null == visitorName ? _self.visitorName : visitorName // ignore: cast_nullable_to_non_nullable
+as String,visitorPhone: freezed == visitorPhone ? _self.visitorPhone : visitorPhone // ignore: cast_nullable_to_non_nullable
+as String?,idType: freezed == idType ? _self.idType : idType // ignore: cast_nullable_to_non_nullable
+as String?,idNumber: freezed == idNumber ? _self.idNumber : idNumber // ignore: cast_nullable_to_non_nullable
+as String?,vehicleReg: freezed == vehicleReg ? _self.vehicleReg : vehicleReg // ignore: cast_nullable_to_non_nullable
+as String?,visits: null == visits ? _self.visits : visits // ignore: cast_nullable_to_non_nullable
+as int,lastSeenOn: freezed == lastSeenOn ? _self.lastSeenOn : lastSeenOn // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$CheckInResultModel {
+
+ VisitModel? get visit; String get outcome; String get message;/// Why they are barred, where they are.
+ String? get barReason;
+/// Create a copy of CheckInResultModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CheckInResultModelCopyWith<CheckInResultModel> get copyWith => _$CheckInResultModelCopyWithImpl<CheckInResultModel>(this as CheckInResultModel, _$identity);
+
+  /// Serializes this CheckInResultModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckInResultModel&&(identical(other.visit, visit) || other.visit == visit)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.message, message) || other.message == message)&&(identical(other.barReason, barReason) || other.barReason == barReason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,visit,outcome,message,barReason);
+
+@override
+String toString() {
+  return 'CheckInResultModel(visit: $visit, outcome: $outcome, message: $message, barReason: $barReason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CheckInResultModelCopyWith<$Res>  {
+  factory $CheckInResultModelCopyWith(CheckInResultModel value, $Res Function(CheckInResultModel) _then) = _$CheckInResultModelCopyWithImpl;
+@useResult
+$Res call({
+ VisitModel? visit, String outcome, String message, String? barReason
+});
+
+
+$VisitModelCopyWith<$Res>? get visit;
+
+}
+/// @nodoc
+class _$CheckInResultModelCopyWithImpl<$Res>
+    implements $CheckInResultModelCopyWith<$Res> {
+  _$CheckInResultModelCopyWithImpl(this._self, this._then);
+
+  final CheckInResultModel _self;
+  final $Res Function(CheckInResultModel) _then;
+
+/// Create a copy of CheckInResultModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? visit = freezed,Object? outcome = null,Object? message = null,Object? barReason = freezed,}) {
+  return _then(_self.copyWith(
+visit: freezed == visit ? _self.visit : visit // ignore: cast_nullable_to_non_nullable
+as VisitModel?,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
+as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,barReason: freezed == barReason ? _self.barReason : barReason // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+/// Create a copy of CheckInResultModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$VisitModelCopyWith<$Res>? get visit {
+    if (_self.visit == null) {
+    return null;
+  }
+
+  return $VisitModelCopyWith<$Res>(_self.visit!, (value) {
+    return _then(_self.copyWith(visit: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [CheckInResultModel].
+extension CheckInResultModelPatterns on CheckInResultModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CheckInResultModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CheckInResultModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CheckInResultModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _CheckInResultModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CheckInResultModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CheckInResultModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( VisitModel? visit,  String outcome,  String message,  String? barReason)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CheckInResultModel() when $default != null:
+return $default(_that.visit,_that.outcome,_that.message,_that.barReason);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( VisitModel? visit,  String outcome,  String message,  String? barReason)  $default,) {final _that = this;
+switch (_that) {
+case _CheckInResultModel():
+return $default(_that.visit,_that.outcome,_that.message,_that.barReason);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( VisitModel? visit,  String outcome,  String message,  String? barReason)?  $default,) {final _that = this;
+switch (_that) {
+case _CheckInResultModel() when $default != null:
+return $default(_that.visit,_that.outcome,_that.message,_that.barReason);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CheckInResultModel extends CheckInResultModel {
+  const _CheckInResultModel({this.visit, required this.outcome, required this.message, this.barReason}): super._();
+  factory _CheckInResultModel.fromJson(Map<String, dynamic> json) => _$CheckInResultModelFromJson(json);
+
+@override final  VisitModel? visit;
+@override final  String outcome;
+@override final  String message;
+/// Why they are barred, where they are.
+@override final  String? barReason;
+
+/// Create a copy of CheckInResultModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CheckInResultModelCopyWith<_CheckInResultModel> get copyWith => __$CheckInResultModelCopyWithImpl<_CheckInResultModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CheckInResultModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CheckInResultModel&&(identical(other.visit, visit) || other.visit == visit)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.message, message) || other.message == message)&&(identical(other.barReason, barReason) || other.barReason == barReason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,visit,outcome,message,barReason);
+
+@override
+String toString() {
+  return 'CheckInResultModel(visit: $visit, outcome: $outcome, message: $message, barReason: $barReason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CheckInResultModelCopyWith<$Res> implements $CheckInResultModelCopyWith<$Res> {
+  factory _$CheckInResultModelCopyWith(_CheckInResultModel value, $Res Function(_CheckInResultModel) _then) = __$CheckInResultModelCopyWithImpl;
+@override @useResult
+$Res call({
+ VisitModel? visit, String outcome, String message, String? barReason
+});
+
+
+@override $VisitModelCopyWith<$Res>? get visit;
+
+}
+/// @nodoc
+class __$CheckInResultModelCopyWithImpl<$Res>
+    implements _$CheckInResultModelCopyWith<$Res> {
+  __$CheckInResultModelCopyWithImpl(this._self, this._then);
+
+  final _CheckInResultModel _self;
+  final $Res Function(_CheckInResultModel) _then;
+
+/// Create a copy of CheckInResultModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? visit = freezed,Object? outcome = null,Object? message = null,Object? barReason = freezed,}) {
+  return _then(_CheckInResultModel(
+visit: freezed == visit ? _self.visit : visit // ignore: cast_nullable_to_non_nullable
+as VisitModel?,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
+as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,barReason: freezed == barReason ? _self.barReason : barReason // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+/// Create a copy of CheckInResultModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$VisitModelCopyWith<$Res>? get visit {
+    if (_self.visit == null) {
+    return null;
+  }
+
+  return $VisitModelCopyWith<$Res>(_self.visit!, (value) {
+    return _then(_self.copyWith(visit: value));
+  });
+}
+}
+
 // dart format on

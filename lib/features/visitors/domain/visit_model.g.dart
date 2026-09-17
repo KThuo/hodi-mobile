@@ -84,3 +84,43 @@ Map<String, dynamic> _$OnSiteSummaryModelToJson(_OnSiteSummaryModel instance) =>
       'onSite': instance.onSite,
       'awaitingApproval': instance.awaitingApproval,
     };
+
+_KnownVisitorModel _$KnownVisitorModelFromJson(Map<String, dynamic> json) =>
+    _KnownVisitorModel(
+      visitorName: json['visitorName'] as String,
+      visitorPhone: json['visitorPhone'] as String?,
+      idType: json['idType'] as String?,
+      idNumber: json['idNumber'] as String?,
+      vehicleReg: json['vehicleReg'] as String?,
+      visits: (json['visits'] as num?)?.toInt() ?? 0,
+      lastSeenOn: json['lastSeenOn'] as String?,
+    );
+
+Map<String, dynamic> _$KnownVisitorModelToJson(_KnownVisitorModel instance) =>
+    <String, dynamic>{
+      'visitorName': instance.visitorName,
+      'visitorPhone': instance.visitorPhone,
+      'idType': instance.idType,
+      'idNumber': instance.idNumber,
+      'vehicleReg': instance.vehicleReg,
+      'visits': instance.visits,
+      'lastSeenOn': instance.lastSeenOn,
+    };
+
+_CheckInResultModel _$CheckInResultModelFromJson(Map<String, dynamic> json) =>
+    _CheckInResultModel(
+      visit: json['visit'] == null
+          ? null
+          : VisitModel.fromJson(json['visit'] as Map<String, dynamic>),
+      outcome: json['outcome'] as String,
+      message: json['message'] as String,
+      barReason: json['barReason'] as String?,
+    );
+
+Map<String, dynamic> _$CheckInResultModelToJson(_CheckInResultModel instance) =>
+    <String, dynamic>{
+      'visit': instance.visit,
+      'outcome': instance.outcome,
+      'message': instance.message,
+      'barReason': instance.barReason,
+    };

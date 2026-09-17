@@ -20,6 +20,7 @@ import '../../features/more/presentation/more_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../core/widgets/hodi_webview_page.dart';
 import '../../features/visitors/presentation/visitors_screen.dart';
+import '../../features/visitors/presentation/check_in_screen.dart';
 import '../../features/expenses/presentation/expenses_screen.dart';
 import '../../features/reports/presentation/reports_screen.dart';
 import '../../features/penalties/presentation/penalties_screen.dart';
@@ -393,6 +394,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'visitors',
                     name: RouteNames.visitors,
                     builder: (context, state) => const VisitorsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'check-in',
+                        name: RouteNames.checkIn,
+                        builder: (context, state) => const CheckInScreen(),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'maintenance',

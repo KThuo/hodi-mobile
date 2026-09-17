@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
@@ -91,6 +92,17 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
         elevation: 0,
         centerTitle: true,
       ),
+      // The gate's own action, and the biggest thing on the screen for them: somebody is standing
+      // at the barrier. Only for ROLE_VISIT_NEW — a tenant answers visits, they do not admit them.
+      floatingActionButton: isGate
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/more/visitors/check-in'),
+              backgroundColor: HodiColors.primaryStart,
+              foregroundColor: HodiColors.white,
+              icon: const Icon(Icons.person_add_alt_1),
+              label: const Text('Bring someone in'),
+            )
+          : null,
       body: Column(
         children: [
           if (summary != null) _Summary(summary: summary),
