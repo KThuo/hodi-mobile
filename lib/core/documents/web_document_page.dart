@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -68,8 +69,14 @@ class WebDocumentPage extends StatefulWidget {
 
 class _WebDocumentPageState extends State<WebDocumentPage> {
   late final WebViewController _controller;
-  bool _loading = true;
+
+  /// The card is on the page. Not the same as the page having loaded: this is a Vue application,
+  /// so the document arrives over a second request after the shell has painted, and a Save
+  /// offered before then reads an element that is not there yet.
+  bool _ready = false;
   bool _saving = false;
+  bool _gaveUp = false;
+  Timer? _poll;
 
   @override
   void initState() {
@@ -80,14 +87,73 @@ class _WebDocumentPageState extends State<WebDocumentPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (_) {
-            if (mounted) setState(() => _loading = true);
+            _poll?.cancel();
+            if (mounted) {
+              setState(() {
+                _ready = false;
+                _gaveUp = false;
+              });
+            }
           },
-          onPageFinished: (_) {
-            if (mounted) setState(() => _loading = false);
-          },
+          onPageFinished: (_) => _awaitCard(),
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
+  }
+
+  @override
+  void dispose() {
+    _poll?.cancel();
+    super.dispose();
+  }
+
+  /// Waits for the document to render, then lets the reader save it.
+  ///
+  /// Polling rather than a message from the page: the page is `hodi-f`'s and knows nothing about
+  /// this app, and adding a hook to it for the sake of a web view would put a second surface's
+  /// concern into a page that already works.
+  ///
+  /// Gives up after [_patience] and says so. A reference that names no invoice renders an error
+  /// on the page itself, which the reader can see — so the only thing to add is to stop
+  /// promising a Save that has nothing to act on.
+  void _awaitCard() {
+    _poll?.cancel();
+    final until = DateTime.now().add(_patience);
+
+    // A tick can outlast its interval on a slow handset. Without this they queue up behind each
+    // other and the last one to answer wins, which is not necessarily the last one asked.
+    var looking = false;
+
+    _poll = Timer.periodic(const Duration(milliseconds: 300), (timer) async {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (looking) return;
+      looking = true;
+
+      Object? found;
+      try {
+        found = await _controller.runJavaScriptReturningResult(
+          'document.getElementById(${jsonEncode(widget.elementId)}) ? 1 : 0',
+        );
+      } catch (_) {
+        // Mid-navigation, or the view is gone. Try again on the next tick; the deadline below
+        // is what ends this, not one failed read.
+      } finally {
+        looking = false;
+      }
+
+      if (!mounted) return;
+
+      if (found != null && found.toString().contains('1')) {
+        timer.cancel();
+        setState(() => _ready = true);
+      } else if (DateTime.now().isAfter(until)) {
+        timer.cancel();
+        setState(() => _gaveUp = true);
+      }
+    });
   }
 
   /// The page's own Download button, run from here.
@@ -109,9 +175,8 @@ class _WebDocumentPageState extends State<WebDocumentPage> {
         }
       }
 
-      // The script answers with nothing when the card is not on the page — the document failed to
-      // load, or the reference names no invoice. There is nothing to save and nothing useful to
-      // say that the page itself is not already saying.
+      // The card went away between the check and the read — a reload, a navigation. Nothing to
+      // save, and nothing useful to add to what the page is already showing.
       if (html.length < 40) {
         throw Exception('That document has not finished loading yet.');
       }
@@ -124,7 +189,9 @@ class _WebDocumentPageState extends State<WebDocumentPage> {
             'Use the share button in your browser instead.');
       }
 
-      final origin = Uri.parse(widget.url).replace(path: '', query: '').toString();
+      // `origin` rather than a hand-stripped URL: the page's stylesheets are linked with
+      // absolute paths, and the converter resolves them against this.
+      final origin = Uri.parse(widget.url).origin;
       // Deprecated in favour of building the PDF with the `pdf` package — which means drawing
       // the document again in Dart. That is a second rendering of the same invoice, and a second
       // rendering is a second document; keeping the web's is the entire point of this screen.
@@ -171,9 +238,8 @@ class _WebDocumentPageState extends State<WebDocumentPage> {
             )
           else
             IconButton(
-              // Disabled until the page has painted: the script reads the rendered card, and
-              // there is nothing to read before then.
-              onPressed: _loading ? null : _save,
+              // Disabled until the card is actually on the page — see [_awaitCard].
+              onPressed: _ready ? _save : null,
               icon: const Icon(Icons.download_rounded),
               tooltip: 'Save as PDF',
             ),
@@ -182,7 +248,10 @@ class _WebDocumentPageState extends State<WebDocumentPage> {
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
-          if (_loading)
+          // Covers the page while it fetches. Lifted once the card is there, and also once we
+          // stop waiting — whatever the page has to say by then, the reader should see it
+          // rather than a spinner over the top of it.
+          if (!_ready && !_gaveUp)
             ColoredBox(
               color: HodiColors.background,
               child: Center(
@@ -246,3 +315,6 @@ String _extractScript(String elementId, String title) {
 })();
 ''';
 }
+
+/// How long to wait for the document before letting the page speak for itself.
+const Duration _patience = Duration(seconds: 12);
