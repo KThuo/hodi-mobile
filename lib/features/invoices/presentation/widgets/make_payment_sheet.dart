@@ -10,6 +10,7 @@ import '../../../../core/widgets/hodi_gradient_button.dart';
 import '../../domain/invoice_detail_model.dart';
 import '../../domain/payment_type_model.dart';
 import '../../providers/invoice_providers.dart';
+import '../../../payments/providers/after_payment.dart';
 
 class MakePaymentSheet extends ConsumerStatefulWidget {
   final InvoiceDetailModel invoice;
@@ -162,7 +163,13 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
      * still typed, because the next thing anybody does is try again.
      */
     if (response.isSuccess) {
-      ref.invalidate(invoiceDetailProvider(widget.invoice.rrn ?? ''));
+      // Everything a payment touches, not just the page behind this sheet — the invoice lists,
+      // the payments list and the tenancy move too. See refreshAfterPayment.
+      refreshAfterPayment(
+        ref,
+        invoiceRrn: widget.invoice.rrn,
+        occupationId: widget.invoice.invoice.occupationId,
+      );
 
       if (mounted) {
         Navigator.of(context).pop(true);

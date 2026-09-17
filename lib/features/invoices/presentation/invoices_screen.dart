@@ -24,11 +24,7 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> with SingleTick
   final _searchController = TextEditingController();
   final _scrollControllers = List.generate(3, (_) => ScrollController());
 
-  static const _tabs = [
-    {'label': 'Unpaid', 'status': '0'},
-    {'label': 'Paid', 'status': '2'},
-    {'label': 'Voided', 'status': '4'},
-  ];
+  static const _tabs = invoiceTabs;
 
   @override
   void initState() {
@@ -52,7 +48,7 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> with SingleTick
   void _onScroll(int tabIndex) {
     final controller = _scrollControllers[tabIndex];
     if (controller.position.pixels >= controller.position.maxScrollExtent - 200) {
-      final status = _tabs[tabIndex]['status']!;
+      final status = _tabs[tabIndex].status;
       ref.read(invoiceListProvider(status).notifier).loadMore();
     }
   }
@@ -63,7 +59,7 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> with SingleTick
       if (previous?.selectedEstateId != next.selectedEstateId ||
           previous?.selectedPropertyId != next.selectedPropertyId) {
         for (final tab in _tabs) {
-          ref.read(invoiceListProvider(tab['status']!).notifier).refresh();
+          ref.read(invoiceListProvider(tab.status).notifier).refresh();
         }
       }
     });
@@ -82,7 +78,7 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> with SingleTick
           unselectedLabelColor: HodiColors.textLight,
           indicatorColor: HodiColors.primaryStart,
           indicatorSize: TabBarIndicatorSize.label,
-          tabs: _tabs.map((t) => Tab(text: t['label'])).toList(),
+          tabs: _tabs.map((t) => Tab(text: t.label)).toList(),
         ),
       ),
       body: Column(
@@ -93,11 +89,11 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> with SingleTick
               controller: _searchController,
               hintText: 'Search invoices...',
               onChanged: (value) {
-                final status = _tabs[_tabController.index]['status']!;
+                final status = _tabs[_tabController.index].status;
                 ref.read(invoiceListProvider(status).notifier).search(value);
               },
               onClear: () {
-                final status = _tabs[_tabController.index]['status']!;
+                final status = _tabs[_tabController.index].status;
                 ref.read(invoiceListProvider(status).notifier).search('');
               },
             ),
@@ -106,7 +102,7 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> with SingleTick
             child: TabBarView(
               controller: _tabController,
               children: List.generate(3, (tabIndex) {
-                final status = _tabs[tabIndex]['status']!;
+                final status = _tabs[tabIndex].status;
                 return _InvoiceTabView(
                   status: status,
                   scrollController: _scrollControllers[tabIndex],

@@ -54,6 +54,20 @@ class InvoiceListState {
   }
 }
 
+/// How the invoices screen is tabbed, and therefore which lists exist.
+///
+/// Here rather than on the screen because anything that changes an invoice has to refresh every
+/// one of them — a settled invoice leaves Unpaid and joins Paid — and a second copy of this list
+/// is a tab that quietly stops being refreshed. See `refreshAfterPayment`.
+///
+/// The status values are the server's: 0 unpaid, 2 paid, 4 voided. The unpaid tab is sent as
+/// `outstanding` rather than a status, because a part-paid invoice is status 1 and is still owed.
+const invoiceTabs = <({String label, String status})>[
+  (label: 'Unpaid', status: '0'),
+  (label: 'Paid', status: '2'),
+  (label: 'Voided', status: '4'),
+];
+
 @Riverpod(keepAlive: true)
 class InvoiceList extends _$InvoiceList {
   @override
@@ -136,18 +150,6 @@ final invoiceActionsProvider =
   return response.isSuccess ? response.data : null;
 });
 
-final invoiceDetailProvider =
-    FutureProvider.autoDispose.family<InvoiceDetailModel?, String>((ref, rrn) async {
-  final repo = ref.watch(invoiceRepositoryProvider);
-  final response = await repo.getInvoiceDetail(rrn);
-  if (response.isEstateOverdue) {
-    return null; // Dialog handled globally via ErrorInterceptor
-  }
-  if (!response.isSuccess) {
-    throw Exception(response.message.isNotEmpty ? response.message : 'Failed to load invoice');
-  }
-  return response.data;
-});
 
 
 /// The month the platform is currently billing into.
