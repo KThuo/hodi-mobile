@@ -6,6 +6,7 @@ import '../../../core/api/api_constants.dart';
 import '../../../core/map/static_map_view.dart';
 import '../../../core/theme/hodi_border_radius.dart';
 import '../../../core/theme/hodi_colors.dart';
+import '../../../core/widgets/amenity_icons.dart';
 import '../../../core/theme/hodi_shadows.dart';
 import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -110,7 +111,8 @@ class VacantHouseDetailScreen extends ConsumerWidget {
                         listing.floorLabel != null)
                       _FactsRow(listing: listing),
 
-                    if (listing.moveInCosts.isNotEmpty) ...[
+                    if (listing.rent != null ||
+                        listing.moveInCosts.isNotEmpty) ...[
                       const SizedBox(height: 18),
                       _MoveInCard(listing: listing),
                     ],
@@ -141,18 +143,31 @@ class VacantHouseDetailScreen extends ConsumerWidget {
                                 color: HodiColors.surfaceInset,
                                 borderRadius: HodiBorderRadius.full,
                               ),
-                              child: Text(a.name, style: HodiTextStyles.bodySmall),
+                              // The estate's own glyph, from the picker the amenity was defined
+                              // in. A list of identical chips has to be read word by word; the
+                              // glyph is what makes "borehole" findable at a glance.
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(AmenityIcons.of(a.icon),
+                                      size: 14, color: HodiColors.textMedium),
+                                  const SizedBox(width: 6),
+                                  Text(a.name, style: HodiTextStyles.bodySmall),
+                                ],
+                              ),
                             ),
                         ],
                       ),
                     ],
 
-                    const SizedBox(height: 18),
-                    StaticMapView(
-                      latitude: listing.latitude,
-                      longitude: listing.longitude,
-                      label: listing.title,
-                    ),
+                    if (listing.latitude != null && listing.longitude != null) ...[
+                      const SizedBox(height: 18),
+                      StaticMapView(
+                        latitude: listing.latitude,
+                        longitude: listing.longitude,
+                        label: listing.title,
+                      ),
+                    ],
 
                     if (listing.hasContact) ...[
                       const SizedBox(height: 18),
@@ -262,9 +277,14 @@ class _FactsRow extends StatelessWidget {
 
 /// What it costs to move in.
 ///
-/// The question this whole screen is really answering. Itemised as the server sends it, with the
-/// refundable part called out separately — the difference between a deposit and a fee is the
-/// thing somebody most wants to know once they have seen the total.
+/// The question this whole screen is really answering, and the one no listing site in this market
+/// answers: a rent that turns out to need a deposit, a water deposit and an agency fee is the
+/// commonest unpleasant surprise in renting here, and every one of those figures is already
+/// configured against the property.
+///
+/// Laid out as `hodi-f`'s `ListingPage.vue` lays it out — the first month's rent, then each
+/// configured charge with how it was set, then the total, then what comes back at the end. Same
+/// rows, same total, same note.
 class _MoveInCard extends StatelessWidget {
   const _MoveInCard({required this.listing});
 
@@ -272,8 +292,6 @@ class _MoveInCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final refundable = listing.refundableAtEnd;
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -287,49 +305,41 @@ class _MoveInCard extends StatelessWidget {
         children: [
           Text('Moving in', style: HodiTextStyles.heading3.copyWith(fontSize: 16)),
           const SizedBox(height: 12),
-          for (final cost in listing.moveInCosts)
+          for (final row in listing.moveInRows)
             Padding(
               padding: const EdgeInsets.only(bottom: 9),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
-                          child: Text(cost.name,
-                              style: HodiTextStyles.bodyMedium),
-                        ),
-                        if (cost.refundable) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: HodiColors.successBg,
-                              borderRadius: HodiBorderRadius.full,
-                            ),
+                        Text(row.name, style: HodiTextStyles.bodyMedium),
+                        if (row.note.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 1),
                             child: Text(
-                              'refundable',
+                              row.note,
                               style: HodiTextStyles.bodySmall.copyWith(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w700,
-                                color: HodiColors.successEnd,
+                                fontSize: 11,
+                                color: row.refundable
+                                    ? HodiColors.successEnd
+                                    : HodiColors.textLight,
                               ),
                             ),
                           ),
-                        ],
                       ],
                     ),
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    // A charge set as a rule rather than a figure — "two months' rent" — is shown
-                    // as the rule. Rendering it as KES 0 would be a price nobody quoted.
-                    cost.amount != null
-                        ? 'KES ${CurrencyFormatter.format(cost.amount!)}'
-                        : cost.months != null
-                            ? '${cost.months} month${cost.months == 1 ? '' : 's'}'
-                            : '—',
+                    // A charge set as a rule rather than a figure — "two months' rent" — has
+                    // no amount. Its note already says what it is; an em dash here is honest
+                    // where KES 0 would be a price nobody quoted.
+                    row.amount != null
+                        ? 'KES ${CurrencyFormatter.format(row.amount!)}'
+                        : '—',
                     style: HodiTextStyles.currency.copyWith(fontSize: 14),
                   ),
                 ],
@@ -338,7 +348,7 @@ class _MoveInCard extends StatelessWidget {
           const Divider(height: 18, color: HodiColors.divider),
           Row(
             children: [
-              Text('Total to move in',
+              Text('Payable up front',
                   style: HodiTextStyles.bodyLarge
                       .copyWith(fontWeight: FontWeight.w700)),
               const Spacer(),
@@ -351,11 +361,13 @@ class _MoveInCard extends StatelessWidget {
               ),
             ],
           ),
-          if (refundable > 0) ...[
+          // The deposit the property carries, not a sum of the rows flagged refundable. The two
+          // are not the same figure and the web quotes this one.
+          if ((listing.deposit ?? 0) > 0) ...[
             const SizedBox(height: 6),
             Text(
-              'KES ${CurrencyFormatter.format(refundable)} of that is refundable '
-              'when you leave.',
+              'KES ${CurrencyFormatter.format(listing.deposit!)} of that is '
+              'refundable when you leave.',
               style: HodiTextStyles.bodySmall
                   .copyWith(color: HodiColors.successEnd),
             ),
@@ -365,3 +377,4 @@ class _MoveInCard extends StatelessWidget {
     );
   }
 }
+

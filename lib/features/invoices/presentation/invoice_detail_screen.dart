@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/documents/web_document_page.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_text_styles.dart';
 import '../../../core/theme/hodi_border_radius.dart';
@@ -11,7 +12,6 @@ import '../../../core/widgets/hodi_status_badge.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/utils/document_actions.dart';
 import '../../../core/widgets/hodi_gradient_button.dart';
 import '../domain/invoice_detail_model.dart';
 import '../domain/invoice_document_model.dart';
@@ -245,31 +245,26 @@ class _BottomActions extends ConsumerStatefulWidget {
 }
 
 class _BottomActionsState extends ConsumerState<_BottomActions> {
-  bool _busy = false;
-
   InvoiceDocumentModel get document => widget.document;
   String get rrn => widget.rrn;
 
-  /// Opens the **web's** invoice page in the browser.
+  /// Opens the **web's** invoice, inside the app.
   ///
-  /// The page `hodi-f` serves at `/invoices/detail/{rrn}`, publicly and by reference, with its own
-  /// Download on it. So the document somebody saves from a phone is the document somebody saves
-  /// from a laptop — the same page, the same button, the same output.
+  /// The page `hodi-f` serves at `/invoices/detail/{rrn}`, publicly and by reference. Signed out
+  /// — which a web view always is — it renders the bare document and nothing else, so what
+  /// opens here is the document, not a page to find the document on. Saving it runs the page's own
+  /// print pipeline from Dart. See [WebDocumentPage].
   ///
-  /// The server's `invoice.pdf` is the fallback, for a handset with no browser able to take the
-  /// link. It is a different document, which is exactly why it is second rather than first.
-  Future<void> _openPdf() async {
-    final repo = ref.read(invoiceRepositoryProvider);
-    final opened = await DocumentActions.openInBrowser(repo.webInvoiceUrl(rrn));
-    if (opened || !mounted) return;
-
-    await DocumentActions.run(
-      context,
-      () => repo.downloadInvoicePdf(rrn),
-      onBusy: (busy) {
-        if (mounted) setState(() => _busy = busy);
-      },
-    );
+  /// So the paper a tenant gets from a phone is the paper the office gets from a laptop.
+  void _openPdf() {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => WebDocumentPage(
+        title: 'Invoice',
+        url: ref.read(invoiceRepositoryProvider).webInvoiceUrl(rrn),
+        elementId: 'invoice-document',
+        fileName: 'Invoice-$rrn',
+      ),
+    ));
   }
 
   void _openPaymentSheet(BuildContext context, InvoiceDetailModel actions) {
@@ -301,18 +296,13 @@ class _BottomActionsState extends ConsumerState<_BottomActions> {
       ),
       child: Row(
         children: [
-          // Download PDF button
+          // Opens the document. No spinner: it pushes a screen, and the waiting — for the page,
+          // then for the save — is shown there, where it is happening.
           Expanded(
             flex: canPay ? 1 : 2,
             child: OutlinedButton.icon(
-              onPressed: _busy ? null : _openPdf,
-              icon: _busy
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.picture_as_pdf_outlined, size: 18),
+              onPressed: _openPdf,
+              icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
               label: Text(
                 'Invoice',
                 style: HodiTextStyles.bodyMedium.copyWith(

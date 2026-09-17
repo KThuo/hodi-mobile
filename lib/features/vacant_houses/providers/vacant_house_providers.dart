@@ -42,6 +42,11 @@ class VacantHouseListState {
   final String? category;
   final String? area;
 
+  /// "2+ beds". The server filters on a minimum rather than an exact count, which is what
+  /// somebody looking for a place actually means — nobody turns down a three-bedroom because
+  /// they asked for two.
+  final int? minBedrooms;
+
   const VacantHouseListState({
     this.houses = const [],
     this.isLoading = false,
@@ -51,9 +56,11 @@ class VacantHouseListState {
     this.searchTerm,
     this.category,
     this.area,
+    this.minBedrooms,
   });
 
-  bool get filtered => category != null || area != null;
+  bool get filtered =>
+      category != null || area != null || minBedrooms != null;
 
   VacantHouseListState copyWith({
     List<VacantHouseModel>? houses,
@@ -64,6 +71,7 @@ class VacantHouseListState {
     String? searchTerm,
     String? Function()? category,
     String? Function()? area,
+    int? Function()? minBedrooms,
   }) {
     return VacantHouseListState(
       houses: houses ?? this.houses,
@@ -74,6 +82,7 @@ class VacantHouseListState {
       searchTerm: searchTerm ?? this.searchTerm,
       category: category != null ? category() : this.category,
       area: area != null ? area() : this.area,
+      minBedrooms: minBedrooms != null ? minBedrooms() : this.minBedrooms,
     );
   }
 }
@@ -94,6 +103,7 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
       searchTerm: state.searchTerm,
       category: state.category,
       area: state.area,
+      minBedrooms: state.minBedrooms,
     );
 
     if (response.isSuccess && response.data != null) {
@@ -150,12 +160,23 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
     await _fetchPage(0);
   }
 
+  Future<void> filterByBedrooms(int? minBedrooms) async {
+    state = state.copyWith(
+      houses: const [],
+      isLoading: true,
+      minBedrooms: () => minBedrooms,
+      currentPage: 0,
+    );
+    await _fetchPage(0);
+  }
+
   Future<void> clearFilters() async {
     state = state.copyWith(
       houses: const [],
       isLoading: true,
       category: () => null,
       area: () => null,
+      minBedrooms: () => null,
       currentPage: 0,
     );
     await _fetchPage(0);

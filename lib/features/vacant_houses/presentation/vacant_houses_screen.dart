@@ -92,6 +92,22 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
             ),
           ),
 
+          // Bedrooms first: it is the filter somebody arrives with already decided. A minimum
+          // rather than an exact count, as the web has it — nobody looking for two bedrooms
+          // turns down a three. Capped by what is actually listed, so there is no "4+" chip
+          // over an estate whose largest unit has two.
+          if (filters != null && filters.maxBedrooms > 1)
+            _ChoiceRow(
+              choices: [
+                for (var n = 1; n <= (filters.maxBedrooms > 4 ? 4 : filters.maxBedrooms); n++)
+                  ListingChoice(value: '$n', label: '$n+ bed${n == 1 ? '' : 's'}'),
+              ],
+              selected: state.minBedrooms?.toString(),
+              onSelect: (v) => ref
+                  .read(vacantHouseListProvider.notifier)
+                  .filterByBedrooms(v == null ? null : int.parse(v)),
+            ),
+
           if (filters != null && filters.areas.isNotEmpty)
             _ChoiceRow(
               choices: filters.areas,

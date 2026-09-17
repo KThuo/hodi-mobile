@@ -90,12 +90,31 @@ void main() {
       'contactEmail': 'jane@example.invalid',
     };
 
-    test('the total is the sum of the rows shown', () {
-      expect(VacantHouseDetailModel.fromJson(detail).totalMoveInCost, 60000);
+    test('the first month\u2019s rent leads the rows, though the server never sent it', () {
+      final rows = VacantHouseDetailModel.fromJson(detail).moveInRows;
+
+      expect(rows.first.name, 'First month\u2019s rent');
+      expect(rows.first.amount, 45000);
+      expect(rows.map((r) => r.name), [
+        'First month\u2019s rent',
+        'Rent deposit',
+        'Water deposit',
+        'Agency fee',
+      ]);
     });
 
-    test('the refundable part is separable, because it is the question', () {
-      expect(VacantHouseDetailModel.fromJson(detail).refundableAtEnd, 50000);
+    test('the total includes that rent, because the tenant has to find it too', () {
+      // The configured charges come to 60,000. Somebody moving in needs 105,000, and a screen
+      // that says 60,000 sends them to the agent 45,000 short. This is the figure `hodi-f`'s
+      // ListingPage.vue prints.
+      expect(VacantHouseDetailModel.fromJson(detail).totalMoveInCost, 105000);
+    });
+
+    test('what comes back is the property\u2019s deposit, not a sum of refundable rows', () {
+      // Adding up everything flagged refundable gives 50,000 here. The deposit is 45,000, and
+      // that is the number the web quotes \u2014 the flag marks a kind of charge, it does not
+      // promise the water deposit returns through the same door.
+      expect(VacantHouseDetailModel.fromJson(detail).deposit, 45000);
     });
 
     test('a charge expressed as a rule contributes no figure', () {
@@ -108,9 +127,17 @@ void main() {
         ],
       });
 
-      expect(d.totalMoveInCost, 0);
-      expect(d.moveInCosts.single.amount, isNull);
-      expect(d.moveInCosts.single.months, 2);
+      // Only the rent, which is real. The deposit row shows its rule instead of a figure.
+      expect(d.totalMoveInCost, 45000);
+      expect(d.moveInRows.last.amount, isNull);
+      expect(d.moveInRows.last.note, '2 months\u2019 rent \u00b7 refundable');
+    });
+
+    test('an un-priced listing totals nothing rather than guessing', () {
+      final d = VacantHouseDetailModel.fromJson({...detail, 'rent': null});
+
+      expect(d.moveInRows.first.amount, isNull);
+      expect(d.totalMoveInCost, 60000);
     });
 
     test('contact details come through, which they did not before', () {

@@ -18,8 +18,12 @@ import '../theme/hodi_colors.dart';
 /// would be answered with a refusal; the app fetches those through the authenticated client and
 /// opens the file.
 ///
-/// An in-app web view is not a third option. It can carry the header, but Android's WebView does
-/// not render PDFs — it would show a blank page on the platform most of these handsets run.
+/// **An in-app web view is a third option, but only for a document the web draws in HTML.** It
+/// cannot show a PDF — Android's WebView does not render them, and would show a blank page on the
+/// platform most of these handsets run. What it can do is load `hodi-f`'s own document page and
+/// let the app run that page's print pipeline; see `WebDocumentPage`, which is how the invoice
+/// works. A receipt cannot go that way yet: `hodi-f` has no public receipt page, so a session-less
+/// web view would be bounced to the sign-in, and the server's PDF stays the only route.
 abstract class DocumentActions {
   /// Opens a public document in the phone's own browser.
   ///

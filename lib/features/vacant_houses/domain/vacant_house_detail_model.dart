@@ -58,18 +58,60 @@ abstract class VacantHouseDetailModel with _$VacantHouseDetailModel {
         if (parkingSpaces != null && parkingSpaces! > 0) '$parkingSpaces parking',
       ].join(' · ');
 
-  /// What it costs to move in: the itemised list, summed.
+  /// Everything payable before the keys change hands, as rows.
   ///
-  /// Summed from the rows shown rather than taken from a separate total, so the figure printed
-  /// under them is one somebody can add up themselves. An item with no amount contributes
-  /// nothing — "deposit: one month" is a rule, not a number, and the server sends it as such.
-  double get totalMoveInCost =>
-      moveInCosts.fold(0, (sum, c) => sum + (c.amount ?? 0));
+  /// **The first row is the first month's rent, and the server does not send it.** It is not a
+  /// configured fee, it is the rent, so it is not in `moveInCosts` — but somebody has to find it
+  /// on the same day as the deposits, and a total that quietly left it out would understate what
+  /// moving in costs by a whole month. `hodi-f`'s `ListingPage.vue` composes this list exactly
+  /// this way, and the two surfaces must not disagree about the one figure this screen exists to
+  /// answer.
+  List<MoveInCostRow> get moveInRows => [
+        MoveInCostRow(name: 'First month’s rent', amount: rent),
+        ...moveInCosts.map(
+          (c) => MoveInCostRow(
+            name: c.name,
+            amount: c.amount,
+            months: c.months,
+            refundable: c.refundable,
+          ),
+        ),
+      ];
 
-  /// Of that, what comes back at the end.
-  double get refundableAtEnd => moveInCosts
-      .where((c) => c.refundable)
-      .fold(0, (sum, c) => sum + (c.amount ?? 0));
+  /// What somebody needs in hand on the day.
+  ///
+  /// Summed from the rows on screen rather than taken from a figure of its own, so it is one
+  /// anybody can add up themselves. A charge with no amount contributes nothing — "deposit: two
+  /// months' rent" against an un-agreed rent is a rule, not a number, and counting it as zero
+  /// would be as wrong as counting it as anything else.
+  double get totalMoveInCost =>
+      moveInRows.fold(0, (sum, r) => sum + (r.amount ?? 0));
+}
+
+/// One line under "Moving in".
+///
+/// Not [MoveInCostModel]: that is what the server sends, and this is what the screen shows — the
+/// two differ by the first month's rent. Plain rather than freezed because it is never parsed
+/// from or written to JSON.
+class MoveInCostRow {
+  const MoveInCostRow({
+    required this.name,
+    required this.amount,
+    this.months,
+    this.refundable = false,
+  });
+
+  final String name;
+  final double? amount;
+  final int? months;
+  final bool refundable;
+
+  /// The qualifier beside the name — how it was set, and whether it comes back.
+  String get note => [
+        if (months != null && months != 0)
+          '$months month${months == 1 ? '' : 's'}’ rent',
+        if (refundable) 'refundable',
+      ].join(' · ');
 }
 
 /// One line of what it costs to move in.
