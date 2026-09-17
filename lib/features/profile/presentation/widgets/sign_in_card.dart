@@ -31,6 +31,8 @@ class SignInCard extends ConsumerStatefulWidget {
 class _SignInCardState extends ConsumerState<SignInCard> {
   bool _pinSet = false;
   bool _loading = true;
+  /// A removal in flight, so the row cannot be asked twice while the first is still going.
+  bool _removing = false;
 
   @override
   void initState() {
@@ -124,7 +126,7 @@ class _SignInCardState extends ConsumerState<SignInCard> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: _confirmRemove,
+                      onPressed: _removing ? null : _confirmRemove,
                       style: OutlinedButton.styleFrom(foregroundColor: HodiColors.errorEnd),
                       child: const Text('Remove'),
                     ),
@@ -186,6 +188,10 @@ class _SignInCardState extends ConsumerState<SignInCard> {
   }
 
   /// Removing costs the password, because the person doing this has usually forgotten the PIN.
+  ///
+  /// The removal reaches the server: `POST /auth/pin/remove` deletes the row this handset's PIN
+  /// lives in, or every row on the account when "from every phone" is ticked — which is the only
+  /// way to reach a handset that is no longer in their hand.
   Future<void> _confirmRemove() async {
     final controller = TextEditingController();
     var everywhere = false;
@@ -211,6 +217,10 @@ class _SignInCardState extends ConsumerState<SignInCard> {
                 labelText: 'Password',
                 obscureText: true,
                 prefixIcon: Icons.lock_outline,
+                // So the Remove action can enable itself. Without it the button stayed live with
+                // an empty field, the dialog closed on a tap, and nothing happened or was said —
+                // which reads exactly like a PIN that cannot be removed.
+                onChanged: (_) => setDialogState(() {}),
               ),
               const SizedBox(height: 6),
               CheckboxListTile(
@@ -230,7 +240,9 @@ class _SignInCardState extends ConsumerState<SignInCard> {
           actions: [
             TextButton(onPressed: () => context.pop(false), child: const Text('Cancel')),
             TextButton(
-              onPressed: () => context.pop(true),
+              // Dead until there is a password to send, rather than closing on nothing.
+              onPressed:
+                  controller.text.isEmpty ? null : () => context.pop(true),
               style: TextButton.styleFrom(foregroundColor: HodiColors.errorEnd),
               child: const Text('Remove'),
             ),
@@ -239,14 +251,29 @@ class _SignInCardState extends ConsumerState<SignInCard> {
       ),
     );
 
-    if (confirmed != true || controller.text.isEmpty) return;
+    final password = controller.text;
+    controller.dispose();
+    if (confirmed != true || password.isEmpty) return;
 
+    setState(() => _removing = true);
     final response = await ref.read(authRepositoryProvider).removePin(
-          currentPassword: controller.text,
+          currentPassword: password,
           everywhere: everywhere,
         );
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.message)));
+    setState(() => _removing = false);
+
+    // Always says something. The server's own sentence on a refusal — "That is not your current
+    // password" — and its confirmation on success; the fallback is only for a reply with neither.
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(response.message.isNotEmpty
+          ? response.message
+          : response.isSuccess
+              ? 'PIN removed.'
+              : 'That PIN could not be removed.'),
+      backgroundColor:
+          response.isSuccess ? HodiColors.successStart : HodiColors.errorStart,
+    ));
     if (response.isSuccess) _readPinState();
   }
 }
