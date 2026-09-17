@@ -30,6 +30,7 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/profile/presentation/set_pin_screen.dart';
 import '../../features/profile/presentation/change_password_screen.dart';
 import '../../features/stays/presentation/stays_screen.dart';
+import '../../features/stays/presentation/stay_detail_screen.dart';
 import '../../features/metres/presentation/metres_screen.dart';
 import '../../features/metres/presentation/metre_history_screen.dart';
 import '../../features/vacant_houses/presentation/vacant_houses_screen.dart';
@@ -123,6 +124,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/stays',
         name: RouteNames.stays,
         builder: (context, state) => const StaysScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            name: RouteNames.stayDetail,
+            // A public token, not a HashId — passed back exactly as the list row carried it.
+            builder: (context, state) =>
+                StayDetailScreen(id: state.pathParameters['id'] ?? ''),
+          ),
+        ],
       ),
       GoRoute(
         path: '/vacant-houses',

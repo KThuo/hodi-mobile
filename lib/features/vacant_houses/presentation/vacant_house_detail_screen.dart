@@ -12,6 +12,7 @@ import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/map/static_map_view.dart';
 import '../domain/vacant_house_detail_model.dart';
+import 'widgets/listing_contact_card.dart';
 import '../providers/vacant_house_providers.dart';
 
 class VacantHouseDetailScreen extends ConsumerWidget {
@@ -59,6 +60,10 @@ class VacantHouseDetailScreen extends ConsumerWidget {
                 ],
                 const SizedBox(height: 16),
                 _CostSummaryCard(detail: detail),
+                if (detail.hasContact) ...[
+                  const SizedBox(height: 16),
+                  ListingContactCard(detail: detail),
+                ],
                 const SizedBox(height: 24),
               ],
             ),

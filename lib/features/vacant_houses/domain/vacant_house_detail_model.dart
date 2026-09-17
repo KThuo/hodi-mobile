@@ -33,12 +33,24 @@ abstract class VacantHouseDetailModel with _$VacantHouseDetailModel {
     @JsonKey(fromJson: parseDouble) @Default(0) double maxRefundableAmount,
     @Default([]) List<VacantHouseFeature> houseFeatures,
     @Default([]) List<VacantHouseImage> categoryImages,
+
+    /// Who to ring about it.
+    ///
+    /// Sent by `VacantUnitModels` and dropped on the floor here until now, which left the app
+    /// showing a listing with no way to enquire about it while the browser showed a phone number,
+    /// an email address and a WhatsApp button.
+    String? contactName,
+    String? contactPhone,
+    String? contactEmail,
   }) = _VacantHouseDetailModel;
 
   factory VacantHouseDetailModel.fromJson(Map<String, dynamic> json) =>
       _$VacantHouseDetailModelFromJson(json);
 
   double get totalMoveInCost => (rent) + totalMonthlyBills + totalOnboardFees;
+
+  bool get hasContact =>
+      (contactPhone?.isNotEmpty ?? false) || (contactEmail?.isNotEmpty ?? false);
 }
 
 @freezed

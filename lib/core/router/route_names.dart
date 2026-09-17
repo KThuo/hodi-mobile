@@ -6,6 +6,7 @@ abstract class RouteNames {
   // Public
   static const vacantHouses = 'vacant-houses';
   static const stays = 'stays';
+  static const stayDetail = 'stay-detail';
   static const vacantHouseDetail = 'vacant-house-detail';
 
   // Main

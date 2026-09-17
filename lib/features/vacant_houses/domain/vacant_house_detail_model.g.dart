@@ -56,6 +56,9 @@ _VacantHouseDetailModel _$VacantHouseDetailModelFromJson(
           ?.map((e) => VacantHouseImage.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  contactName: json['contactName'] as String?,
+  contactPhone: json['contactPhone'] as String?,
+  contactEmail: json['contactEmail'] as String?,
 );
 
 Map<String, dynamic> _$VacantHouseDetailModelToJson(
@@ -86,6 +89,9 @@ Map<String, dynamic> _$VacantHouseDetailModelToJson(
   'maxRefundableAmount': instance.maxRefundableAmount,
   'houseFeatures': instance.houseFeatures,
   'categoryImages': instance.categoryImages,
+  'contactName': instance.contactName,
+  'contactPhone': instance.contactPhone,
+  'contactEmail': instance.contactEmail,
 };
 
 _VacantHouseBill _$VacantHouseBillFromJson(Map<String, dynamic> json) =>

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_constants.dart';
 import '../../../core/theme/hodi_border_radius.dart';
@@ -57,7 +58,10 @@ class StaysScreen extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                     itemCount: stays.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 14),
-                    itemBuilder: (context, i) => _StayCard(stay: stays[i]),
+                    itemBuilder: (context, i) => _StayCard(
+                    stay: stays[i],
+                    onTap: () => context.push('/stays/${stays[i].id}'),
+                  ),
                   ),
                 );
               },
@@ -77,9 +81,10 @@ class StaysScreen extends ConsumerWidget {
 }
 
 class _StayCard extends StatelessWidget {
-  const _StayCard({required this.stay});
+  const _StayCard({required this.stay, this.onTap});
 
   final StayModel stay;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +95,9 @@ class _StayCard extends StatelessWidget {
         boxShadow: HodiShadows.cardLight,
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AspectRatio(
@@ -179,6 +186,7 @@ class _StayCard extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
