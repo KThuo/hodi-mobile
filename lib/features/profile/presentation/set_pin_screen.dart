@@ -125,6 +125,10 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
         ),
         const SizedBox(height: 18),
         PinPad(
+          // Keyed by step. All three steps draw a pad at the same place in the tree, so without
+          // this Flutter reuses one State and the next question opens holding the last answer's
+          // four digits — which is what made "enter it once more" need four backspaces first.
+          key: const ValueKey(_Step.prove),
           busy: _busy,
           error: _error,
           onCompleted: (pin) {
@@ -151,6 +155,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
         ),
         const SizedBox(height: 18),
         PinPad(
+          key: const ValueKey(_Step.choose),
           busy: _busy,
           error: _error,
           onCompleted: (pin) => setState(() {
@@ -173,6 +178,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
         ),
         const SizedBox(height: 18),
         PinPad(
+          key: const ValueKey(_Step.confirm),
           busy: _busy,
           error: _error,
           onCompleted: _finish,
