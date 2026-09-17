@@ -440,7 +440,10 @@ Two things to carry across deliberately:
 1. ~~Is the meter photo evidence or OCR input?~~ **Answered: evidence.** It is uploaded, stored and
    viewable from meter history on both web and mobile. Two sub-decisions remain in §4 — how a tenant
    reaches it, and whether EXIF is stripped.
-2. **Which maps approach?** (§6) — baked key, static images, or OSM.
+2. ~~Which maps approach?~~ **Answered: the runtime key, as the web does it** — which means
+   **static map images**, because that is the only Maps surface a key fetched at runtime can drive
+   on both platforms. `google_maps_flutter` reads its Android key from `AndroidManifest.xml` at view
+   creation and has no runtime setter. Built; see `docs/PENDING_MODULES.md` §4.
 3. **Is PIN login worth device pairing?** (§7) — a PIN without a paired device is a four-digit
    password on the open internet, so the honest choices are *build the pairing subsystem* or *ship
    biometric unlock only, which needs no backend at all*. Biometric-only is a fraction of the work
