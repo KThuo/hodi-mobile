@@ -211,6 +211,8 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                     _handleBiometricToggle(enabled),
                 onProfileTap: () => context.go('/more/profile'),
                 onAboutTap: () => _showAboutInfo(context),
+                onPrivacyTap: () => context.push('/more/privacy'),
+                onTermsTap: () => context.push('/more/terms'),
                 onLogoutTap: () => _confirmLogout(context, ref),
               ),
             ),
@@ -342,6 +344,8 @@ class _AccountSection extends StatelessWidget {
   final ValueChanged<bool> onBiometricToggle;
   final VoidCallback onProfileTap;
   final VoidCallback onAboutTap;
+  final VoidCallback onPrivacyTap;
+  final VoidCallback onTermsTap;
   final VoidCallback onLogoutTap;
 
   const _AccountSection({
@@ -350,6 +354,8 @@ class _AccountSection extends StatelessWidget {
     required this.onBiometricToggle,
     required this.onProfileTap,
     required this.onAboutTap,
+    required this.onPrivacyTap,
+    required this.onTermsTap,
     required this.onLogoutTap,
   });
 
@@ -400,6 +406,21 @@ class _AccountSection extends StatelessWidget {
                 icon: Icons.info_outline,
                 label: 'About',
                 onTap: onAboutTap,
+              ),
+              const Divider(height: 1, indent: 56, color: HodiColors.divider),
+
+              // Reachable from inside the app, which is what the stores ask for — and more to the
+              // point, what somebody wants at the moment they think to look.
+              _AccountRow(
+                icon: Icons.privacy_tip_outlined,
+                label: 'Privacy Policy',
+                onTap: onPrivacyTap,
+              ),
+              const Divider(height: 1, indent: 56, color: HodiColors.divider),
+              _AccountRow(
+                icon: Icons.gavel_outlined,
+                label: 'Terms & Conditions',
+                onTap: onTermsTap,
               ),
               const Divider(height: 1, indent: 56, color: HodiColors.divider),
 

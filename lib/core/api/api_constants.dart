@@ -154,6 +154,15 @@ abstract class ApiConstants {
   static const String stays = '$apiPrefix/stays';
   static const String mapConfig = '$apiPrefix/map-config';
 
+  // ── The public site ───────────────────────────────────────────────────────
+  //
+  // Not API paths. `hodi-f` serves these at the root of the same host the API is on, and the app
+  // opens them rather than shipping its own copy: a privacy policy that exists twice is a privacy
+  // policy that disagrees with itself the first time one is amended, and the one somebody was
+  // shown is the one that has to be current.
+  static const String privacyPolicyUrl = '$baseUrl/privacy';
+  static const String termsUrl = '$baseUrl/terms';
+
   // ── Maintenance ───────────────────────────────────────────────────────────
   //
   // ROLE_MAINT_{VIEW,NEW} is held by tenants and caretakers alike, which is why this module is in

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../api/api_constants.dart';
 import '../auth/providers/auth_provider.dart';
 import 'app_shell.dart';
 import 'route_names.dart';
@@ -17,6 +18,7 @@ import '../../features/properties/presentation/properties_screen.dart';
 import '../../features/properties/presentation/property_detail_screen.dart';
 import '../../features/more/presentation/more_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../core/widgets/hodi_webview_page.dart';
 import '../../features/visitors/presentation/visitors_screen.dart';
 import '../../features/expenses/presentation/expenses_screen.dart';
 import '../../features/reports/presentation/reports_screen.dart';
@@ -324,6 +326,26 @@ final routerProvider = Provider<GoRouter>((ref) {
                         },
                       ),
                     ],
+                  ),
+                  // The policy and the terms, opened from the site that owns them. In the shell so
+                  // the bottom bar stays put: somebody checking what they agreed to is not leaving
+                  // the app, and a full-screen push with only a back button reads as though they
+                  // have.
+                  GoRoute(
+                    path: 'privacy',
+                    name: RouteNames.privacyPolicy,
+                    builder: (context, state) => const HodiWebviewPage(
+                      title: 'Privacy Policy',
+                      url: ApiConstants.privacyPolicyUrl,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'terms',
+                    name: RouteNames.termsAndConditions,
+                    builder: (context, state) => const HodiWebviewPage(
+                      title: 'Terms & Conditions',
+                      url: ApiConstants.termsUrl,
+                    ),
                   ),
                   GoRoute(
                     path: 'reports',
