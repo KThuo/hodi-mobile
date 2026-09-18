@@ -44,6 +44,8 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
   final _name = TextEditingController();
   final _idNumber = TextEditingController();
   final _vehicle = TextEditingController();
+  final _vehicleMake = TextEditingController();
+  final _vehicleColour = TextEditingController();
   final _notes = TextEditingController();
 
   _Step _step = _Step.phone;
@@ -59,6 +61,8 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
     _name.dispose();
     _idNumber.dispose();
     _vehicle.dispose();
+    _vehicleMake.dispose();
+    _vehicleColour.dispose();
     _notes.dispose();
     super.dispose();
   }
@@ -103,6 +107,10 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
           idNumber: _idNumber.text.trim(),
           visitorCount: _count,
           vehicleReg: _vehicle.text,
+          // Only meaningful alongside a plate. A make and a colour with no registration is a
+          // description of a car nobody can look up, and the repository drops blanks anyway.
+          vehicleMake: _vehicleMake.text,
+          vehicleColour: _vehicleColour.text,
           purposeNotes: _notes.text,
         );
 
@@ -324,7 +332,57 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
           controller: _vehicle,
           hint: 'Optional — KDA 123X',
           textCapitalization: TextCapitalization.characters,
+          // Redraws so the two fields below appear as the plate is typed.
+          onChanged: (_) => setState(() {}),
         ),
+
+        // Make and colour, once there is a plate to hang them on.
+        //
+        // The plate is what a gate searches on, so it leads and it is the only part asked for
+        // unprompted. But a plate alone is a poor description at a barrier at night — "white
+        // Toyota, KDA 123X" is what somebody radios through, and the columns for it have been on
+        // `visits` since the table was created. The web asks for all three behind its "Arrived by
+        // car" tick; here the plate field is that tick.
+        //
+        // Both stay optional. A gate form that insists on a vehicle colour is a gate form that
+        // gets filled in with rubbish.
+        if (_vehicle.text.trim().isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _Label('Make'),
+                    const SizedBox(height: 8),
+                    _BigField(
+                      controller: _vehicleMake,
+                      hint: 'Toyota',
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _Label('Colour'),
+                    const SizedBox(height: 8),
+                    _BigField(
+                      controller: _vehicleColour,
+                      hint: 'White',
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
 
         const SizedBox(height: 24),
         _Next(
