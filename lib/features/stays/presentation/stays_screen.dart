@@ -14,6 +14,8 @@ import '../../../core/widgets/hodi_empty_state.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/widgets/hodi_webview_page.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
+import '../../../core/utils/date_formatter.dart';
+import '../../../core/widgets/browse_filters.dart';
 import '../../../core/widgets/hodi_search_bar.dart';
 import '../domain/stay_model.dart';
 import '../providers/stay_providers.dart';
@@ -23,12 +25,91 @@ import '../providers/stay_providers.dart';
 /// Reachable without signing in — it is beside To Let on the sign-in screen for the same reason the
 /// web puts both in the public layout: somebody looking for somewhere to stay does not have an
 /// account yet, and asking them to make one before they can look is asking in the wrong order.
-class StaysScreen extends ConsumerWidget {
+class StaysScreen extends ConsumerStatefulWidget {
   const StaysScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StaysScreen> createState() => _StaysScreenState();
+}
+
+class _StaysScreenState extends ConsumerState<StaysScreen> {
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// "3 – 7 Oct", or the invitation when nothing is picked.
+  String _datesLabel(StayQuery q) {
+    final from = q.checkIn;
+    final to = q.checkOut;
+    if (from == null || to == null) return 'Any dates';
+    return '${DateFormatter.formatShortDate(from)} \u2013 '
+        '${DateFormatter.formatShortDate(to)}';
+  }
+
+  Future<void> _pickDates(StayQuery q) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final picked = await showDateRangePicker(
+      context: context,
+      // Nobody stays last week. The picker refuses it rather than the search coming back empty.
+      firstDate: today,
+      lastDate: today.add(const Duration(days: 365)),
+      initialDateRange: q.checkIn != null && q.checkOut != null
+          ? DateTimeRange(start: q.checkIn!, end: q.checkOut!)
+          : null,
+      helpText: 'Check in and out',
+      saveText: 'Done',
+    );
+    if (picked == null || !mounted) return;
+    ref.read(stayQueryProvider.notifier).setDates(picked.start, picked.end);
+  }
+
+  Future<void> _pickSort(StaySort current) async {
+    final picked = await showSortSheet<StaySort>(
+      context: context,
+      options: [
+        for (final s in StaySort.values) (value: s, label: s.label),
+      ],
+      selected: current,
+    );
+    if (picked == null || !mounted) return;
+    ref.read(stayQueryProvider.notifier).sortBy(picked);
+  }
+
+  void _openMore(StayQuery q) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _MoreFilters(query: q),
+    );
+  }
+
+  /// What the count line says, matching the web's three cases exactly.
+  String _countText(AsyncValue<List<StayModel>> stays, StayQuery q) {
+    if (stays.isLoading) return 'Looking\u2026';
+    final list = stays.value ?? const <StayModel>[];
+    if (list.isEmpty) {
+      return q.nights != null
+          ? 'Nothing free for those dates'
+          : 'Nothing matches those filters';
+    }
+    final nights = q.nights;
+    final places = '${list.length} place${list.length == 1 ? '' : 's'}';
+    return nights == null
+        ? places
+        : '$places free for $nights night${nights == 1 ? '' : 's'}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final staysAsync = ref.watch(staysProvider);
+    final query = ref.watch(stayQueryProvider);
 
     return Scaffold(
       backgroundColor: HodiColors.background,
@@ -36,26 +117,90 @@ class StaysScreen extends ConsumerWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: HodiSearchBar(
-              hintText: 'Where are you going?',
-              onChanged: (term) => ref.read(stayQueryProvider.notifier).search(term),
+              controller: _searchController,
+              hintText: 'Where are you going',
+              onChanged: (term) =>
+                  ref.read(stayQueryProvider.notifier).search(term),
+              onClear: () => ref.read(stayQueryProvider.notifier).search(''),
             ),
+          ),
+
+          // When and how many, where the web keeps them: at the top, because they are the two
+          // questions every booking starts with and a stay filtered without dates is a list of
+          // places that may already be taken.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FilterTapButton(
+                    onTap: () => _pickDates(query),
+                    icon: Icons.calendar_today_outlined,
+                    label: _datesLabel(query),
+                    emphasised: query.nights != null,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilterTapButton(
+                  onTap: () => _openMore(query),
+                  icon: Icons.person_outline,
+                  label: query.guests == null
+                      ? 'Guests'
+                      : '${query.guests} guest${query.guests == 1 ? '' : 's'}',
+                  emphasised: query.guests != null,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 8),
+          // Three, not four: every BNB unit in this portfolio is small, and the web stops here
+          // for the same reason.
+          BedroomPills(
+            value: query.minBedrooms,
+            max: 3,
+            onChanged: (n) =>
+                ref.read(stayQueryProvider.notifier).setBedrooms(n),
+          ),
+
+          FilterActionsRow(
+            activeCount: [
+              query.minBathrooms,
+              query.maxNightly,
+            ].whereType<Object>().length,
+            onMore: () => _openMore(query),
+            sortLabel: query.sort.label,
+            onSort: () => _pickSort(query.sort),
+          ),
+
+          ResultCountLine(
+            text: _countText(staysAsync, query),
+            activeCount: query.activeCount,
+            onClear: () {
+              _searchController.clear();
+              ref.read(stayQueryProvider.notifier).clear();
+            },
           ),
           Expanded(
             child: staysAsync.when(
               data: (stays) {
                 if (stays.isEmpty) {
-                  return const HodiEmptyState(
+                  return HodiEmptyState(
                     icon: Icons.hotel_outlined,
-                    title: 'Nothing available',
-                    subtitle: 'No stay matches that yet. Try a different place or fewer guests.',
+                    title: query.nights != null
+                        ? 'Nothing free for those dates'
+                        : 'Nothing matches those filters',
+                    subtitle: query.activeCount > 0
+                        ? 'Try other dates, or clear the filters above.'
+                        : 'No stay is listed yet. Check back soon.',
                   );
                 }
                 return RefreshIndicator(
                   onRefresh: () async => ref.invalidate(staysProvider),
                   child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                    padding: const EdgeInsets.fromLTRB(16, 2, 16, 24),
                     itemCount: stays.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 14),
                     itemBuilder: (context, i) => _StayCard(
@@ -233,6 +378,129 @@ class _MapLink extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Guests, bathrooms and a ceiling on the nightly rate.
+///
+/// The same three the web keeps here, plus guests — which the web has room for in its top row and
+/// a phone does not.
+class _MoreFilters extends ConsumerStatefulWidget {
+  const _MoreFilters({required this.query});
+
+  final StayQuery query;
+
+  @override
+  ConsumerState<_MoreFilters> createState() => _MoreFiltersState();
+}
+
+class _MoreFiltersState extends ConsumerState<_MoreFilters> {
+  late final TextEditingController _maxNightly;
+  late final TextEditingController _minBaths;
+  late int? _guests;
+
+  @override
+  void initState() {
+    super.initState();
+    final q = widget.query;
+    _maxNightly = TextEditingController(
+      text: q.maxNightly == null ? '' : q.maxNightly!.toInt().toString(),
+    );
+    _minBaths = TextEditingController(text: q.minBathrooms?.toString() ?? '');
+    _guests = q.guests;
+  }
+
+  @override
+  void dispose() {
+    _maxNightly.dispose();
+    _minBaths.dispose();
+    super.dispose();
+  }
+
+  void _reset() => setState(() {
+        _maxNightly.clear();
+        _minBaths.clear();
+        _guests = null;
+      });
+
+  void _apply() {
+    Navigator.of(context).pop();
+    ref.read(stayQueryProvider.notifier).applyMore(
+          guests: _guests,
+          minBathrooms: int.tryParse(_minBaths.text.trim()),
+          maxNightly: double.tryParse(_maxNightly.text.trim()),
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterSheet(
+      onApply: _apply,
+      onReset: _reset,
+      children: [
+        FilterField(
+          label: 'Guests',
+          child: Row(
+            children: [
+              _Stepper(
+                onTap: () => setState(
+                  () => _guests = (_guests ?? 1) <= 1 ? null : _guests! - 1,
+                ),
+                icon: Icons.remove,
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    _guests == null ? 'Any' : '$_guests',
+                    style: HodiTextStyles.bodyLarge
+                        .copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+              _Stepper(
+                onTap: () => setState(() => _guests = (_guests ?? 0) + 1),
+                icon: Icons.add,
+              ),
+            ],
+          ),
+        ),
+        FilterField(
+          label: 'Bathrooms',
+          child: FilterNumberField(
+              controller: _minBaths, hint: 'Minimum bathrooms'),
+        ),
+        FilterField(
+          label: 'Nightly rate',
+          child: FilterNumberField(
+              controller: _maxNightly, hint: 'Maximum per night'),
+        ),
+      ],
+    );
+  }
+}
+
+class _Stepper extends StatelessWidget {
+  const _Stepper({required this.onTap, required this.icon});
+
+  final VoidCallback onTap;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: HodiColors.surfaceLight,
+          shape: BoxShape.circle,
+          border: Border.all(color: HodiColors.divider),
+        ),
+        child: Icon(icon, size: 18, color: HodiColors.textMedium),
       ),
     );
   }

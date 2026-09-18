@@ -37,6 +37,10 @@ class VacantHouseListState {
   final bool isLoading;
   final bool hasMore;
   final int currentPage;
+
+  /// How many match, across every page — what the count line reports. The list holds only what
+  /// has been scrolled in so far, which is a different number and not the one to show.
+  final int totalElements;
   final String? error;
   final String? searchTerm;
   final String? category;
@@ -46,43 +50,87 @@ class VacantHouseListState {
   /// somebody looking for a place actually means — nobody turns down a three-bedroom because
   /// they asked for two.
   final int? minBedrooms;
+  final int? minBathrooms;
+  final double? minRent;
+  final double? maxRent;
+  final bool dsq;
+  final bool parking;
+
+  /// `null` is the server's own order, which `ToLetPage.vue` labels "Newest first" and sends as
+  /// no parameter at all.
+  final String? sort;
 
   const VacantHouseListState({
     this.houses = const [],
     this.isLoading = false,
     this.hasMore = true,
     this.currentPage = 0,
+    this.totalElements = 0,
     this.error,
     this.searchTerm,
     this.category,
     this.area,
     this.minBedrooms,
+    this.minBathrooms,
+    this.minRent,
+    this.maxRent,
+    this.dsq = false,
+    this.parking = false,
+    this.sort,
   });
 
-  bool get filtered =>
-      category != null || area != null || minBedrooms != null;
+  /// The filters behind "More filters" that are set. The button carries this, so a narrowed list
+  /// is never unexplained.
+  int get extraCount => [
+        minBathrooms,
+        minRent,
+        maxRent,
+        dsq ? true : null,
+        parking ? true : null,
+        category,
+        area,
+      ].whereType<Object>().length;
+
+  /// Everything a "Clear" would undo — which is what the web counts.
+  int get activeCount => extraCount + (minBedrooms == null ? 0 : 1);
+
+  bool get filtered => activeCount > 0;
 
   VacantHouseListState copyWith({
     List<VacantHouseModel>? houses,
     bool? isLoading,
     bool? hasMore,
     int? currentPage,
+    int? totalElements,
     String? error,
     String? searchTerm,
     String? Function()? category,
     String? Function()? area,
     int? Function()? minBedrooms,
+    int? Function()? minBathrooms,
+    double? Function()? minRent,
+    double? Function()? maxRent,
+    bool? dsq,
+    bool? parking,
+    String? Function()? sort,
   }) {
     return VacantHouseListState(
       houses: houses ?? this.houses,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
       currentPage: currentPage ?? this.currentPage,
+      totalElements: totalElements ?? this.totalElements,
       error: error,
       searchTerm: searchTerm ?? this.searchTerm,
       category: category != null ? category() : this.category,
       area: area != null ? area() : this.area,
       minBedrooms: minBedrooms != null ? minBedrooms() : this.minBedrooms,
+      minBathrooms: minBathrooms != null ? minBathrooms() : this.minBathrooms,
+      minRent: minRent != null ? minRent() : this.minRent,
+      maxRent: maxRent != null ? maxRent() : this.maxRent,
+      dsq: dsq ?? this.dsq,
+      parking: parking ?? this.parking,
+      sort: sort != null ? sort() : this.sort,
     );
   }
 }
@@ -104,6 +152,12 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
       category: state.category,
       area: state.area,
       minBedrooms: state.minBedrooms,
+      minBathrooms: state.minBathrooms,
+      minRent: state.minRent,
+      maxRent: state.maxRent,
+      dsq: state.dsq ? true : null,
+      parking: state.parking ? true : null,
+      sort: state.sort,
     );
 
     if (response.isSuccess && response.data != null) {
@@ -113,6 +167,7 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
         isLoading: false,
         hasMore: paged.hasMore,
         currentPage: page,
+        totalElements: paged.totalElements,
       );
     } else {
       state = state.copyWith(isLoading: false, error: response.message);
@@ -170,6 +225,44 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
     await _fetchPage(0);
   }
 
+  /// Everything behind "More filters", applied together when the sheet is dismissed.
+  ///
+  /// One call rather than one per field: each would refetch, so closing the sheet with four
+  /// things changed would fire four searches and show the answer to the third.
+  Future<void> applyMore({
+    required String? category,
+    required String? area,
+    required int? minBathrooms,
+    required double? minRent,
+    required double? maxRent,
+    required bool dsq,
+    required bool parking,
+  }) async {
+    state = state.copyWith(
+      houses: const [],
+      isLoading: true,
+      category: () => category,
+      area: () => area,
+      minBathrooms: () => minBathrooms,
+      minRent: () => minRent,
+      maxRent: () => maxRent,
+      dsq: dsq,
+      parking: parking,
+      currentPage: 0,
+    );
+    await _fetchPage(0);
+  }
+
+  Future<void> sortBy(String? sort) async {
+    state = state.copyWith(
+      houses: const [],
+      isLoading: true,
+      sort: () => sort,
+      currentPage: 0,
+    );
+    await _fetchPage(0);
+  }
+
   Future<void> clearFilters() async {
     state = state.copyWith(
       houses: const [],
@@ -177,6 +270,11 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
       category: () => null,
       area: () => null,
       minBedrooms: () => null,
+      minBathrooms: () => null,
+      minRent: () => null,
+      maxRent: () => null,
+      dsq: false,
+      parking: false,
       currentPage: 0,
     );
     await _fetchPage(0);

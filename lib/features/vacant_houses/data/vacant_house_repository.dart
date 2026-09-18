@@ -33,6 +33,10 @@ class VacantHouseRepository {
     double? minRent,
     double? maxRent,
     int? minBedrooms,
+    int? minBathrooms,
+    bool? dsq,
+    bool? parking,
+    String? sort,
   }) async {
     return _apiClient.get<PagedResponse<VacantHouseModel>>(
       ApiConstants.vacantUnits,
@@ -45,6 +49,12 @@ class VacantHouseRepository {
         'minRent': ?minRent,
         'maxRent': ?maxRent,
         'minBedrooms': ?minBedrooms,
+        'minBathrooms': ?minBathrooms,
+        // Only when ticked. `dsq=false` is a filter for units *without* one, which is not what an
+        // unticked box means.
+        'dsq': ?dsq,
+        'parking': ?parking,
+        'sort': ?sort,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

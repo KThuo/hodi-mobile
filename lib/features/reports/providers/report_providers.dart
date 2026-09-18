@@ -44,11 +44,24 @@ class _SearchNotifier extends Notifier<String> {
 final tenantReportSearchProvider =
     NotifierProvider<_SearchNotifier, String>(_SearchNotifier.new);
 
-/// One page of the tenant report, for the lens and filters currently set.
+/// The tenant report, for the lens and filters currently set.
 ///
-/// A page rather than an endless list, deliberately: this is a report, and the totals beneath it
-/// are the totals of the rows returned. Scrolling more rows in would keep moving a figure somebody
-/// is reading.
+/// ## Everything, not a page of it
+///
+/// The server computes `totals` from the rows it returns — `TenantReportTotals.of(rows)` sums
+/// the page, not the query. Asking for fifty of eighty-nine therefore produced a correct total of
+/// the wrong thing, and the screen had to apologise for it in a sentence under the figures.
+///
+/// So it asks for the service's own ceiling, [_reportPageSize], and gets the lot in one call.
+/// Past that the totals are genuinely partial and the screen says so plainly — but at this
+/// ceiling that is a report nobody is reading on a phone anyway.
+///
+/// Still one call rather than an endless list: this is a report, and a figure that moves as
+/// somebody scrolls is a figure they cannot read.
+/// `TenantReportService.MAX_PAGE`. Asking for more is clamped to this, so this is the most that
+/// can be covered by one set of totals.
+const int _reportPageSize = 200;
+
 final tenantReportProvider =
     FutureProvider.autoDispose<TenantReportPageModel?>((ref) async {
   final lens = ref.watch(tenantLensProvider);
@@ -63,7 +76,7 @@ final tenantReportProvider =
         // Biggest balance first, which is the order somebody reads an arrears list in.
         sort: 'accountBalance',
         desc: true,
-        pageSize: 50,
+        pageSize: _reportPageSize,
       );
 
   if (!response.isSuccess) {

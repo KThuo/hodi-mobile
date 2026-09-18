@@ -63,57 +63,63 @@ class FilterNotifier extends Notifier<FilterState> {
   bool get isSuperadmin => _isSuperadmin;
   bool get isTenant => _isTenant;
 
+  /// Fills both switchers.
+  ///
+  /// The estate list is fetched for everybody who has one, not only a superadmin: `/estates/
+  /// options` is already scoped on the server, so a bank admin gets the bank's estates and an
+  /// estate admin gets one. Asking only for superadmins meant a bank admin had no estate switcher
+  /// at all.
+  ///
+  /// Properties are then asked for with whatever estate is selected — which is nothing, at first,
+  /// and nothing is a valid answer: it means every property the caller may see. The old code
+  /// skipped the call entirely unless the account carried an `estateId`, so a superadmin opened to
+  /// an empty property switcher.
   Future<void> loadFilters() async {
     if (_isTenant) return;
 
     state = state.copyWith(isLoading: true);
 
-    // Superadmin: fetch estates
-    if (_isSuperadmin) {
-      final estatesResponse = await _repository.getEstates();
-      if (estatesResponse.isSuccess && estatesResponse.data != null) {
-        state = state.copyWith(estates: estatesResponse.data);
-      }
+    final estates = await _repository.getEstates();
+    if (estates.isSuccess && estates.data != null) {
+      state = state.copyWith(estates: estates.data);
     }
 
-    // Fetch properties using the user's estateId
-    final user = ref.read(authProvider).user;
-    final estateId = user?.estateId;
-    if (estateId != null && estateId.isNotEmpty) {
-      // Admin/caretaker: prefill estate filter with their estate
-      if (!_isSuperadmin) {
-        state = state.copyWith(selectedEstateId: () => estateId);
-      }
-
-      final propertiesResponse = await _repository.getProperties(estateId);
-      if (propertiesResponse.isSuccess && propertiesResponse.data != null) {
-        state = state.copyWith(properties: propertiesResponse.data);
-      }
+    // One estate to choose from is not a choice. Selecting it up front means the property
+    // switcher beside it is scoped from the first frame rather than after a redundant tap.
+    final own = ref.read(authProvider).user?.estateId;
+    if (!_isSuperadmin && own != null && own.isNotEmpty) {
+      state = state.copyWith(selectedEstateId: () => own);
+    } else if (state.estates.length == 1) {
+      state = state.copyWith(selectedEstateId: () => state.estates.single.id);
     }
 
+    await _loadProperties(state.selectedEstateId);
     state = state.copyWith(isLoading: false);
   }
 
   Future<void> selectEstate(String? id) async {
     state = state.copyWith(
       selectedEstateId: () => id,
+      // The property that was chosen belongs to the estate that was chosen. Keeping it would
+      // filter to a property outside the estate now selected, which returns nothing and looks
+      // like an empty estate.
       selectedPropertyId: () => null,
       isLoading: true,
     );
 
-    // Reload properties for selected estate (or user's estate if "All")
-    final estateId = id ?? ref.read(authProvider).user?.estateId;
-    if (estateId != null && estateId.isNotEmpty) {
-      final propertiesResponse = await _repository.getProperties(estateId);
-      if (propertiesResponse.isSuccess && propertiesResponse.data != null) {
-        state = state.copyWith(properties: propertiesResponse.data);
-      }
-    } else {
-      state = state.copyWith(properties: []);
-    }
-
+    await _loadProperties(id);
     state = state.copyWith(isLoading: false);
     _invalidateAllLists();
+  }
+
+  /// Null [estateId] is not "skip this" — it is "every property I may see".
+  Future<void> _loadProperties(String? estateId) async {
+    final response = await _repository.getProperties(estateId);
+    state = state.copyWith(
+      properties: response.isSuccess && response.data != null
+          ? response.data
+          : const <FilterOption>[],
+    );
   }
 
   void selectProperty(String? id) {

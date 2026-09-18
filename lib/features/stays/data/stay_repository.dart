@@ -21,6 +21,8 @@ class StayRepository {
     DateTime? checkIn,
     DateTime? checkOut,
     int? guests,
+    int? minBedrooms,
+    int? minBathrooms,
     double? maxNightly,
     int limit = 24,
   }) async {
@@ -31,6 +33,8 @@ class StayRepository {
         'checkIn': ?_date(checkIn),
         'checkOut': ?_date(checkOut),
         'guests': ?guests,
+        'minBedrooms': ?minBedrooms,
+        'minBathrooms': ?minBathrooms,
         'maxNightly': ?maxNightly,
         'limit': limit,
       },

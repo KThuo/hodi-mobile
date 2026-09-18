@@ -97,8 +97,16 @@ abstract class ApiConstants {
   // ── Estates ───────────────────────────────────────────────────────────────
   static const String estates = '$apiPrefix/estates';
 
+  /// `{id, label}` for the estate switcher, scoped to what the caller may see. Not `/estates`,
+  /// which is a paged list of summaries.
+  static const String estateOptions = '$apiPrefix/estates/options';
+
   // ── Properties ────────────────────────────────────────────────────────────
   static const String properties = '$apiPrefix/properties';
+
+  /// `{id, label}` for the property switcher. Takes `estateId` as a query parameter; as a path
+  /// segment it is read as a property id instead.
+  static const String propertyOptions = '$apiPrefix/properties/options';
 
   // ── Units (legacy called them houses) ─────────────────────────────────────
   static const String units = '$apiPrefix/units'; // append /{id}

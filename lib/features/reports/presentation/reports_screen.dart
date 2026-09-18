@@ -193,11 +193,14 @@ class _Totals extends StatelessWidget {
             tone: totals.accountBalance > 0 ? HodiColors.errorStart : null,
             bold: true,
           ),
+          // Only when it is actually true. The report asks for the server's whole ceiling, so
+          // for any normal estate these figures are the figures and there is nothing to qualify
+          // — the old sentence ran under every report and read as a disclaimer on all of them.
           if (page.partial) ...[
             const SizedBox(height: 10),
             Text(
-              'These figures cover the ${page.content.length} tenancies shown, '
-              'of ${page.totalElements} in this selection.',
+              'Largest ${page.content.length} of ${page.totalElements}. '
+              'Filter by property to total the rest.',
               style: HodiTextStyles.bodySmall
                   .copyWith(fontSize: 11, color: HodiColors.textLight),
             ),

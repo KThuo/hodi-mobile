@@ -508,7 +508,7 @@ class _Prompt extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(text, style: HodiTextStyles.heading2.copyWith(fontSize: 22)),
+        Text(text, style: HodiTextStyles.heading3.copyWith(fontSize: 17)),
         if (hint != null) ...[
           const SizedBox(height: 6),
           Text(hint!,
@@ -565,10 +565,12 @@ class _BigField extends StatelessWidget {
       inputFormatters: keyboardType == TextInputType.phone
           ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]'))]
           : null,
-      style: HodiTextStyles.heading3.copyWith(fontSize: 19),
+      style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: HodiTextStyles.bodyLarge.copyWith(color: HodiColors.textFaint),
+        // Generous padding is what makes this easy to hit. Oversized type was not — it just
+        // made the screen look like it came from a different application.
         filled: true,
         fillColor: HodiColors.cardBackground,
         contentPadding:
@@ -600,7 +602,7 @@ class _Next extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 58,
+      height: 52,
       child: FilledButton(
         onPressed: busy ? null : onTap,
         style: FilledButton.styleFrom(
@@ -616,8 +618,8 @@ class _Next extends StatelessWidget {
               )
             : Text(
                 label,
-                style: HodiTextStyles.heading3
-                    .copyWith(fontSize: 18, color: HodiColors.white),
+                style: HodiTextStyles.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600, color: HodiColors.white),
               ),
       ),
     );

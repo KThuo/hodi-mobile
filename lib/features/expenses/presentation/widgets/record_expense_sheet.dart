@@ -171,7 +171,7 @@ class _RecordExpenseSheetState extends ConsumerState<RecordExpenseSheet> {
                   ),
                   items: [
                     for (final p in properties)
-                      DropdownMenuItem(value: p.id, child: Text(p.name)),
+                      DropdownMenuItem(value: p.id, child: Text(p.label)),
                   ],
                   onChanged: (id) => setState(() => _propertyId = id),
                 ),

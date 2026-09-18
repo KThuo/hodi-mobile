@@ -185,7 +185,7 @@ class _FilterDropdown extends StatelessWidget {
               (item) => DropdownMenuItem<String>(
                 value: item.id,
                 child: Text(
-                  item.name,
+                  item.label,
                   style: const TextStyle(fontSize: 14, color: HodiColors.textDark),
                 ),
               ),

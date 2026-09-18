@@ -92,20 +92,27 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      // The gate's own action, and the biggest thing on the screen for them: somebody is standing
-      // at the barrier. Only for ROLE_VISIT_NEW — a tenant answers visits, they do not admit them.
+      // The gate's own action. Only for ROLE_VISIT_NEW — a tenant answers visits, they do not
+      // admit them.
+      //
+      // "Check in", not "Bring someone in": Maintenance says "Report" and Expenses says "Record",
+      // and a sentence on this one button made the screen read as somebody else's work.
       floatingActionButton: isGate
           ? FloatingActionButton.extended(
               onPressed: () => context.push('/more/visitors/check-in'),
               backgroundColor: HodiColors.primaryStart,
               foregroundColor: HodiColors.white,
-              icon: const Icon(Icons.person_add_alt_1),
-              label: const Text('Bring someone in'),
+              icon: const Icon(Icons.add),
+              label: const Text('Check in'),
             )
           : null,
       body: Column(
         children: [
-          if (summary != null) _Summary(summary: summary),
+          // Nothing on site and nobody waiting is not news. The card said "0 on site" over an
+          // empty list, which is the list saying it twice.
+          if (summary != null &&
+              (summary.onSite > 0 || summary.awaitingApproval > 0))
+            _Summary(summary: summary),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: HodiSearchBar(
