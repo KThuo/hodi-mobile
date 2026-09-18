@@ -9,7 +9,7 @@ import '../../../core/widgets/hodi_empty_state.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/browse_filters.dart';
-import '../../../core/widgets/hodi_search_bar.dart';
+import '../../../core/widgets/place_field.dart';
 import '../domain/vacant_house_detail_model.dart';
 import '../providers/vacant_house_providers.dart';
 import 'widgets/vacant_house_list_item.dart';
@@ -81,19 +81,49 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
       ),
       body: Column(
         children: [
+          // A place, not words. Choosing one captures a point, and a point is what lets the
+          // search say "within 5 km" and "nearest first" — see [PlaceField], which degrades to
+          // a plain text box wherever Places is unavailable.
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: HodiSearchBar(
+            child: PlaceField(
               controller: _searchController,
-              // The web's words. Somebody comparing the two should not have to work out that
-              // these are the same box.
               hintText: 'Where do you want to live',
-              onChanged: (v) =>
-                  ref.read(vacantHouseListProvider.notifier).search(v),
-              onClear: () =>
-                  ref.read(vacantHouseListProvider.notifier).search(''),
+              pinned: state.pinned,
+              onText: (text) =>
+                  ref.read(vacantHouseListProvider.notifier).search(text ?? ''),
+              onPlace: (place) => ref
+                  .read(vacantHouseListProvider.notifier)
+                  .pinTo(place.latitude, place.longitude, place.name),
+              onClearPin: () =>
+                  ref.read(vacantHouseListProvider.notifier).unpin(),
             ),
           ),
+
+          // Only once there is a point to be a radius of.
+          if (state.pinned)
+            SizedBox(
+              height: 38,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  for (final km in _radii) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterTapButton(
+                        onTap: () => ref
+                            .read(vacantHouseListProvider.notifier)
+                            .setRadius(km),
+                        icon: Icons.my_location,
+                        label: 'Within ${km.toInt()} km',
+                        emphasised: state.radiusKm == km,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
 
           // Bedrooms lead, as they do on the web: it is the filter somebody arrives with already
           // decided. Capped by what is actually listed, so there is no "4+" over an estate whose
@@ -108,8 +138,8 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
           FilterActionsRow(
             activeCount: state.extraCount,
             onMore: () => _openMore(state, filters),
-            sortLabel: _sortLabel(state.sort),
-            onSort: () => _openSort(state.sort),
+            sortLabel: _sortLabel(state.sort, state.pinned),
+            onSort: () => _openSort(state.sort, state.pinned),
           ),
 
           ResultCountLine(
@@ -127,6 +157,9 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
     );
   }
 
+  /// The distances `ToLetPage.vue` offers, unchanged.
+  static const _radii = <double>[1, 2, 5, 10, 25];
+
   /// The web offers 1+ through 4+. Fewer where fewer are listed; never more.
   int _bedroomCap(int listed) => listed < 1 ? 0 : (listed > 4 ? 4 : listed);
 
@@ -134,17 +167,19 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
   /// `ToLetPage.vue` does with it. Carrying it as a value rather than as null keeps a dismissed
   /// sort sheet — which returns null — distinguishable from a chosen "Newest first".
   ///
-  /// The web also offers "Nearest first". It is left out here because it needs a pinned place to
-  /// be nearest to, and this screen has no place autocomplete to pin one with; an option that
-  /// silently does nothing is worse than one that is absent.
-  static const _sorts = <({String value, String label})>[
-    (value: 'newest', label: 'Newest first'),
-    (value: 'rent', label: 'Rent: low to high'),
-    (value: '-rent', label: 'Rent: high to low'),
-  ];
+  /// "Nearest first" is offered only once a place has been chosen, because that is the only time
+  /// there is anything to be nearest to. Offering it always would be an option that silently
+  /// does nothing.
+  static List<({String value, String label})> _sortsFor(bool pinned) => [
+        const (value: 'newest', label: 'Newest first'),
+        const (value: 'rent', label: 'Rent: low to high'),
+        const (value: '-rent', label: 'Rent: high to low'),
+        if (pinned) const (value: 'nearest', label: 'Nearest first'),
+      ];
 
-  String _sortLabel(String? sort) => _sorts
-      .firstWhere((o) => o.value == (sort ?? 'newest'), orElse: () => _sorts.first)
+  String _sortLabel(String? sort, bool pinned) => _sortsFor(pinned)
+      .firstWhere((o) => o.value == (sort ?? 'newest'),
+          orElse: () => _sortsFor(pinned).first)
       .label;
 
   String _countText(VacantHouseListState state) {
@@ -155,13 +190,15 @@ class _VacantHousesScreenState extends ConsumerState<VacantHousesScreen> {
           : 'Nothing is available right now';
     }
     final n = state.totalElements;
-    return '$n available';
+    return state.pinned
+        ? '$n available within ${state.radiusKm.toInt()} km'
+        : '$n available';
   }
 
-  Future<void> _openSort(String? current) async {
+  Future<void> _openSort(String? current, bool pinned) async {
     final picked = await showSortSheet<String>(
       context: context,
-      options: _sorts,
+      options: _sortsFor(pinned),
       selected: current ?? 'newest',
     );
     // Null here means dismissed, not "Newest first" — that arrives as its own value.
@@ -319,7 +356,11 @@ class _MoreFiltersState extends ConsumerState<_MoreFilters> {
               onSelect: (v) => setState(() => _category = v),
             ),
           ),
-        if (filters != null && filters.areas.isNotEmpty)
+        // Only where there is no pin. With a point chosen the radius is the location filter, and
+        // two ways to ask the same question disagree with each other.
+        if (filters != null &&
+            filters.areas.isNotEmpty &&
+            !widget.state.pinned)
           FilterField(
             label: 'Area',
             child: _Choices(

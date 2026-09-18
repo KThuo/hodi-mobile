@@ -37,6 +37,9 @@ class VacantHouseRepository {
     bool? dsq,
     bool? parking,
     String? sort,
+    double? latitude,
+    double? longitude,
+    double? radiusKm,
   }) async {
     return _apiClient.get<PagedResponse<VacantHouseModel>>(
       ApiConstants.vacantUnits,
@@ -55,6 +58,9 @@ class VacantHouseRepository {
         'dsq': ?dsq,
         'parking': ?parking,
         'sort': ?sort,
+        'latitude': ?latitude,
+        'longitude': ?longitude,
+        'radiusKm': ?radiusKm,
       },
       fromJsonT: (data) => PagedResponse.fromJson(
         data as Map<String, dynamic>,

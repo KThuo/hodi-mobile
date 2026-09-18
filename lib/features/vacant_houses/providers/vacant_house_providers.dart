@@ -60,6 +60,13 @@ class VacantHouseListState {
   /// no parameter at all.
   final String? sort;
 
+  /// Where a chosen place is. Both or neither — half a coordinate is not a point.
+  final double? latitude;
+  final double? longitude;
+
+  /// How far from it to look. Only meaningful while [pinned].
+  final double radiusKm;
+
   const VacantHouseListState({
     this.houses = const [],
     this.isLoading = false,
@@ -77,7 +84,13 @@ class VacantHouseListState {
     this.dsq = false,
     this.parking = false,
     this.sort,
+    this.latitude,
+    this.longitude,
+    this.radiusKm = 5,
   });
+
+  /// A point has been chosen, so distance is a question that can be asked.
+  bool get pinned => latitude != null && longitude != null;
 
   /// The filters behind "More filters" that are set. The button carries this, so a narrowed list
   /// is never unexplained.
@@ -91,8 +104,9 @@ class VacantHouseListState {
         area,
       ].whereType<Object>().length;
 
-  /// Everything a "Clear" would undo — which is what the web counts.
-  int get activeCount => extraCount + (minBedrooms == null ? 0 : 1);
+  /// Everything a "Clear" would undo — which is what the web counts, the pin included.
+  int get activeCount =>
+      extraCount + (minBedrooms == null ? 0 : 1) + (pinned ? 1 : 0);
 
   bool get filtered => activeCount > 0;
 
@@ -113,6 +127,9 @@ class VacantHouseListState {
     bool? dsq,
     bool? parking,
     String? Function()? sort,
+    double? Function()? latitude,
+    double? Function()? longitude,
+    double? radiusKm,
   }) {
     return VacantHouseListState(
       houses: houses ?? this.houses,
@@ -131,6 +148,9 @@ class VacantHouseListState {
       dsq: dsq ?? this.dsq,
       parking: parking ?? this.parking,
       sort: sort != null ? sort() : this.sort,
+      latitude: latitude != null ? latitude() : this.latitude,
+      longitude: longitude != null ? longitude() : this.longitude,
+      radiusKm: radiusKm ?? this.radiusKm,
     );
   }
 }
@@ -148,7 +168,6 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
   Future<void> _fetchPage(int page) async {
     final response = await _repository.searchVacantHouses(
       page: page,
-      searchTerm: state.searchTerm,
       category: state.category,
       area: state.area,
       minBedrooms: state.minBedrooms,
@@ -158,6 +177,13 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
       dsq: state.dsq ? true : null,
       parking: state.parking ? true : null,
       sort: state.sort,
+      latitude: state.latitude,
+      longitude: state.longitude,
+      // Only alongside a point. A radius with nothing to be a radius of is not a filter.
+      radiusKm: state.pinned ? state.radiusKm : null,
+      // With coordinates the radius is the filter, and matching the words as well would exclude
+      // the next street over — which is `ToLetPage.vue`'s own reasoning.
+      searchTerm: state.pinned ? null : state.searchTerm,
     );
 
     if (response.isSuccess && response.data != null) {
@@ -253,6 +279,42 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
     await _fetchPage(0);
   }
 
+  /// A place was chosen. The point replaces the words as the filter, and distance becomes an
+  /// order somebody can ask for.
+  Future<void> pinTo(double latitude, double longitude, String label) async {
+    state = state.copyWith(
+      houses: const [],
+      isLoading: true,
+      searchTerm: label,
+      latitude: () => latitude,
+      longitude: () => longitude,
+      currentPage: 0,
+    );
+    await _fetchPage(0);
+  }
+
+  Future<void> setRadius(double km) async {
+    if (!state.pinned) return;
+    state = state.copyWith(houses: const [], isLoading: true, radiusKm: km, currentPage: 0);
+    await _fetchPage(0);
+  }
+
+  /// Back to matching words. Keeps whatever is typed — dropping the pin is not the same as
+  /// clearing the search.
+  Future<void> unpin() async {
+    if (!state.pinned) return;
+    state = state.copyWith(
+      houses: const [],
+      isLoading: true,
+      latitude: () => null,
+      longitude: () => null,
+      // "Nearest first" cannot survive losing the point it measured from.
+      sort: () => state.sort == 'nearest' ? null : state.sort,
+      currentPage: 0,
+    );
+    await _fetchPage(0);
+  }
+
   Future<void> sortBy(String? sort) async {
     state = state.copyWith(
       houses: const [],
@@ -275,6 +337,10 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
       maxRent: () => null,
       dsq: false,
       parking: false,
+      searchTerm: '',
+      latitude: () => null,
+      longitude: () => null,
+      sort: () => state.sort == 'nearest' ? null : state.sort,
       currentPage: 0,
     );
     await _fetchPage(0);

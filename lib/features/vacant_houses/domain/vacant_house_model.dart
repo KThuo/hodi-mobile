@@ -32,6 +32,10 @@ abstract class VacantHouseModel with _$VacantHouseModel {
     @JsonKey(fromJson: parseDoubleNullable) double? squareFt,
     @Default(false) bool dsq,
     int? parkingSpaces,
+
+    /// "Ground", "First", "Basement 2" — composed by the server, never a bare number. The
+    /// schema puts basements below zero and a card printing "-1" reads as a fault.
+    String? floorLabel,
     double? latitude,
     double? longitude,
 
@@ -55,4 +59,31 @@ abstract class VacantHouseModel with _$VacantHouseModel {
       ].join(' · ');
 
   String? get coverImage => images.isEmpty ? null : images.first;
+
+  /// What to draw where there is no photograph.
+  ///
+  /// Initials of the kind of home, as the web does it — so an unphotographed listing reads as
+  /// one awaiting a photograph rather than as a broken image. A flat block is indistinguishable
+  /// from a rendering failure, which is exactly how it looks.
+  String get initials {
+    final source = (categoryName?.isNotEmpty ?? false) ? categoryName! : title;
+    return source
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0].toUpperCase())
+        .join();
+  }
+
+  /// "400 m away" under a kilometre: "0.4 km away" reads as a rounding error, metres read as a
+  /// walk. Null where the search was not pinned to a point — and null is the only case, unlike
+  /// the web, where an undefined slips past the guard and prints "undefined km away".
+  String? get distanceLabel {
+    final km = distanceKm;
+    if (km == null) return null;
+    return km < 1
+        ? '${(km * 1000).round().clamp(50, 999)} m away'
+        : '${km.toStringAsFixed(km >= 10 ? 0 : 1)} km away';
+  }
+
 }

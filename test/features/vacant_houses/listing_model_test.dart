@@ -168,4 +168,71 @@ void main() {
     expect(f.areas.single.label, 'Kilimani');
     expect(f.total, 8);
   });
+
+  group('the card', () {
+    const row = {
+      'id': '3k7f2a',
+      'title': '3 bedroom apartment',
+      'categoryName': 'Apartment',
+      'propertyName': 'WESTLAKE APARTMENTS',
+      'area': 'Naivasha, Nakuru',
+      'rent': 40000,
+      'bedrooms': 3,
+      'bathrooms': 1,
+      'floorLabel': 'Third Floor',
+      'dsq': false,
+      'images': <dynamic>[],
+      'imageCount': 0,
+    };
+
+    test('the floor arrives in words, not as a number', () {
+      // The schema puts basements below zero, so a card printing "-1" reads as a fault. The
+      // server composes the label; this only has to carry it.
+      expect(VacantHouseModel.fromJson(row).floorLabel, 'Third Floor');
+    });
+
+    test('the placeholder is initials of the kind of home', () {
+      // A grid of unphotographed listings has to be distinguishable one from another. A house
+      // glyph thirty times over is not.
+      expect(VacantHouseModel.fromJson(row).initials, 'A');
+      expect(
+        VacantHouseModel.fromJson({...row, 'categoryName': 'Town House'}).initials,
+        'TH',
+      );
+    });
+
+    test('no category falls back to the title rather than to nothing', () {
+      expect(
+        VacantHouseModel.fromJson({...row, 'categoryName': null}).initials,
+        '3B',
+      );
+    });
+
+    test('no distance means no badge, not the word "undefined"', () {
+      // `ListingCard.vue` guards on `distanceKm !== null`, so an *undefined* falls through and
+      // the badge renders "undefined km away" — which is what the live card does today. Null is
+      // the only empty here, so the guard cannot be got round.
+      expect(VacantHouseModel.fromJson(row).distanceLabel, isNull);
+    });
+
+    test('under a kilometre reads as a walk', () {
+      // "0.4 km away" reads as a rounding error; metres read as a distance somebody can picture.
+      expect(
+        VacantHouseModel.fromJson({...row, 'distanceKm': 0.4}).distanceLabel,
+        '400 m away',
+      );
+    });
+
+    test('further off is kilometres, and loses the decimal when it stops helping', () {
+      expect(
+        VacantHouseModel.fromJson({...row, 'distanceKm': 2.4}).distanceLabel,
+        '2.4 km away',
+      );
+      expect(
+        VacantHouseModel.fromJson({...row, 'distanceKm': 18.3}).distanceLabel,
+        '18 km away',
+      );
+    });
+  });
+
 }
