@@ -1193,8 +1193,12 @@ as int,
 /// @nodoc
 mixin _$ListingFilters {
 
- List<ListingChoice> get categories;/// Areas, which is what the server offers instead of house types. The app asked for
-/// `/filters/house-types` and there is no such endpoint.
+ List<ListingChoice> get categories;/// Areas the server counts, parsed and no longer offered as a filter.
+///
+/// Location is asked as a place now, not picked from a list — a chip row cannot express
+/// "within two kilometres of here", and offering both would be two controls answering one
+/// question differently. Kept because the server sends it and a model that silently drops a
+/// field is harder to read than one that carries it.
  List<ListingChoice> get areas;@JsonKey(fromJson: parseDoubleNullable) double? get minRent;@JsonKey(fromJson: parseDoubleNullable) double? get maxRent; int get maxBedrooms; int get total;
 /// Create a copy of ListingFilters
 /// with the given fields replaced by the non-null parameter values.
@@ -1404,11 +1408,19 @@ class _ListingFilters extends ListingFilters {
   return EqualUnmodifiableListView(_categories);
 }
 
-/// Areas, which is what the server offers instead of house types. The app asked for
-/// `/filters/house-types` and there is no such endpoint.
+/// Areas the server counts, parsed and no longer offered as a filter.
+///
+/// Location is asked as a place now, not picked from a list — a chip row cannot express
+/// "within two kilometres of here", and offering both would be two controls answering one
+/// question differently. Kept because the server sends it and a model that silently drops a
+/// field is harder to read than one that carries it.
  final  List<ListingChoice> _areas;
-/// Areas, which is what the server offers instead of house types. The app asked for
-/// `/filters/house-types` and there is no such endpoint.
+/// Areas the server counts, parsed and no longer offered as a filter.
+///
+/// Location is asked as a place now, not picked from a list — a chip row cannot express
+/// "within two kilometres of here", and offering both would be two controls answering one
+/// question differently. Kept because the server sends it and a model that silently drops a
+/// field is harder to read than one that carries it.
 @override@JsonKey() List<ListingChoice> get areas {
   if (_areas is EqualUnmodifiableListView) return _areas;
   // ignore: implicit_dynamic_type

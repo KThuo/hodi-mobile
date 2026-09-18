@@ -283,7 +283,6 @@ class _MoreFiltersState extends ConsumerState<_MoreFilters> {
   late final TextEditingController _minBaths;
 
   String? _category;
-  String? _area;
   late bool _dsq;
   late bool _parking;
 
@@ -295,7 +294,6 @@ class _MoreFiltersState extends ConsumerState<_MoreFilters> {
     _maxRent = TextEditingController(text: _plain(s.maxRent));
     _minBaths = TextEditingController(text: s.minBathrooms?.toString() ?? '');
     _category = s.category;
-    _area = s.area;
     _dsq = s.dsq;
     _parking = s.parking;
   }
@@ -320,7 +318,6 @@ class _MoreFiltersState extends ConsumerState<_MoreFilters> {
       _maxRent.clear();
       _minBaths.clear();
       _category = null;
-      _area = null;
       _dsq = false;
       _parking = false;
     });
@@ -330,7 +327,6 @@ class _MoreFiltersState extends ConsumerState<_MoreFilters> {
     Navigator.of(context).pop();
     ref.read(vacantHouseListProvider.notifier).applyMore(
           category: _category,
-          area: _area,
           minBathrooms: int.tryParse(_minBaths.text.trim()),
           minRent: double.tryParse(_minRent.text.trim()),
           maxRent: double.tryParse(_maxRent.text.trim()),
@@ -354,19 +350,6 @@ class _MoreFiltersState extends ConsumerState<_MoreFilters> {
               choices: filters.categories,
               selected: _category,
               onSelect: (v) => setState(() => _category = v),
-            ),
-          ),
-        // Only where there is no pin. With a point chosen the radius is the location filter, and
-        // two ways to ask the same question disagree with each other.
-        if (filters != null &&
-            filters.areas.isNotEmpty &&
-            !widget.state.pinned)
-          FilterField(
-            label: 'Area',
-            child: _Choices(
-              choices: filters.areas,
-              selected: _area,
-              onSelect: (v) => setState(() => _area = v),
             ),
           ),
         FilterField(

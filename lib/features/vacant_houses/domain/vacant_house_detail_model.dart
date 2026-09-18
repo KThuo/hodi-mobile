@@ -177,8 +177,12 @@ abstract class ListingFilters with _$ListingFilters {
   const factory ListingFilters({
     @Default(<ListingChoice>[]) List<ListingChoice> categories,
 
-    /// Areas, which is what the server offers instead of house types. The app asked for
-    /// `/filters/house-types` and there is no such endpoint.
+    /// Areas the server counts, parsed and no longer offered as a filter.
+    ///
+    /// Location is asked as a place now, not picked from a list — a chip row cannot express
+    /// "within two kilometres of here", and offering both would be two controls answering one
+    /// question differently. Kept because the server sends it and a model that silently drops a
+    /// field is harder to read than one that carries it.
     @Default(<ListingChoice>[]) List<ListingChoice> areas,
     @JsonKey(fromJson: parseDoubleNullable) double? minRent,
     @JsonKey(fromJson: parseDoubleNullable) double? maxRent,

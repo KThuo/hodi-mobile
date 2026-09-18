@@ -44,7 +44,6 @@ class VacantHouseListState {
   final String? error;
   final String? searchTerm;
   final String? category;
-  final String? area;
 
   /// "2+ beds". The server filters on a minimum rather than an exact count, which is what
   /// somebody looking for a place actually means — nobody turns down a three-bedroom because
@@ -76,7 +75,6 @@ class VacantHouseListState {
     this.error,
     this.searchTerm,
     this.category,
-    this.area,
     this.minBedrooms,
     this.minBathrooms,
     this.minRent,
@@ -101,7 +99,6 @@ class VacantHouseListState {
         dsq ? true : null,
         parking ? true : null,
         category,
-        area,
       ].whereType<Object>().length;
 
   /// Everything a "Clear" would undo — which is what the web counts, the pin included.
@@ -119,7 +116,6 @@ class VacantHouseListState {
     String? error,
     String? searchTerm,
     String? Function()? category,
-    String? Function()? area,
     int? Function()? minBedrooms,
     int? Function()? minBathrooms,
     double? Function()? minRent,
@@ -140,7 +136,6 @@ class VacantHouseListState {
       error: error,
       searchTerm: searchTerm ?? this.searchTerm,
       category: category != null ? category() : this.category,
-      area: area != null ? area() : this.area,
       minBedrooms: minBedrooms != null ? minBedrooms() : this.minBedrooms,
       minBathrooms: minBathrooms != null ? minBathrooms() : this.minBathrooms,
       minRent: minRent != null ? minRent() : this.minRent,
@@ -169,7 +164,6 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
     final response = await _repository.searchVacantHouses(
       page: page,
       category: state.category,
-      area: state.area,
       minBedrooms: state.minBedrooms,
       minBathrooms: state.minBathrooms,
       minRent: state.minRent,
@@ -231,16 +225,6 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
     await _fetchPage(0);
   }
 
-  Future<void> filterByArea(String? area) async {
-    state = state.copyWith(
-      houses: const [],
-      isLoading: true,
-      area: () => area,
-      currentPage: 0,
-    );
-    await _fetchPage(0);
-  }
-
   Future<void> filterByBedrooms(int? minBedrooms) async {
     state = state.copyWith(
       houses: const [],
@@ -257,7 +241,6 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
   /// things changed would fire four searches and show the answer to the third.
   Future<void> applyMore({
     required String? category,
-    required String? area,
     required int? minBathrooms,
     required double? minRent,
     required double? maxRent,
@@ -268,7 +251,6 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
       houses: const [],
       isLoading: true,
       category: () => category,
-      area: () => area,
       minBathrooms: () => minBathrooms,
       minRent: () => minRent,
       maxRent: () => maxRent,
@@ -330,7 +312,6 @@ class VacantHouseListNotifier extends Notifier<VacantHouseListState> {
       houses: const [],
       isLoading: true,
       category: () => null,
-      area: () => null,
       minBedrooms: () => null,
       minBathrooms: () => null,
       minRent: () => null,
