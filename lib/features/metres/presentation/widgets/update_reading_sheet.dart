@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/hodi_colors.dart';
 import '../../../../core/theme/hodi_text_styles.dart';
-import '../../../../core/utils/image_helper.dart';
 import '../../../../core/utils/ocr_helper.dart';
 import '../../../../core/widgets/hodi_text_field.dart';
 import '../../../../core/widgets/hodi_gradient_button.dart';
 import '../../domain/metre_model.dart';
 import '../../providers/metre_providers.dart';
+import 'reading_camera_screen.dart';
 import 'reading_frame_screen.dart';
 
 class UpdateReadingSheet extends ConsumerStatefulWidget {
@@ -57,38 +57,48 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
    * reading to be typed, which is what somebody does when the light is bad anyway.
    */
   Future<void> _captureImage() async {
-    final file = await ImageHelper.captureFromCamera();
-    if (file == null || !mounted) return;
-
-    setState(() => _capturedImage = file);
-
-    final crop = await Navigator.of(context).push<File>(
+    final shot = await Navigator.of(context).push<ReadingShot>(
       MaterialPageRoute(
-        builder: (_) => ReadingFrameScreen(photo: file),
+        builder: (_) => const ReadingCameraScreen(),
         fullscreenDialog: true,
       ),
     );
-    if (!mounted || crop == null) return;
+    if (shot == null || !mounted) return;
 
+    setState(() => _capturedImage = shot.photo);
+    await _read(shot.crop, allowAdjust: true);
+  }
+
+  /// Reads a cropped strip, and offers the adjust screen when it finds nothing.
+  ///
+  /// The viewfinder frames at capture time, which is the right place and handles the common case in
+  /// one aim. It cannot handle every case: a meter behind glass in a dark cupboard is fiddly enough
+  /// that "move the photograph a little" is a better answer than "go back and take it again", and
+  /// by then the person has usually walked away from the wall.
+  ///
+  /// So the adjust screen stays, demoted to where it earns its place. Offered once — [allowAdjust]
+  /// is false on the way back from it, because a second identical offer is a loop.
+  Future<void> _read(File crop, {required bool allowAdjust}) async {
     setState(() => _isProcessingImage = true);
 
     try {
       final ocrText = await OcrHelper.recognizeText(crop);
-
       if (!mounted) return;
-
       setState(() => _isProcessingImage = false);
 
-      if (ocrText != null) {
-        final reading = OcrHelper.extractReading(ocrText, widget.metre.currentReading);
-        if (reading != null) {
-          _readingController.text = reading;
-          setState(() {});
-        } else {
-          _showToast('No number in the frame. Try framing just the dials.');
-        }
+      final reading = ocrText == null
+          ? null
+          : OcrHelper.extractReading(ocrText, widget.metre.currentReading);
+
+      if (reading != null) {
+        _readingController.text = reading;
+        setState(() {});
+        return;
+      }
+      if (allowAdjust) {
+        await _adjust();
       } else {
-        _showToast('No number in the frame. Try framing just the dials.');
+        _showToast('No number in the frame. Type the reading instead.');
       }
     } catch (_) {
       if (!mounted) return;
@@ -100,6 +110,23 @@ class _UpdateReadingSheetState extends ConsumerState<UpdateReadingSheet> {
         await crop.delete();
       } catch (_) {}
     }
+  }
+
+  /// The photograph under a movable frame, for when the aim was close but not close enough.
+  Future<void> _adjust() async {
+    final photo = _capturedImage;
+    if (photo == null) return;
+
+    final crop = await Navigator.of(context).push<File>(
+      MaterialPageRoute(
+        builder: (_) => ReadingFrameScreen(photo: photo),
+        fullscreenDialog: true,
+      ),
+    );
+    // Backing out keeps the photograph and leaves the reading to be typed, which is what somebody
+    // does when the light is bad anyway.
+    if (crop == null || !mounted) return;
+    await _read(crop, allowAdjust: false);
   }
 
   void _removeImage() {

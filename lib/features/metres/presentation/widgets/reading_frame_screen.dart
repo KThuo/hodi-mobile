@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/hodi_colors.dart';
 import '../../../../core/theme/hodi_text_styles.dart';
 import '../../../../core/utils/image_crop.dart';
+import 'reading_band.dart';
 
 /// Where the reading goes — and, because of that, what gets read.
 ///
@@ -86,21 +87,9 @@ class _ReadingFrameScreenState extends State<ReadingFrameScreen> {
 
   /// The band, in the coordinates of the displayed photograph.
   ///
-  /// Meters read left to right along one row, so the band is wide and shallow — shaped like the
-  /// thing being read, which is most of what tells somebody what to put in it.
-  static Rect _bandIn(Size viewport) {
-    final width = viewport.width * 0.86;
-    // Wide and shallow, but never taller than a fair share of a short viewport — a photograph
-    // wider than the screen leaves very little height, and a band that outgrew it would be a frame
-    // you cannot aim.
-    final ceiling = viewport.height * 0.45;
-    final height = (width / 3.4).clamp(ceiling < 56 ? ceiling : 56.0, ceiling);
-    return Rect.fromCenter(
-      center: Offset(viewport.width / 2, viewport.height / 2),
-      width: width,
-      height: height,
-    );
-  }
+  /// Shared with the viewfinder rather than defined twice: if the two disagreed, somebody would
+  /// line the dials up inside one rectangle on the camera and a different rectangle would be read.
+  static Rect _bandIn(Size viewport) => ReadingBand.of(viewport);
 
   Future<void> _useFraming() async {
     final image = _decoded;

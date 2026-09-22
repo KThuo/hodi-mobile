@@ -48,7 +48,6 @@ dependencies:
   intl: ^0.20.2
 
   # Camera & OCR
-  image_picker: ^1.2.1
   google_mlkit_text_recognition: ^0.15.1
 
   # Models
@@ -63,6 +62,7 @@ dependencies:
   package_info_plus: ^9.0.0
   url_launcher: ^6.3.2
   printing: ^5.15.0
+  camera: ^0.12.1
 
 dev_dependencies:
   flutter_test:
