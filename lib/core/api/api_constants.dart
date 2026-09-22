@@ -182,6 +182,17 @@ abstract class ApiConstants {
   /// downloads it — on a laptop or on a handset — gets the same document**, because it is the
   /// same page with the same Download button. A server PDF would be a second document, and a
   /// Flutter template would be a third.
+  /// Confirming a slip a payer is holding, against the invoice they are paying.
+  ///
+  /// Keyed on the invoice rather than on an account: the server takes the estate from the bill, so
+  /// nobody has to be asked which of an estate's accounts the money went into — a question whose
+  /// answer was discarded whenever the credit had already arrived by notification.
+  ///
+  /// Confirming writes the credit. There is no payment to post afterwards.
+  static String validateSlip(String invoiceRrn, String reference) =>
+      '$apiPrefix/statements/validate-slip/'
+      '${Uri.encodeComponent(invoiceRrn)}/${Uri.encodeComponent(reference)}';
+
   static String webInvoiceUrl(String rrn) => '$baseUrl/invoices/detail/$rrn';
 
   // ── Leases ────────────────────────────────────────────────────────────────

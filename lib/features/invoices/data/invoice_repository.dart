@@ -6,6 +6,7 @@ import '../../../core/utils/pdf_downloader.dart';
 import '../domain/invoice_model.dart';
 import '../domain/billing_period.dart';
 import '../domain/invoice_detail_model.dart';
+import '../domain/slip_result_model.dart';
 import '../domain/invoice_document_model.dart';
 import '../domain/payment_type_model.dart';
 
@@ -127,6 +128,18 @@ class InvoiceRepository {
   /// so a document downloaded from a handset and one downloaded from a laptop are the same
   /// document, produced by the same code. That consistency is the reason this is the web page and
   /// not the server's `invoice.pdf`: two renderers would be two documents, however close.
+  /// Asks the bank about a reference. Answers either way — an unconfirmed slip is an answer, not
+  /// an error — so the caller reads [SlipResultModel.valid] rather than catching.
+  Future<ApiResponse<SlipResultModel>> validateSlip({
+    required String invoiceRrn,
+    required String reference,
+  }) async {
+    return _apiClient.get<SlipResultModel>(
+      ApiConstants.validateSlip(invoiceRrn, reference),
+      fromJsonT: (data) => SlipResultModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
   String webInvoiceUrl(String rrn) => ApiConstants.webInvoiceUrl(rrn);
 
   Future<void> downloadInvoicePdf(String rrn) async {

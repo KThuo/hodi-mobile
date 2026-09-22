@@ -9,6 +9,7 @@ import '../../../../core/widgets/hodi_text_field.dart';
 import '../../../../core/widgets/hodi_gradient_button.dart';
 import '../../domain/invoice_detail_model.dart';
 import '../../domain/payment_type_model.dart';
+import '../../domain/slip_result_model.dart';
 import '../../providers/invoice_providers.dart';
 import '../../../payments/providers/after_payment.dart';
 
@@ -35,6 +36,9 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
   PaymentTypeModel? _selectedType;
   bool _isLoadingTypes = true;
   bool _isSubmitting = false;
+  bool _checkingSlip = false;
+  String? _slipError;
+  SlipResultModel? _slip;
   String? _typesError;
 
   @override
@@ -92,6 +96,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
     if (response.isSuccess && response.data != null && response.data!.isNotEmpty) {
       setState(() {
         _paymentTypes = response.data!;
+        _paymentTypes = _oneSlipOption(_paymentTypes);
         _selectedType = _paymentTypes.first;
         _isLoadingTypes = false;
       });
@@ -104,6 +109,70 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
       });
     }
   }
+
+  /// Every inbound channel, as one option.
+  ///
+  /// A paybill, a till and a bank account are all "quote a reference and we will find it", and an
+  /// estate with three of them wants one form with one reference box, not three chips leading to
+  /// the same field. The web collapses them for the same reason; this screen did not, so three
+  /// configured accounts were three chips a payer had to choose between for no purpose.
+  ///
+  /// Which one it turned out to be is established by confirming the reference, not by the choice.
+  List<PaymentTypeModel> _oneSlipOption(List<PaymentTypeModel> all) {
+    final inbound = all.where((t) => t.renderAs == 'VALIDATE').toList();
+    if (inbound.length < 2) return all;
+
+    return [
+      ...all.where((t) => t.renderAs != 'VALIDATE'),
+      // Named for what it is rather than after whichever account happened to be first.
+      inbound.first.copyWith(name: 'Bank slip', bankName: null, bankLogoUrl: null),
+    ];
+  }
+
+  /// Confirms the reference. On success the credit is written and there is nothing left to post.
+  Future<void> _confirmSlip() async {
+    final reference = _refNoController.text.trim();
+    if (reference.length < 6) {
+      setState(() => _slipError = 'A bank reference is at least six characters.');
+      return;
+    }
+
+    setState(() {
+      _checkingSlip = true;
+      _slipError = null;
+      _slip = null;
+    });
+
+    final response = await ref.read(invoiceRepositoryProvider).validateSlip(
+          invoiceRrn: widget.invoice.rrn ?? '',
+          reference: reference,
+        );
+    if (!mounted) return;
+
+    final result = response.data;
+    setState(() {
+      _checkingSlip = false;
+      if (result != null && result.valid) {
+        _slip = result;
+      } else {
+        _slipError = result?.message.isNotEmpty == true
+            ? result!.message
+            : (response.message.isNotEmpty
+                ? response.message
+                : 'That reference could not be confirmed.');
+      }
+    });
+
+    if (_slip != null) {
+      // Confirming is the record. The estate applies it from its statements screen.
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Confirmed. The office will apply it to your account.'),
+      ));
+    }
+  }
+
+  bool get _isSlip => _selectedType?.renderAs == 'VALIDATE';
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate() || _selectedType == null) return;
@@ -312,7 +381,10 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
           ),
           const SizedBox(height: 20),
 
-          // Common fields
+          // A slip takes neither of these. The amount is the bank's, and who paid comes off the
+          // credit itself — asking for them would be asking somebody to assert what the bank is
+          // about to confirm.
+          if (!_isSlip) ...[
           HodiTextField(
             controller: _amountController,
             labelText: 'Amount *',
@@ -341,6 +413,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
             },
           ),
           const SizedBox(height: 14),
+          ],
 
           // Cheque-specific fields
           // Which fields a method needs comes from `renderAs` now, not from a type id the app had
@@ -388,21 +461,35 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
             const SizedBox(height: 14),
           ],
 
-          // Bank slip-specific fields
-          if (_selectedType?.renderAs == 'VALIDATE') ...[
+          // A slip somebody is holding.
+          //
+          // One reference, and the bank settles the rest: the amount, who paid, and which channel
+          // it came through. Confirming writes the credit, so there is nothing to submit after it
+          // and the button below is hidden.
+          if (_isSlip) ...[
             HodiTextField(
               controller: _refNoController,
-              labelText: 'Slip Reference *',
-              hintText: 'Enter slip reference number',
+              labelText: 'Reference from your bank *',
+              hintText: 'The code on your M-PESA message or bank confirmation',
               prefixIcon: Icons.tag,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Reference number is required';
-                }
-                return null;
+              onChanged: (_) {
+                if (_slipError != null) setState(() => _slipError = null);
               },
             ),
-            const SizedBox(height: 14),
+            if (_slipError != null) ...[
+              const SizedBox(height: 8),
+              Text(_slipError!,
+                  style: HodiTextStyles.bodySmall
+                      .copyWith(color: HodiColors.errorStart)),
+            ],
+            const SizedBox(height: 16),
+            HodiGradientButton(
+              text: _checkingSlip ? 'Checking with the bank…' : 'Confirm the reference',
+              icon: Icons.verified_outlined,
+              isLoading: _checkingSlip,
+              onPressed: _checkingSlip ? null : _confirmSlip,
+            ),
+            const SizedBox(height: 24),
           ],
 
           // Bank deposit-specific fields
@@ -423,6 +510,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
             const SizedBox(height: 14),
           ],
 
+          if (!_isSlip) ...[
           HodiTextField(
             controller: _descriptionController,
             labelText: 'Description',
@@ -439,6 +527,7 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
             onPressed: _isSubmitting ? null : _submit,
           ),
           const SizedBox(height: 24),
+          ],
         ],
       ),
     );
