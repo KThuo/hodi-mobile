@@ -120,11 +120,14 @@ class _MakePaymentSheetState extends ConsumerState<MakePaymentSheet> {
   /// Which one it turned out to be is established by confirming the reference, not by the choice.
   List<PaymentTypeModel> _oneSlipOption(List<PaymentTypeModel> all) {
     final inbound = all.where((t) => t.renderAs == 'VALIDATE').toList();
-    if (inbound.length < 2) return all;
+    if (inbound.isEmpty) return all;
 
     return [
       ...all.where((t) => t.renderAs != 'VALIDATE'),
-      // Named for what it is rather than after whichever account happened to be first.
+      // Named for what it is, and named that whether there is one account behind it or six.
+      // Wearing the account's own name where an estate happened to have exactly one meant the
+      // same step read "KCB Till" on one estate and "Bank slip" on the next, for a payer doing
+      // the identical thing either way: quoting a reference.
       inbound.first.copyWith(name: 'Bank slip', bankName: null, bankLogoUrl: null),
     ];
   }

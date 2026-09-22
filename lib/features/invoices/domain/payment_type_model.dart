@@ -46,6 +46,11 @@ abstract class PaymentTypeModel with _$PaymentTypeModel {
   /// Shown rather than collected: the payer sends money themselves and quotes the account.
   bool get isTransfer => renderAs == 'TRANSFER' || renderAs == 'VALIDATE';
 
+  /// A glyph for the channel, chosen by what it is rather than by which bank is behind it.
+  ///
+  /// Cash, a cheque and a bank slip belong to no bank — the first two by nature, the slip because
+  /// the one option stands for every inbound account at once — so a logo would be wrong for all
+  /// three even where one existed.
   IconData get icon {
     switch (renderAs) {
       case 'STK':
@@ -55,8 +60,10 @@ abstract class PaymentTypeModel with _$PaymentTypeModel {
       case 'CHEQUE':
         return Icons.receipt_long_outlined;
       case 'VALIDATE':
-      case 'TRANSFER':
+        // A bank building: the money is already at one, and this is the slip proving it.
         return Icons.account_balance_outlined;
+      case 'TRANSFER':
+        return Icons.swap_horiz;
       default:
         return Icons.credit_card;
     }
