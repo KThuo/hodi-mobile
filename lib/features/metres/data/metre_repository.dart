@@ -46,25 +46,23 @@ class MetreRepository {
     );
   }
 
-  Future<ApiResponse<PagedResponse<MetreHistoryModel>>> getMetreHistory({
-    int page = 0,
-    int pageSize = 20,
+  /// One year of a meter's readings.
+  ///
+  /// Not paged, and it never was: the server answers a `ReadingHistory` — a year, the years there
+  /// are to choose from, and the rows for that year. Parsing it as a page looked for a `content`
+  /// key that is not there, so every history came back empty.
+  ///
+  /// `page`, `pageSize` and `searchTerm` went with it. The endpoint takes `year` and nothing else,
+  /// and an unknown query parameter is ignored rather than refused — which is why sending three of
+  /// them looked like it was working.
+  Future<ApiResponse<MetreHistoryPage>> getMetreHistory({
     required String metreId,
     int? year,
-    String? searchTerm,
   }) async {
-    return _apiClient.get<PagedResponse<MetreHistoryModel>>(
+    return _apiClient.get<MetreHistoryPage>(
       ApiConstants.meterReadings(metreId),
-      queryParameters: {
-        'page': page,
-        'pageSize': pageSize,
-        'year': ?year,
-        if (searchTerm != null && searchTerm.isNotEmpty) 'searchTerm': searchTerm,
-      },
-      fromJsonT: (data) => PagedResponse.fromJson(
-        data as Map<String, dynamic>,
-        (item) => MetreHistoryModel.fromJson(item),
-      ),
+      queryParameters: {'year': ?year},
+      fromJsonT: (data) => MetreHistoryPage.fromJson(data as Map<String, dynamic>),
     );
   }
 

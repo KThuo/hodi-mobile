@@ -134,18 +134,26 @@ class MetreHistoryState {
   final String? searchTerm;
   final int year;
 
+  /// The years this meter has readings in, newest first, from the same reply as the rows.
+  ///
+  /// Together on purpose: fetched separately, the picker can offer a year the rows call empty, or
+  /// hold one back while rows for it are already on screen.
+  final List<int> years;
+
   MetreHistoryState({
     this.histories = const [],
     this.isLoading = false,
-    this.hasMore = true,
+    this.hasMore = false,
     this.currentPage = 0,
     this.error,
     this.searchTerm,
+    this.years = const [],
     int? year,
   }) : year = year ?? DateTime.now().year;
 
   MetreHistoryState copyWith({
     List<MetreHistoryModel>? histories,
+    List<int>? years,
     bool? isLoading,
     bool? hasMore,
     int? currentPage,
@@ -161,6 +169,7 @@ class MetreHistoryState {
       error: error,
       searchTerm: searchTerm ?? this.searchTerm,
       year: year ?? this.year,
+      years: years ?? this.years,
     );
   }
 }
@@ -180,7 +189,7 @@ class MetreHistoryNotifier extends Notifier<MetreHistoryState> {
   MetreHistoryState build() {
     final metreId = ref.watch(selectedMetreIdProvider);
     if (metreId.isNotEmpty) {
-      Future.microtask(() => _fetchPage(0));
+      Future.microtask(_fetch);
       return MetreHistoryState(isLoading: true);
     }
     return MetreHistoryState();
@@ -189,21 +198,28 @@ class MetreHistoryNotifier extends Notifier<MetreHistoryState> {
   MetreRepository get _repository => ref.read(metreRepositoryProvider);
   String get _metreId => ref.read(selectedMetreIdProvider);
 
-  Future<void> _fetchPage(int page) async {
+  /// One year at a time, which is what the endpoint answers.
+  ///
+  /// It used to ask for a page and read `content` off the reply. The server sends a
+  /// `ReadingHistory` — a year, the years available and the rows — so the parse found nothing and
+  /// every history screen was empty. There are no pages here to scroll: a meter is read once a
+  /// month, so a year is twelve rows.
+  Future<void> _fetch() async {
     final response = await _repository.getMetreHistory(
-      page: page,
       metreId: _metreId,
       year: state.year,
-      searchTerm: state.searchTerm,
     );
 
     if (response.isSuccess && response.data != null) {
-      final paged = response.data!;
+      final page = response.data!;
       state = state.copyWith(
-        histories: page == 0 ? paged.content : [...state.histories, ...paged.content],
+        histories: page.readings,
         isLoading: false,
-        hasMore: paged.hasMore,
-        currentPage: page,
+        hasMore: false,
+        year: page.year,
+        // The years the picker offers, from the same reply as the rows, so it cannot offer one the
+        // rows call empty.
+        years: page.years,
       );
     } else {
       state = state.copyWith(
@@ -213,15 +229,9 @@ class MetreHistoryNotifier extends Notifier<MetreHistoryState> {
     }
   }
 
-  Future<void> loadMore() async {
-    if (state.isLoading || !state.hasMore) return;
-    state = state.copyWith(isLoading: true);
-    await _fetchPage(state.currentPage + 1);
-  }
-
   Future<void> refresh() async {
     state = state.copyWith(isLoading: true, error: null);
-    await _fetchPage(0);
+    await _fetch();
   }
 
   Future<void> search(String term) async {
@@ -230,7 +240,7 @@ class MetreHistoryNotifier extends Notifier<MetreHistoryState> {
       searchTerm: term,
       year: state.year,
     );
-    await _fetchPage(0);
+    await _fetch();
   }
 
   Future<void> filterByYear(int year) async {
@@ -239,7 +249,7 @@ class MetreHistoryNotifier extends Notifier<MetreHistoryState> {
       searchTerm: state.searchTerm,
       year: year,
     );
-    await _fetchPage(0);
+    await _fetch();
   }
 }
 

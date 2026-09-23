@@ -51,3 +51,27 @@ Map<String, dynamic> _$MetreHistoryModelToJson(_MetreHistoryModel instance) =>
       'billed': instance.billed,
       'hasPhoto': instance.hasPhoto,
     };
+
+_MetreHistoryPage _$MetreHistoryPageFromJson(Map<String, dynamic> json) =>
+    _MetreHistoryPage(
+      year: (json['year'] as num?)?.toInt() ?? 0,
+      years:
+          (json['years'] as List<dynamic>?)
+              ?.map((e) => (e as num).toInt())
+              .toList() ??
+          const <int>[],
+      readings:
+          (json['readings'] as List<dynamic>?)
+              ?.map(
+                (e) => MetreHistoryModel.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const <MetreHistoryModel>[],
+    );
+
+Map<String, dynamic> _$MetreHistoryPageToJson(_MetreHistoryPage instance) =>
+    <String, dynamic>{
+      'year': instance.year,
+      'years': instance.years,
+      'readings': instance.readings,
+    };

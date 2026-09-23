@@ -61,3 +61,34 @@ abstract class MetreHistoryModel with _$MetreHistoryModel {
         ' × ${rate.toStringAsFixed(2)}';
   }
 }
+
+/// One year of a meter's readings, and the years there are to choose from.
+///
+/// ## Why this exists
+///
+/// The screen parsed the reply as a `PagedResponse`, looking for `content`, `number` and
+/// `totalElements`. The server sends none of those: `GET /meters/{id}/readings` answers a
+/// `ReadingHistory` — a year, the years available, and the rows. So the parse found no `content`,
+/// produced an empty list, and the history screen showed nothing at all while the readings were
+/// sitting in the reply.
+///
+/// The two are together in one response deliberately, and the server's own note says why: fetched
+/// separately, a year can be offered that the rows call empty, or held back while rows for it are
+/// already on screen.
+@freezed
+abstract class MetreHistoryPage with _$MetreHistoryPage {
+  const MetreHistoryPage._();
+
+  const factory MetreHistoryPage({
+    /// The year these readings are for — the one asked for, or the current one.
+    @Default(0) int year,
+
+    /// Every year this meter has a reading in, newest first. May not contain [year], which is why
+    /// the picker shows the current year whether or not anything was read in it.
+    @Default(<int>[]) List<int> years,
+    @Default(<MetreHistoryModel>[]) List<MetreHistoryModel> readings,
+  }) = _MetreHistoryPage;
+
+  factory MetreHistoryPage.fromJson(Map<String, dynamic> json) =>
+      _$MetreHistoryPageFromJson(json);
+}

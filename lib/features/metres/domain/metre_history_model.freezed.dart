@@ -329,4 +329,293 @@ as bool,
 
 }
 
+
+/// @nodoc
+mixin _$MetreHistoryPage {
+
+/// The year these readings are for — the one asked for, or the current one.
+ int get year;/// Every year this meter has a reading in, newest first. May not contain [year], which is why
+/// the picker shows the current year whether or not anything was read in it.
+ List<int> get years; List<MetreHistoryModel> get readings;
+/// Create a copy of MetreHistoryPage
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MetreHistoryPageCopyWith<MetreHistoryPage> get copyWith => _$MetreHistoryPageCopyWithImpl<MetreHistoryPage>(this as MetreHistoryPage, _$identity);
+
+  /// Serializes this MetreHistoryPage to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MetreHistoryPage&&(identical(other.year, year) || other.year == year)&&const DeepCollectionEquality().equals(other.years, years)&&const DeepCollectionEquality().equals(other.readings, readings));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,year,const DeepCollectionEquality().hash(years),const DeepCollectionEquality().hash(readings));
+
+@override
+String toString() {
+  return 'MetreHistoryPage(year: $year, years: $years, readings: $readings)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MetreHistoryPageCopyWith<$Res>  {
+  factory $MetreHistoryPageCopyWith(MetreHistoryPage value, $Res Function(MetreHistoryPage) _then) = _$MetreHistoryPageCopyWithImpl;
+@useResult
+$Res call({
+ int year, List<int> years, List<MetreHistoryModel> readings
+});
+
+
+
+
+}
+/// @nodoc
+class _$MetreHistoryPageCopyWithImpl<$Res>
+    implements $MetreHistoryPageCopyWith<$Res> {
+  _$MetreHistoryPageCopyWithImpl(this._self, this._then);
+
+  final MetreHistoryPage _self;
+  final $Res Function(MetreHistoryPage) _then;
+
+/// Create a copy of MetreHistoryPage
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? year = null,Object? years = null,Object? readings = null,}) {
+  return _then(_self.copyWith(
+year: null == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
+as int,years: null == years ? _self.years : years // ignore: cast_nullable_to_non_nullable
+as List<int>,readings: null == readings ? _self.readings : readings // ignore: cast_nullable_to_non_nullable
+as List<MetreHistoryModel>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [MetreHistoryPage].
+extension MetreHistoryPagePatterns on MetreHistoryPage {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MetreHistoryPage value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _MetreHistoryPage() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MetreHistoryPage value)  $default,){
+final _that = this;
+switch (_that) {
+case _MetreHistoryPage():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MetreHistoryPage value)?  $default,){
+final _that = this;
+switch (_that) {
+case _MetreHistoryPage() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int year,  List<int> years,  List<MetreHistoryModel> readings)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _MetreHistoryPage() when $default != null:
+return $default(_that.year,_that.years,_that.readings);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int year,  List<int> years,  List<MetreHistoryModel> readings)  $default,) {final _that = this;
+switch (_that) {
+case _MetreHistoryPage():
+return $default(_that.year,_that.years,_that.readings);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int year,  List<int> years,  List<MetreHistoryModel> readings)?  $default,) {final _that = this;
+switch (_that) {
+case _MetreHistoryPage() when $default != null:
+return $default(_that.year,_that.years,_that.readings);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _MetreHistoryPage extends MetreHistoryPage {
+  const _MetreHistoryPage({this.year = 0, final  List<int> years = const <int>[], final  List<MetreHistoryModel> readings = const <MetreHistoryModel>[]}): _years = years,_readings = readings,super._();
+  factory _MetreHistoryPage.fromJson(Map<String, dynamic> json) => _$MetreHistoryPageFromJson(json);
+
+/// The year these readings are for — the one asked for, or the current one.
+@override@JsonKey() final  int year;
+/// Every year this meter has a reading in, newest first. May not contain [year], which is why
+/// the picker shows the current year whether or not anything was read in it.
+ final  List<int> _years;
+/// Every year this meter has a reading in, newest first. May not contain [year], which is why
+/// the picker shows the current year whether or not anything was read in it.
+@override@JsonKey() List<int> get years {
+  if (_years is EqualUnmodifiableListView) return _years;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_years);
+}
+
+ final  List<MetreHistoryModel> _readings;
+@override@JsonKey() List<MetreHistoryModel> get readings {
+  if (_readings is EqualUnmodifiableListView) return _readings;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_readings);
+}
+
+
+/// Create a copy of MetreHistoryPage
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MetreHistoryPageCopyWith<_MetreHistoryPage> get copyWith => __$MetreHistoryPageCopyWithImpl<_MetreHistoryPage>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MetreHistoryPageToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MetreHistoryPage&&(identical(other.year, year) || other.year == year)&&const DeepCollectionEquality().equals(other._years, _years)&&const DeepCollectionEquality().equals(other._readings, _readings));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,year,const DeepCollectionEquality().hash(_years),const DeepCollectionEquality().hash(_readings));
+
+@override
+String toString() {
+  return 'MetreHistoryPage(year: $year, years: $years, readings: $readings)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MetreHistoryPageCopyWith<$Res> implements $MetreHistoryPageCopyWith<$Res> {
+  factory _$MetreHistoryPageCopyWith(_MetreHistoryPage value, $Res Function(_MetreHistoryPage) _then) = __$MetreHistoryPageCopyWithImpl;
+@override @useResult
+$Res call({
+ int year, List<int> years, List<MetreHistoryModel> readings
+});
+
+
+
+
+}
+/// @nodoc
+class __$MetreHistoryPageCopyWithImpl<$Res>
+    implements _$MetreHistoryPageCopyWith<$Res> {
+  __$MetreHistoryPageCopyWithImpl(this._self, this._then);
+
+  final _MetreHistoryPage _self;
+  final $Res Function(_MetreHistoryPage) _then;
+
+/// Create a copy of MetreHistoryPage
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? year = null,Object? years = null,Object? readings = null,}) {
+  return _then(_MetreHistoryPage(
+year: null == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
+as int,years: null == years ? _self._years : years // ignore: cast_nullable_to_non_nullable
+as List<int>,readings: null == readings ? _self._readings : readings // ignore: cast_nullable_to_non_nullable
+as List<MetreHistoryModel>,
+  ));
+}
+
+
+}
+
 // dart format on

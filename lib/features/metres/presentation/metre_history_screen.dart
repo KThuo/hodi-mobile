@@ -34,7 +34,8 @@ class _MetreHistoryScreenState extends ConsumerState<MetreHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
+    // No scroll listener: a year of readings is twelve rows, because a meter is read once a month.
+    // The endpoint answers a whole year at a time and there is no next page to fetch.
     // Set the selected metre ID so the history notifier can fetch data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(selectedMetreIdProvider.notifier).set(widget.metreId);
@@ -46,12 +47,6 @@ class _MetreHistoryScreenState extends ConsumerState<MetreHistoryScreen> {
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      ref.read(metreHistoryProvider.notifier).loadMore();
-    }
   }
 
   bool get _canUpdateReading {
@@ -76,10 +71,19 @@ class _MetreHistoryScreenState extends ConsumerState<MetreHistoryScreen> {
     );
   }
 
-  List<int> get _yearOptions {
-    final currentYear = DateTime.now().year;
-    final count = currentYear - 2025 + 1;
-    return List.generate(count, (i) => currentYear - i);
+  /// The years this meter actually has readings in, as the server reports them.
+  ///
+  /// It used to count back to a hardcoded 2025, which offers years a meter installed last month was
+  /// never read in and silently stops working the year somebody backdates a reading to 2024. The
+  /// server sends the real list beside the rows, for exactly this.
+  ///
+  /// The year on screen is always included even when the server does not list it: a year with no
+  /// readings is a legitimate thing to be looking at, and it would be odd for the picker to drop
+  /// the very year it is showing.
+  List<int> _yearOptions(MetreHistoryState state) {
+    final years = {...state.years, state.year, DateTime.now().year}.toList()
+      ..sort((a, b) => b.compareTo(a));
+    return years;
   }
 
   @override
@@ -129,7 +133,7 @@ class _MetreHistoryScreenState extends ConsumerState<MetreHistoryScreen> {
                   const SizedBox(width: 8),
                   _YearDropdown(
                     selectedYear: state.year,
-                    years: _yearOptions,
+                    years: _yearOptions(state),
                     onChanged: (year) {
                       ref.read(metreHistoryProvider.notifier).filterByYear(year);
                     },
