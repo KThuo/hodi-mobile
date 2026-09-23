@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hodi_mobile/core/utils/date_formatter.dart';
 import 'package:hodi_mobile/features/metres/domain/metre_history_model.dart';
 
 void main() {
@@ -59,4 +60,50 @@ void main() {
       expect(page.years, isEmpty);
     });
   });
+
+  group('when a reading was taken', () {
+    test('reads as a plain stamp, not an ISO instant', () {
+      // The card printed `readOn` raw, so it carried 2026-09-23T13:01:22.481937Z.
+      final parsed = DateFormatter.parseApiDate('2026-09-23T13:01:22.481937Z');
+
+      expect(parsed, isNotNull);
+      expect(DateFormatter.formatStamp(parsed!.toUtc()), '2026-09-23 13:01');
+    });
+
+    test('a missing or unreadable timestamp parses to nothing', () {
+      // The card leaves the line off rather than printing the raw string.
+      expect(DateFormatter.parseApiDate(null), isNull);
+      expect(DateFormatter.parseApiDate(''), isNull);
+      expect(DateFormatter.parseApiDate('not a date'), isNull);
+    });
+  });
+
+  group('whether a reading has been billed', () {
+    test('a billed reading names its invoice', () {
+      final row = MetreHistoryModel.fromJson({
+        'billed': true,
+        'invoiceRrn': 'INV-4471',
+      });
+
+      expect(row.billed, isTrue);
+      expect(row.invoiceRrn, 'INV-4471');
+    });
+
+    test('an unbilled reading says so rather than showing nothing', () {
+      // The useful state, not an omission: the reading is recorded and the next invoice picks it
+      // up. Showing only a reference made this indistinguishable from a billed row whose
+      // reference had not come back.
+      final row = MetreHistoryModel.fromJson({'billed': false});
+
+      expect(row.billed, isFalse);
+      expect(row.invoiceRrn, isNull);
+    });
+
+    test('billed with no reference is not treated as billed on screen', () {
+      // The chip requires both, because "billed" with nothing to quote helps nobody.
+      final row = MetreHistoryModel.fromJson({'billed': true, 'invoiceRrn': ''});
+      expect(row.invoiceRrn, isEmpty);
+    });
+  });
+
 }

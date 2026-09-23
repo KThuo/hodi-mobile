@@ -7,6 +7,7 @@ abstract class DateFormatter {
   static final _monthYearFormat = DateFormat('MMMM yyyy');
   static final _apiDateFormat = DateFormat('yyyy-MM-dd');
   static final _timeFormat = DateFormat('HH:mm');
+  static final _stampFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   static String formatDate(DateTime date) => _dateFormat.format(date);
   static String formatDateTime(DateTime date) => _dateTimeFormat.format(date);
@@ -17,6 +18,13 @@ abstract class DateFormatter {
   /// Just the clock time. Needs no BuildContext, unlike `TimeOfDay.format`, which is what makes
   /// it usable from a static helper on a widget.
   static String formatTime(DateTime date) => _timeFormat.format(date);
+
+  /// `2026-09-23 13:01` — a timestamp read as a fact rather than as prose.
+  ///
+  /// For the moment a thing was recorded, where the point is precision and sorting by eye, not
+  /// reading it aloud. The server sends a full ISO instant; printing that raw put
+  /// `2026-09-23T13:01:22.481937Z` on the screen.
+  static String formatStamp(DateTime date) => _stampFormat.format(date);
 
   /// The time for something today, the date and time for anything older.
   ///

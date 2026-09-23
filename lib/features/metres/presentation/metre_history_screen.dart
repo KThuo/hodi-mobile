@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
+import '../../../core/theme/hodi_border_radius.dart';
 import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_text_styles.dart';
+import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/hodi_app_bar.dart';
 import '../../../core/widgets/hodi_search_bar.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
@@ -209,6 +211,16 @@ class _HistoryListItem extends StatelessWidget {
 
   const _HistoryListItem({required this.history, this.onTap, this.onViewPhoto});
 
+  /// When it was read, as `2026-09-23 13:01`.
+  ///
+  /// The server sends a full ISO instant and this printed it raw, so the card carried
+  /// `2026-09-23T13:01:22.481937Z`. Null where the timestamp is missing or unparseable, in which
+  /// case the line is left off rather than showing the raw string.
+  String? get _readOn {
+    final parsed = DateFormatter.parseApiDate(history.readOn);
+    return parsed == null ? null : DateFormatter.formatStamp(parsed.toLocal());
+  }
+
   @override
   Widget build(BuildContext context) {
     return HodiCard(
@@ -238,11 +250,12 @@ class _HistoryListItem extends StatelessWidget {
                   icon: Icon(Icons.photo_camera_outlined,
                       size: 18, color: HodiColors.primaryStart),
                 ),
-              if (history.invoiceRrn != null && history.invoiceRrn!.isNotEmpty)
-                Text(
-                  history.invoiceRrn!,
-                  style: HodiTextStyles.bodySmall.copyWith(color: HodiColors.primaryStart),
-                ),
+              // Whether it has been billed, said either way.
+              //
+              // Only the reference showed before, so an unbilled reading and a billed one whose
+              // reference had not come back looked the same — and "not yet billed" is the useful
+              // state, not an omission: the next invoice picks it up.
+              _BilledChip(history: history),
             ],
           ),
           const SizedBox(height: 8),
@@ -281,13 +294,14 @@ class _HistoryListItem extends StatelessWidget {
               ),
             ],
           ),
-          if (history.readOn != null) ...[
+          if (_readOn != null) ...[
             const SizedBox(height: 4),
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                history.readOn!,
-                style: HodiTextStyles.bodySmall,
+                'Read $_readOn',
+                style: HodiTextStyles.bodySmall
+                    .copyWith(color: HodiColors.textLight),
               ),
             ),
           ],
@@ -331,6 +345,52 @@ class _YearDropdown extends StatelessWidget {
             if (value != null) onChanged(value);
           },
         ),
+      ),
+    );
+  }
+}
+
+
+/// Whether a reading has been charged for, and on which invoice.
+///
+/// Said either way. Only the reference showed before, so a reading not yet billed and one whose
+/// reference had not come back looked identical — and "not yet billed" is the useful state rather
+/// than an omission: the reading is recorded and the next invoice picks it up.
+class _BilledChip extends StatelessWidget {
+  const _BilledChip({required this.history});
+
+  final MetreHistoryModel history;
+
+  @override
+  Widget build(BuildContext context) {
+    final rrn = history.invoiceRrn;
+    final billed = history.billed && rrn != null && rrn.isNotEmpty;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: billed ? HodiColors.successBg : HodiColors.warningBg,
+        borderRadius: HodiBorderRadius.full,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            billed ? Icons.receipt_long_outlined : Icons.schedule,
+            size: 11,
+            color: billed ? HodiColors.successEnd : HodiColors.warningEnd,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            // The reference is the useful half once there is one: it is what somebody quotes.
+            billed ? rrn : 'Not yet billed',
+            style: HodiTextStyles.bodySmall.copyWith(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: billed ? HodiColors.successEnd : HodiColors.warningEnd,
+            ),
+          ),
+        ],
       ),
     );
   }
