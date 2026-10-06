@@ -20,7 +20,7 @@ import '../../../core/widgets/hodi_search_bar.dart';
 import '../domain/stay_model.dart';
 import '../providers/stay_providers.dart';
 
-/// HODI BNB's public half, on the phone.
+/// The public half of HODI Stays, on the phone.
 ///
 /// Reachable without signing in — it is beside To Let on the sign-in screen for the same reason the
 /// web puts both in the public layout: somebody looking for somewhere to stay does not have an
@@ -156,7 +156,7 @@ class _StaysScreenState extends ConsumerState<StaysScreen> {
           ),
 
           const SizedBox(height: 8),
-          // Three, not four: every BNB unit in this portfolio is small, and the web stops here
+          // Three, not four: every HODI Stays unit in this portfolio is small, and the web stops here
           // for the same reason.
           BedroomPills(
             value: query.minBedrooms,

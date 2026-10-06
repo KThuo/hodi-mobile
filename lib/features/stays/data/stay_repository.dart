@@ -4,7 +4,7 @@ import '../../../core/api/api_response.dart';
 import '../domain/stay_detail_model.dart';
 import '../domain/stay_model.dart';
 
-/// The public half of HODI BNB: what is bookable, and what it would cost.
+/// The public half of HODI Stays: what is bookable, and what it would cost.
 ///
 /// No session anywhere here. Somebody looking for somewhere to stay does not have an account yet,
 /// which is the whole point of the screen — so these paths are on the server's public allowlist and

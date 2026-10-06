@@ -284,7 +284,7 @@ class _QuickStatsGrid extends StatelessWidget {
   static String _tenureLabel(String tenure) => switch (tenure) {
         'RENTAL' => 'Rental',
         'OWNED' => 'Owned',
-        'BNB' => 'Short stay',
+        'BNB' => 'HODI Stays',
         _ => tenure,
       };
 }

@@ -178,7 +178,7 @@ class _TermsCard extends StatelessWidget {
   static String _tenure(String? tenure) => switch (tenure) {
         'RENTAL' => 'Rental',
         'OWNED' => 'Owned',
-        'BNB' => 'Short stay',
+        'BNB' => 'HODI Stays',
         _ => tenure ?? '-',
       };
 }
