@@ -225,6 +225,11 @@ abstract class ApiConstants {
   // ── Reports ───────────────────────────────────────────────────────────────
   static const String reports = '$apiPrefix/reports';
 
+  // ── Analytics ── the three the dashboard's Insights section reads. The rest stay on the web.
+  static const String analyticsLeague = '$apiPrefix/analytics/tenants/league';
+  static const String analyticsProperties = '$apiPrefix/analytics/properties';
+  static const String analyticsStays = '$apiPrefix/analytics/stays';
+
   /// One property's month: what was invoiced, what arrived, what is still owed.
   ///
   /// The property detail endpoint used to carry these figures and no longer does — nothing is

@@ -19,6 +19,7 @@ import '../providers/dashboard_provider.dart';
 import 'widgets/summary_card.dart';
 import 'widgets/property_performance.dart';
 import 'widgets/cash_flow_analytics.dart';
+import '../../analytics/presentation/insights_section.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -28,6 +29,10 @@ class DashboardScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
     final isAdmin =
         ref.watch(hasPermissionProvider(AppPermissions.dashboardView));
+    // A second check rather than assuming the first implies it: the analytics endpoints ask for the
+    // report authority, and a group can hold the dashboard without it.
+    final canReadInsights =
+        isAdmin && ref.watch(hasPermissionProvider(AppPermissions.reportView));
     final overallAsync = ref.watch(overallSummaryProvider);
     final monthlyAsync = ref.watch(monthlySummaryProvider);
     final selectedMonth = ref.watch(selectedMonthProvider);
@@ -43,6 +48,7 @@ class DashboardScreen extends ConsumerWidget {
         onRefresh: () async {
           ref.invalidate(overallSummaryProvider);
           ref.invalidate(monthlySummaryProvider);
+          if (canReadInsights) refreshInsights(ref);
         },
         child: CustomScrollView(
           slivers: [
@@ -264,6 +270,14 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
             ),
+
+            if (canReadInsights) ...[
+              const SliverToBoxAdapter(child: SizedBox(height: 20)),
+              const SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverToBoxAdapter(child: InsightsSection()),
+              ),
+            ],
 
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
