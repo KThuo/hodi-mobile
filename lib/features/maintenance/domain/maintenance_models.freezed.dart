@@ -377,7 +377,8 @@ as bool,
 mixin _$MaintenanceDetailModel {
 
  MaintenanceRequestModel get request;/// Oldest first, as the server sends it — a repair reads forwards.
- List<MaintenanceUpdateModel> get timeline;
+ List<MaintenanceUpdateModel> get timeline;/// The photos this person may see. `updateId` null for the request's own.
+ List<MaintenancePhotoModel> get photos;
 /// Create a copy of MaintenanceDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -390,16 +391,16 @@ $MaintenanceDetailModelCopyWith<MaintenanceDetailModel> get copyWith => _$Mainte
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MaintenanceDetailModel&&(identical(other.request, request) || other.request == request)&&const DeepCollectionEquality().equals(other.timeline, timeline));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MaintenanceDetailModel&&(identical(other.request, request) || other.request == request)&&const DeepCollectionEquality().equals(other.timeline, timeline)&&const DeepCollectionEquality().equals(other.photos, photos));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,request,const DeepCollectionEquality().hash(timeline));
+int get hashCode => Object.hash(runtimeType,request,const DeepCollectionEquality().hash(timeline),const DeepCollectionEquality().hash(photos));
 
 @override
 String toString() {
-  return 'MaintenanceDetailModel(request: $request, timeline: $timeline)';
+  return 'MaintenanceDetailModel(request: $request, timeline: $timeline, photos: $photos)';
 }
 
 
@@ -410,7 +411,7 @@ abstract mixin class $MaintenanceDetailModelCopyWith<$Res>  {
   factory $MaintenanceDetailModelCopyWith(MaintenanceDetailModel value, $Res Function(MaintenanceDetailModel) _then) = _$MaintenanceDetailModelCopyWithImpl;
 @useResult
 $Res call({
- MaintenanceRequestModel request, List<MaintenanceUpdateModel> timeline
+ MaintenanceRequestModel request, List<MaintenanceUpdateModel> timeline, List<MaintenancePhotoModel> photos
 });
 
 
@@ -427,11 +428,12 @@ class _$MaintenanceDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of MaintenanceDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? request = null,Object? timeline = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? request = null,Object? timeline = null,Object? photos = null,}) {
   return _then(_self.copyWith(
 request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
 as MaintenanceRequestModel,timeline: null == timeline ? _self.timeline : timeline // ignore: cast_nullable_to_non_nullable
-as List<MaintenanceUpdateModel>,
+as List<MaintenanceUpdateModel>,photos: null == photos ? _self.photos : photos // ignore: cast_nullable_to_non_nullable
+as List<MaintenancePhotoModel>,
   ));
 }
 /// Create a copy of MaintenanceDetailModel
@@ -525,10 +527,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( MaintenanceRequestModel request,  List<MaintenanceUpdateModel> timeline)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( MaintenanceRequestModel request,  List<MaintenanceUpdateModel> timeline,  List<MaintenancePhotoModel> photos)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MaintenanceDetailModel() when $default != null:
-return $default(_that.request,_that.timeline);case _:
+return $default(_that.request,_that.timeline,_that.photos);case _:
   return orElse();
 
 }
@@ -546,10 +548,10 @@ return $default(_that.request,_that.timeline);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( MaintenanceRequestModel request,  List<MaintenanceUpdateModel> timeline)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( MaintenanceRequestModel request,  List<MaintenanceUpdateModel> timeline,  List<MaintenancePhotoModel> photos)  $default,) {final _that = this;
 switch (_that) {
 case _MaintenanceDetailModel():
-return $default(_that.request,_that.timeline);case _:
+return $default(_that.request,_that.timeline,_that.photos);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -566,10 +568,10 @@ return $default(_that.request,_that.timeline);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( MaintenanceRequestModel request,  List<MaintenanceUpdateModel> timeline)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( MaintenanceRequestModel request,  List<MaintenanceUpdateModel> timeline,  List<MaintenancePhotoModel> photos)?  $default,) {final _that = this;
 switch (_that) {
 case _MaintenanceDetailModel() when $default != null:
-return $default(_that.request,_that.timeline);case _:
+return $default(_that.request,_that.timeline,_that.photos);case _:
   return null;
 
 }
@@ -581,7 +583,7 @@ return $default(_that.request,_that.timeline);case _:
 @JsonSerializable()
 
 class _MaintenanceDetailModel extends MaintenanceDetailModel {
-  const _MaintenanceDetailModel({required this.request, final  List<MaintenanceUpdateModel> timeline = const <MaintenanceUpdateModel>[]}): _timeline = timeline,super._();
+  const _MaintenanceDetailModel({required this.request, final  List<MaintenanceUpdateModel> timeline = const <MaintenanceUpdateModel>[], final  List<MaintenancePhotoModel> photos = const <MaintenancePhotoModel>[]}): _timeline = timeline,_photos = photos,super._();
   factory _MaintenanceDetailModel.fromJson(Map<String, dynamic> json) => _$MaintenanceDetailModelFromJson(json);
 
 @override final  MaintenanceRequestModel request;
@@ -592,6 +594,15 @@ class _MaintenanceDetailModel extends MaintenanceDetailModel {
   if (_timeline is EqualUnmodifiableListView) return _timeline;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_timeline);
+}
+
+/// The photos this person may see. `updateId` null for the request's own.
+ final  List<MaintenancePhotoModel> _photos;
+/// The photos this person may see. `updateId` null for the request's own.
+@override@JsonKey() List<MaintenancePhotoModel> get photos {
+  if (_photos is EqualUnmodifiableListView) return _photos;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_photos);
 }
 
 
@@ -608,16 +619,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MaintenanceDetailModel&&(identical(other.request, request) || other.request == request)&&const DeepCollectionEquality().equals(other._timeline, _timeline));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MaintenanceDetailModel&&(identical(other.request, request) || other.request == request)&&const DeepCollectionEquality().equals(other._timeline, _timeline)&&const DeepCollectionEquality().equals(other._photos, _photos));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,request,const DeepCollectionEquality().hash(_timeline));
+int get hashCode => Object.hash(runtimeType,request,const DeepCollectionEquality().hash(_timeline),const DeepCollectionEquality().hash(_photos));
 
 @override
 String toString() {
-  return 'MaintenanceDetailModel(request: $request, timeline: $timeline)';
+  return 'MaintenanceDetailModel(request: $request, timeline: $timeline, photos: $photos)';
 }
 
 
@@ -628,7 +639,7 @@ abstract mixin class _$MaintenanceDetailModelCopyWith<$Res> implements $Maintena
   factory _$MaintenanceDetailModelCopyWith(_MaintenanceDetailModel value, $Res Function(_MaintenanceDetailModel) _then) = __$MaintenanceDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- MaintenanceRequestModel request, List<MaintenanceUpdateModel> timeline
+ MaintenanceRequestModel request, List<MaintenanceUpdateModel> timeline, List<MaintenancePhotoModel> photos
 });
 
 
@@ -645,11 +656,12 @@ class __$MaintenanceDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of MaintenanceDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? request = null,Object? timeline = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? request = null,Object? timeline = null,Object? photos = null,}) {
   return _then(_MaintenanceDetailModel(
 request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
 as MaintenanceRequestModel,timeline: null == timeline ? _self._timeline : timeline // ignore: cast_nullable_to_non_nullable
-as List<MaintenanceUpdateModel>,
+as List<MaintenanceUpdateModel>,photos: null == photos ? _self._photos : photos // ignore: cast_nullable_to_non_nullable
+as List<MaintenancePhotoModel>,
   ));
 }
 
@@ -1501,6 +1513,278 @@ as int,unassigned: null == unassigned ? _self.unassigned : unassigned // ignore:
 as int,late: null == late ? _self.late : late // ignore: cast_nullable_to_non_nullable
 as int,awaitingClosure: null == awaitingClosure ? _self.awaitingClosure : awaitingClosure // ignore: cast_nullable_to_non_nullable
 as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$MaintenancePhotoModel {
+
+ String get id; String? get updateId; String? get uploadedByName; String? get createdOn;
+/// Create a copy of MaintenancePhotoModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MaintenancePhotoModelCopyWith<MaintenancePhotoModel> get copyWith => _$MaintenancePhotoModelCopyWithImpl<MaintenancePhotoModel>(this as MaintenancePhotoModel, _$identity);
+
+  /// Serializes this MaintenancePhotoModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MaintenancePhotoModel&&(identical(other.id, id) || other.id == id)&&(identical(other.updateId, updateId) || other.updateId == updateId)&&(identical(other.uploadedByName, uploadedByName) || other.uploadedByName == uploadedByName)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,updateId,uploadedByName,createdOn);
+
+@override
+String toString() {
+  return 'MaintenancePhotoModel(id: $id, updateId: $updateId, uploadedByName: $uploadedByName, createdOn: $createdOn)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MaintenancePhotoModelCopyWith<$Res>  {
+  factory $MaintenancePhotoModelCopyWith(MaintenancePhotoModel value, $Res Function(MaintenancePhotoModel) _then) = _$MaintenancePhotoModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, String? updateId, String? uploadedByName, String? createdOn
+});
+
+
+
+
+}
+/// @nodoc
+class _$MaintenancePhotoModelCopyWithImpl<$Res>
+    implements $MaintenancePhotoModelCopyWith<$Res> {
+  _$MaintenancePhotoModelCopyWithImpl(this._self, this._then);
+
+  final MaintenancePhotoModel _self;
+  final $Res Function(MaintenancePhotoModel) _then;
+
+/// Create a copy of MaintenancePhotoModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? updateId = freezed,Object? uploadedByName = freezed,Object? createdOn = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,updateId: freezed == updateId ? _self.updateId : updateId // ignore: cast_nullable_to_non_nullable
+as String?,uploadedByName: freezed == uploadedByName ? _self.uploadedByName : uploadedByName // ignore: cast_nullable_to_non_nullable
+as String?,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [MaintenancePhotoModel].
+extension MaintenancePhotoModelPatterns on MaintenancePhotoModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MaintenancePhotoModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _MaintenancePhotoModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MaintenancePhotoModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _MaintenancePhotoModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MaintenancePhotoModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _MaintenancePhotoModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? updateId,  String? uploadedByName,  String? createdOn)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _MaintenancePhotoModel() when $default != null:
+return $default(_that.id,_that.updateId,_that.uploadedByName,_that.createdOn);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? updateId,  String? uploadedByName,  String? createdOn)  $default,) {final _that = this;
+switch (_that) {
+case _MaintenancePhotoModel():
+return $default(_that.id,_that.updateId,_that.uploadedByName,_that.createdOn);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? updateId,  String? uploadedByName,  String? createdOn)?  $default,) {final _that = this;
+switch (_that) {
+case _MaintenancePhotoModel() when $default != null:
+return $default(_that.id,_that.updateId,_that.uploadedByName,_that.createdOn);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _MaintenancePhotoModel implements MaintenancePhotoModel {
+  const _MaintenancePhotoModel({required this.id, this.updateId, this.uploadedByName, this.createdOn});
+  factory _MaintenancePhotoModel.fromJson(Map<String, dynamic> json) => _$MaintenancePhotoModelFromJson(json);
+
+@override final  String id;
+@override final  String? updateId;
+@override final  String? uploadedByName;
+@override final  String? createdOn;
+
+/// Create a copy of MaintenancePhotoModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MaintenancePhotoModelCopyWith<_MaintenancePhotoModel> get copyWith => __$MaintenancePhotoModelCopyWithImpl<_MaintenancePhotoModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MaintenancePhotoModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MaintenancePhotoModel&&(identical(other.id, id) || other.id == id)&&(identical(other.updateId, updateId) || other.updateId == updateId)&&(identical(other.uploadedByName, uploadedByName) || other.uploadedByName == uploadedByName)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,updateId,uploadedByName,createdOn);
+
+@override
+String toString() {
+  return 'MaintenancePhotoModel(id: $id, updateId: $updateId, uploadedByName: $uploadedByName, createdOn: $createdOn)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MaintenancePhotoModelCopyWith<$Res> implements $MaintenancePhotoModelCopyWith<$Res> {
+  factory _$MaintenancePhotoModelCopyWith(_MaintenancePhotoModel value, $Res Function(_MaintenancePhotoModel) _then) = __$MaintenancePhotoModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String? updateId, String? uploadedByName, String? createdOn
+});
+
+
+
+
+}
+/// @nodoc
+class __$MaintenancePhotoModelCopyWithImpl<$Res>
+    implements _$MaintenancePhotoModelCopyWith<$Res> {
+  __$MaintenancePhotoModelCopyWithImpl(this._self, this._then);
+
+  final _MaintenancePhotoModel _self;
+  final $Res Function(_MaintenancePhotoModel) _then;
+
+/// Create a copy of MaintenancePhotoModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? updateId = freezed,Object? uploadedByName = freezed,Object? createdOn = freezed,}) {
+  return _then(_MaintenancePhotoModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,updateId: freezed == updateId ? _self.updateId : updateId // ignore: cast_nullable_to_non_nullable
+as String?,uploadedByName: freezed == uploadedByName ? _self.uploadedByName : uploadedByName // ignore: cast_nullable_to_non_nullable
+as String?,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

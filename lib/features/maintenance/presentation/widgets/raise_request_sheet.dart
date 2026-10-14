@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/hodi_border_radius.dart';
 import '../../../../core/theme/hodi_colors.dart';
 import '../../../../core/theme/hodi_text_styles.dart';
 import '../../../../core/widgets/hodi_gradient_button.dart';
 import '../../../../core/widgets/hodi_text_field.dart';
+import '../../../../core/widgets/photo_picker_row.dart';
 import '../../../occupations/providers/occupation_providers.dart';
 import '../../domain/maintenance_models.dart';
 import '../../providers/maintenance_providers.dart';
@@ -28,6 +30,9 @@ class _RaiseRequestSheetState extends ConsumerState<RaiseRequestSheet> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _accessController = TextEditingController();
+
+  /// What it looks like now, sent once the request is saved.
+  List<XFile> _photos = const [];
 
   MaintenanceCategoryModel? _category;
   String _priority = 'NORMAL';
@@ -76,6 +81,21 @@ class _RaiseRequestSheetState extends ConsumerState<RaiseRequestSheet> {
       });
       return;
     }
+
+    // The request is in; the photos follow. If they fail, the request still stands and says so.
+    final saved = response.data;
+    if (_photos.isNotEmpty && saved != null) {
+      try {
+        await ref.read(maintenanceRepositoryProvider).addPhotos(saved.id, _photos);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Reported, but the photos did not upload. Add them on the request.'),
+          backgroundColor: HodiColors.warningStart,
+        ));
+      }
+    }
+    if (!mounted) return;
 
     Navigator.of(context).pop(true);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -213,6 +233,14 @@ class _RaiseRequestSheetState extends ConsumerState<RaiseRequestSheet> {
                   labelText: 'Getting in (optional)',
                   hintText: 'Best time to call, where the key is',
                   maxLines: 2,
+                ),
+
+                const SizedBox(height: 16),
+                Text('Photos', style: HodiTextStyles.labelBold),
+                const SizedBox(height: 8),
+                PhotoPickerRow(
+                  photos: _photos,
+                  onChanged: (list) => setState(() => _photos = list),
                 ),
 
                 if (_error != null) ...[

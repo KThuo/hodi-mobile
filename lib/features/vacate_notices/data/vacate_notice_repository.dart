@@ -1,3 +1,4 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -98,10 +99,13 @@ class VacateNoticeRepository {
   }
 
   /// Writes in the thread. Multipart, because the web attaches files through the same address.
-  Future<void> postToThread(String id, String body) async {
+  Future<void> postToThread(String id, String body, {XFile? photo}) async {
     final response = await _apiClient.uploadFile(
       '${ApiConstants.vacateNotices}/$id/thread',
-      data: FormData.fromMap({'body': body}),
+      data: FormData.fromMap({
+        'body': body,
+        if (photo != null) 'file': await MultipartFile.fromFile(photo.path, filename: photo.name),
+      }),
     );
     final data = response.data;
     if (data is Map && data['status'] != '00') {

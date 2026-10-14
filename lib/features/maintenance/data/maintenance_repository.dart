@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_constants.dart';
 import '../../../core/api/api_response.dart';
@@ -102,6 +106,30 @@ class MaintenanceRepository {
       fromJsonT: (data) =>
           MaintenanceRequestModel.fromJson(data as Map<String, dynamic>),
     );
+  }
+
+  /// Photos on the request, or on one update. Up to five each; the server checks the request is
+  /// the caller's to add to.
+  Future<void> addPhotos(String id, List<XFile> photos, {String? updateId}) async {
+    final form = FormData();
+    for (final p in photos) {
+      form.files.add(MapEntry('files', await MultipartFile.fromFile(p.path, filename: p.name)));
+    }
+    if (updateId != null) form.fields.add(MapEntry('updateId', updateId));
+    final response = await _apiClient.uploadFile('${ApiConstants.maintenance}/requests/$id/photos', data: form);
+    final data = response.data;
+    if (data is Map && data['status'] != '00') {
+      throw Exception((data['message'] as String?) ?? 'The photos did not upload.');
+    }
+  }
+
+  /// A photo's bytes, through the request — there is no public link to a photo of somebody's home.
+  Future<Uint8List> photoBytes(String id, String photoId) async {
+    final response = await _apiClient.dio.get<List<int>>(
+      '${ApiConstants.maintenance}/requests/$id/photos/$photoId',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(response.data ?? const []);
   }
 
   Future<ApiResponse<MaintenanceUpdateModel>> comment({

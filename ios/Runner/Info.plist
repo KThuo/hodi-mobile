@@ -48,7 +48,9 @@
 			</dict>
 		</dict>
 		<key>NSCameraUsageDescription</key>
-		<string>Camera access is needed to capture metre reading photos</string>
+		<string>The camera is used to photograph meter readings, and repairs or damage to send to your estate.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Your photos are used only when you choose one to attach to a repair request or a message to your estate.</string>
 		<key>NSFaceIDUsageDescription</key>
 		<string>Enable Face ID to quickly and securely sign in to HODI</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>

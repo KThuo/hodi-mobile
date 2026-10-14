@@ -83,6 +83,13 @@ _MaintenanceDetailModel _$MaintenanceDetailModelFromJson(
           )
           .toList() ??
       const <MaintenanceUpdateModel>[],
+  photos:
+      (json['photos'] as List<dynamic>?)
+          ?.map(
+            (e) => MaintenancePhotoModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const <MaintenancePhotoModel>[],
 );
 
 Map<String, dynamic> _$MaintenanceDetailModelToJson(
@@ -90,6 +97,7 @@ Map<String, dynamic> _$MaintenanceDetailModelToJson(
 ) => <String, dynamic>{
   'request': instance.request,
   'timeline': instance.timeline,
+  'photos': instance.photos,
 };
 
 _MaintenanceUpdateModel _$MaintenanceUpdateModelFromJson(
@@ -160,4 +168,22 @@ Map<String, dynamic> _$MaintenanceWorkloadModelToJson(
   'unassigned': instance.unassigned,
   'late': instance.late,
   'awaitingClosure': instance.awaitingClosure,
+};
+
+_MaintenancePhotoModel _$MaintenancePhotoModelFromJson(
+  Map<String, dynamic> json,
+) => _MaintenancePhotoModel(
+  id: json['id'] as String,
+  updateId: json['updateId'] as String?,
+  uploadedByName: json['uploadedByName'] as String?,
+  createdOn: json['createdOn'] as String?,
+);
+
+Map<String, dynamic> _$MaintenancePhotoModelToJson(
+  _MaintenancePhotoModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'updateId': instance.updateId,
+  'uploadedByName': instance.uploadedByName,
+  'createdOn': instance.createdOn,
 };

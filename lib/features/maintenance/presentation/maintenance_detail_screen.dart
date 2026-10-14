@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../core/widgets/photo_picker_row.dart';
+import '../../../core/widgets/private_photo.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
 import '../../../core/theme/hodi_border_radius.dart';
@@ -40,6 +43,27 @@ class MaintenanceDetailScreen extends ConsumerStatefulWidget {
 class _MaintenanceDetailScreenState
     extends ConsumerState<MaintenanceDetailScreen> {
   final _commentController = TextEditingController();
+
+  /// Photos sent with the next update — the fix done, the part replaced.
+  List<XFile> _commentPhotos = const [];
+
+  Future<void> _addRequestPhotos(List<XFile> photos) async {
+    if (photos.isEmpty) return;
+    await _run(() async {
+      try {
+        await ref.read(maintenanceRepositoryProvider).addPhotos(widget.id, photos);
+        return true;
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            backgroundColor: HodiColors.errorStart,
+          ));
+        }
+        return false;
+      }
+    });
+  }
   bool _busy = false;
 
   @override
@@ -83,10 +107,27 @@ class _MaintenanceDetailScreenState
     final text = _commentController.text.trim();
     if (text.isEmpty) return;
     await _run(() async {
-      final ok = await _report(() => ref
-          .read(maintenanceRepositoryProvider)
-          .comment(id: widget.id, comment: text));
-      if (ok) _commentController.clear();
+      final repo = ref.read(maintenanceRepositoryProvider);
+      final response = await repo.comment(id: widget.id, comment: text);
+      final ok = await _report(() async => response);
+      if (ok) {
+        // The note is in; its photos go on that note, so they show beside it in the history.
+        final update = response.data;
+        if (_commentPhotos.isNotEmpty && update != null) {
+          try {
+            await repo.addPhotos(widget.id, _commentPhotos, updateId: update.id);
+          } catch (_) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('The update was posted, but its photos did not upload.'),
+                backgroundColor: HodiColors.warningStart,
+              ));
+            }
+          }
+        }
+        _commentController.clear();
+        if (mounted) setState(() => _commentPhotos = const []);
+      }
       return ok;
     });
   }
@@ -120,6 +161,30 @@ class _MaintenanceDetailScreenState
             children: [
               _HeaderCard(request: r),
               const SizedBox(height: 16),
+
+              // The photos sent with the request itself; an update's photos sit on that update.
+              if (detail.photos.any((p) => p.updateId == null) || (canComment && r.open)) ...[
+                _Card(
+                  title: 'Photos',
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final p in detail.photos.where((p) => p.updateId == null))
+                        PrivatePhoto(
+                          load: () => ref.read(maintenanceRepositoryProvider).photoBytes(widget.id, p.id),
+                        ),
+                      if (canComment && r.open && detail.photos.where((p) => p.updateId == null).length < 5)
+                        PhotoPickerRow(
+                          photos: const [],
+                          max: 5 - detail.photos.where((p) => p.updateId == null).length,
+                          onChanged: _addRequestPhotos,
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               if (r.awaitingRating && canComment) ...[
                 _RateCard(
@@ -157,7 +222,16 @@ class _MaintenanceDetailScreenState
                       )
                     : Column(
                         children: [
-                          for (final u in detail.timeline) _TimelineRow(update: u),
+                          for (final u in detail.timeline)
+                            _TimelineRow(
+                              update: u,
+                              photos: [
+                                for (final p in detail.photos.where((p) => p.updateId == u.id))
+                                  PrivatePhoto(
+                                    load: () => ref.read(maintenanceRepositoryProvider).photoBytes(widget.id, p.id),
+                                  ),
+                              ],
+                            ),
                         ],
                       ),
               ),
@@ -172,6 +246,14 @@ class _MaintenanceDetailScreenState
                         controller: _commentController,
                         hintText: 'Anything worth knowing',
                         maxLines: 3,
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: PhotoPickerRow(
+                          photos: _commentPhotos,
+                          onChanged: (list) => setState(() => _commentPhotos = list),
+                        ),
                       ),
                       const SizedBox(height: 12),
                       HodiGradientButton(
@@ -346,9 +428,12 @@ class _Card extends StatelessWidget {
 }
 
 class _TimelineRow extends StatelessWidget {
-  const _TimelineRow({required this.update});
+  const _TimelineRow({required this.update, this.photos = const []});
 
   final MaintenanceUpdateModel update;
+
+  /// This update's photos, already wrapped to load through the request.
+  final List<Widget> photos;
 
   @override
   Widget build(BuildContext context) {
@@ -386,6 +471,11 @@ class _TimelineRow extends StatelessWidget {
                     padding: EdgeInsets.only(top: moved ? 2 : 0),
                     child: Text(update.comment!,
                         style: HodiTextStyles.bodyMedium),
+                  ),
+                if (photos.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Wrap(spacing: 6, runSpacing: 6, children: photos),
                   ),
                 const SizedBox(height: 3),
                 Row(

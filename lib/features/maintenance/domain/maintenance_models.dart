@@ -94,6 +94,9 @@ abstract class MaintenanceDetailModel with _$MaintenanceDetailModel {
 
     /// Oldest first, as the server sends it — a repair reads forwards.
     @Default(<MaintenanceUpdateModel>[]) List<MaintenanceUpdateModel> timeline,
+
+    /// The photos this person may see. `updateId` null for the request's own.
+    @Default(<MaintenancePhotoModel>[]) List<MaintenancePhotoModel> photos,
   }) = _MaintenanceDetailModel;
 
   factory MaintenanceDetailModel.fromJson(Map<String, dynamic> json) =>
@@ -161,4 +164,19 @@ abstract class MaintenanceWorkloadModel with _$MaintenanceWorkloadModel {
 
   factory MaintenanceWorkloadModel.fromJson(Map<String, dynamic> json) =>
       _$MaintenanceWorkloadModelFromJson(json);
+}
+
+
+/// A photo on a repair request, or on one update in its history.
+@freezed
+abstract class MaintenancePhotoModel with _$MaintenancePhotoModel {
+  const factory MaintenancePhotoModel({
+    required String id,
+    String? updateId,
+    String? uploadedByName,
+    String? createdOn,
+  }) = _MaintenancePhotoModel;
+
+  factory MaintenancePhotoModel.fromJson(Map<String, dynamic> json) =>
+      _$MaintenancePhotoModelFromJson(json);
 }

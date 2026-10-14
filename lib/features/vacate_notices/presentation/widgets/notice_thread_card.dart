@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/hodi_border_radius.dart';
 import '../../../../core/theme/hodi_colors.dart';
 import '../../../../core/theme/hodi_shadows.dart';
 import '../../../../core/theme/hodi_text_styles.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/widgets/photo_picker_row.dart';
 import '../../domain/notice_thread.dart';
 import '../../providers/vacate_notice_providers.dart';
 
@@ -34,6 +36,9 @@ class _NoticeThreadCardState extends ConsumerState<NoticeThreadCard>
   bool _failed = false;
   bool _sending = false;
   final _draft = TextEditingController();
+
+  /// One photo per message — a picture of the damage, a bank slip.
+  List<XFile> _photo = const [];
   Timer? _timer;
 
   @override
@@ -76,8 +81,13 @@ class _NoticeThreadCardState extends ConsumerState<NoticeThreadCard>
     if (text.isEmpty || _sending) return;
     setState(() => _sending = true);
     try {
-      await ref.read(vacateNoticeRepositoryProvider).postToThread(widget.noticeId, text);
+      await ref.read(vacateNoticeRepositoryProvider).postToThread(
+            widget.noticeId,
+            text,
+            photo: _photo.isEmpty ? null : _photo.first,
+          );
       _draft.clear();
+      setState(() => _photo = const []);
       await _load();
     } catch (e) {
       if (!mounted) return;
@@ -142,7 +152,13 @@ class _NoticeThreadCardState extends ConsumerState<NoticeThreadCard>
               ),
             for (final e in thread.entries) e.isEvent ? _Event(entry: e) : _Bubble(entry: e, onOpen: _open),
             const SizedBox(height: 8),
-            if (thread.open)
+            if (thread.open) ...[
+              PhotoPickerRow(
+                photos: _photo,
+                max: 1,
+                onChanged: (list) => setState(() => _photo = list),
+              ),
+              const SizedBox(height: 8),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -173,8 +189,8 @@ class _NoticeThreadCardState extends ConsumerState<NoticeThreadCard>
                     tooltip: 'Send',
                   ),
                 ],
-              )
-            else
+              ),
+            ] else
               Text('This notice is finished. The conversation stays on the record.',
                   style: HodiTextStyles.bodySmall),
           ],
