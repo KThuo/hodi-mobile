@@ -1,3 +1,7 @@
+import 'package:dio/dio.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
+import '../domain/notice_thread.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_constants.dart';
 import '../../../core/api/api_response.dart';
@@ -83,6 +87,44 @@ class VacateNoticeRepository {
 
   /// The settlement statement, rendered by the server — the same machinery behind the invoice,
   /// the receipt and the lease agreement.
+  // ── The conversation on a notice ──────────────────────────────────────────
+
+  /// The thread, oldest first. Reading it marks it read, which also lets the next SMS go out.
+  Future<ApiResponse<NoticeThread>> thread(String id) {
+    return _apiClient.get<NoticeThread>(
+      '${ApiConstants.vacateNotices}/$id/thread',
+      fromJsonT: (data) => NoticeThread.fromJson(Map<String, dynamic>.from(data as Map)),
+    );
+  }
+
+  /// Writes in the thread. Multipart, because the web attaches files through the same address.
+  Future<void> postToThread(String id, String body) async {
+    final response = await _apiClient.uploadFile(
+      '${ApiConstants.vacateNotices}/$id/thread',
+      data: FormData.fromMap({'body': body}),
+    );
+    final data = response.data;
+    if (data is Map && data['status'] != '00') {
+      throw Exception((data['message'] as String?) ?? 'The message was not sent.');
+    }
+  }
+
+  /// An attachment the office sent, opened in the phone's own viewer.
+  Future<void> openThreadFile(String id, String messageId, {required bool pdf}) async {
+    final dir = await getTemporaryDirectory();
+    final path = '${dir.path}/notice-$id-$messageId.${pdf ? 'pdf' : 'jpg'}';
+    await _apiClient.downloadFile('${ApiConstants.vacateNotices}/$id/thread/$messageId/file', path);
+    await OpenFilex.open(path);
+  }
+
+  /// The notice letter, generated from the notice — always a PDF, so it opens like the statement.
+  Future<void> downloadLetter(String id) async {
+    await _pdfDownloader.downloadAndOpen(
+      '${ApiConstants.vacateNotices}/$id/letter/generated.pdf',
+      'notice-$id.pdf',
+    );
+  }
+
   Future<void> downloadStatement(String id) async {
     await _pdfDownloader.downloadAndOpen(
       '${ApiConstants.vacateNotices}/$id/statement.pdf',

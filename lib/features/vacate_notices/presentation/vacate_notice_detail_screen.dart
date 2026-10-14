@@ -16,6 +16,7 @@ import '../../../core/widgets/hodi_text_field.dart';
 import '../domain/vacate_notice_detail_model.dart';
 import '../domain/vacate_notice_model.dart';
 import '../providers/vacate_notice_providers.dart';
+import 'widgets/notice_thread_card.dart';
 
 /// One notice to vacate.
 ///
@@ -105,6 +106,16 @@ class _VacateNoticeDetailScreenState
     return confirmed == true ? notes : null;
   }
 
+  Future<void> _letter() => DocumentActions.run(
+        context,
+        () => ref
+            .read(vacateNoticeRepositoryProvider)
+            .downloadLetter(widget.noticeId),
+        onBusy: (busy) {
+          if (mounted) setState(() => _busy = busy);
+        },
+      );
+
   Future<void> _statement() => DocumentActions.run(
         context,
         () => ref
@@ -189,6 +200,21 @@ class _VacateNoticeDetailScreenState
               ],
 
               const SizedBox(height: 20),
+              // The notice itself, as a letter — generated from the notice, to keep or to sign.
+              OutlinedButton.icon(
+                onPressed: _busy ? null : _letter,
+                icon: const Icon(Icons.description_outlined, size: 18),
+                label: const Text('Notice letter'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: HodiColors.primaryStart,
+                  side: BorderSide(color: HodiColors.primaryStart),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               OutlinedButton.icon(
                 onPressed: _busy ? null : _statement,
                 icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
@@ -260,6 +286,9 @@ class _VacateNoticeDetailScreenState
                   ),
               ],
               const SizedBox(height: 28),
+              // The conversation with the office, on the record with the notice.
+              const SizedBox(height: 12),
+              NoticeThreadCard(noticeId: widget.noticeId),
             ],
           );
         },
