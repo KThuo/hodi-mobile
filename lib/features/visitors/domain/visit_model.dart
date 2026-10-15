@@ -56,6 +56,10 @@ abstract class VisitModel with _$VisitModel {
     String? gateName,
     String? checkedInByName,
     String? checkedOutByName,
+
+    /// Set when the visitor came in on a pass the host sent — the host invited them, so nobody
+    /// was asked at the gate.
+    String? passId,
     @Default(0) int status,
   }) = _VisitModel;
 
@@ -68,6 +72,9 @@ abstract class VisitModel with _$VisitModel {
 
   bool get approved => approvalStatus == 'APPROVED';
   bool get rejected => approvalStatus == 'REJECTED';
+
+  /// Came in on the host's own pass.
+  bool get invited => passId != null && passId!.isNotEmpty;
 
   /// The unit, preferring what the server composed and never rendering an empty line.
   String get unit {

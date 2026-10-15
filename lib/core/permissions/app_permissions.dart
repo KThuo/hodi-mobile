@@ -102,6 +102,8 @@ abstract class AppPermissions {
   static const visitView = 'ROLE_VISIT_VIEW';
   static const visitNew = 'ROLE_VISIT_NEW';
   static const visitDecide = 'ROLE_VISIT_DECIDE';
+  // The host sending a pass ahead of time. Granted alongside DECIDE.
+  static const visitInvite = 'ROLE_VISIT_INVITE';
 
   // ── Estates ───────────────────────────────────────────────────────────────
   static const estateView = 'ROLE_ESTATE_VIEW';
@@ -155,7 +157,7 @@ abstract class AppPermissions {
     metreView, metreNew, metreEdit,
     expenseView, expenseNew, expenseEdit, expenseDelete,
     maintView, maintNew, maintEdit, maintAssign, maintResolve,
-    visitView, visitNew, visitDecide,
+    visitView, visitNew, visitDecide, visitInvite,
     leaseView, leaseDocumentView, leaseDocumentEdit,
     penaltyView, penaltyApply, penaltyWaive, penaltyEdit,
     estateView,

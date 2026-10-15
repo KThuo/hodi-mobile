@@ -83,6 +83,9 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
     final user = ref.watch(authProvider).user;
     final canDecide = user?.hasPermission(AppPermissions.visitDecide) ?? false;
     final isGate = user?.hasPermission(AppPermissions.visitNew) ?? false;
+    // A host who can send passes. Somebody working the gate checks people in instead.
+    final canInvite =
+        !isGate && (user?.hasPermission(AppPermissions.visitInvite) ?? false);
 
     return Scaffold(
       backgroundColor: HodiColors.background,
@@ -91,6 +94,20 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          if (isGate)
+            IconButton(
+              tooltip: 'Check a pass',
+              icon: const Icon(Icons.qr_code_scanner),
+              onPressed: () => context.push('/more/visitors/scan'),
+            ),
+          if (canInvite)
+            IconButton(
+              tooltip: 'My passes',
+              icon: const Icon(Icons.qr_code_2),
+              onPressed: () => context.push('/more/visitors/passes'),
+            ),
+        ],
       ),
       // The gate's own action. Only for ROLE_VISIT_NEW — a tenant answers visits, they do not
       // admit them.
@@ -105,7 +122,15 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
               icon: const Icon(Icons.add),
               label: const Text('Check in'),
             )
-          : null,
+          : canInvite
+              ? FloatingActionButton.extended(
+                  onPressed: () => context.push('/more/visitors/invite'),
+                  backgroundColor: HodiColors.primaryStart,
+                  foregroundColor: HodiColors.white,
+                  icon: const Icon(Icons.person_add_alt),
+                  label: const Text('Invite'),
+                )
+              : null,
       body: Column(
         children: [
           // Nothing on site and nobody waiting is not news. The card said "0 on site" over an

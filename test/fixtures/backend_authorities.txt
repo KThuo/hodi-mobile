@@ -1,5 +1,5 @@
 # Every authority the HODI backend defines, one per line.
-# Generated from hodi-b — regenerate with the command in test/core/permissions/app_permissions_test.dart.
+# Generated from hodi-b — regenerate with the command in this file.
 ROLE_AUDIT_VIEW
 ROLE_BANK_EDIT
 ROLE_BANK_NEW
@@ -119,6 +119,7 @@ ROLE_VACATE_SETTLE
 ROLE_VACATE_VIEW
 ROLE_VISIT_BLOCK
 ROLE_VISIT_DECIDE
+ROLE_VISIT_INVITE
 ROLE_VISIT_NEW
 ROLE_VISIT_OVERRIDE
 ROLE_VISIT_REVEAL

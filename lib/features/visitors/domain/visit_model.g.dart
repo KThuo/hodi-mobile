@@ -36,6 +36,7 @@ _VisitModel _$VisitModelFromJson(Map<String, dynamic> json) => _VisitModel(
   gateName: json['gateName'] as String?,
   checkedInByName: json['checkedInByName'] as String?,
   checkedOutByName: json['checkedOutByName'] as String?,
+  passId: json['passId'] as String?,
   status: (json['status'] as num?)?.toInt() ?? 0,
 );
 
@@ -70,6 +71,7 @@ Map<String, dynamic> _$VisitModelToJson(_VisitModel instance) =>
       'gateName': instance.gateName,
       'checkedInByName': instance.checkedInByName,
       'checkedOutByName': instance.checkedOutByName,
+      'passId': instance.passId,
       'status': instance.status,
     };
 

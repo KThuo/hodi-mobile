@@ -2,6 +2,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/api/api_constants.dart';
 import '../../../core/api/api_response.dart';
 import '../../../core/api/paged_response.dart';
+import '../domain/pass_model.dart';
 import '../domain/visit_model.dart';
 
 /// Visits.
@@ -133,6 +134,101 @@ class VisitRepository {
       fromJsonT: (data) => VisitModel.fromJson(data as Map<String, dynamic>),
     );
   }
+
+  // ── Passes ────────────────────────────────────────────────────────────────
+
+  /// The host invites somebody. `ROLE_VISIT_INVITE`. No ID number: the gate takes that, if the
+  /// estate wants it. [houseId] only where the tenant has more than one unit.
+  Future<ApiResponse<PassModel>> invite({
+    required String visitorName,
+    String? visitorPhone,
+    String? vehicleReg,
+    int visitorCount = 1,
+    required DateTime validFrom,
+    required DateTime validUntil,
+    String? purpose,
+    String? purposeNotes,
+    String? houseId,
+  }) async {
+    return _apiClient.post<PassModel>(
+      '${ApiConstants.visits}/passes',
+      data: {
+        'visitorName': visitorName.trim(),
+        'visitorCount': visitorCount,
+        'validFrom': _day(validFrom),
+        'validUntil': _day(validUntil),
+        if (visitorPhone != null && visitorPhone.trim().isNotEmpty)
+          'visitorPhone': visitorPhone.trim(),
+        if (vehicleReg != null && vehicleReg.trim().isNotEmpty)
+          'vehicleReg': vehicleReg.trim().toUpperCase(),
+        if (purpose != null && purpose.isNotEmpty) 'purpose': purpose,
+        if (purposeNotes != null && purposeNotes.trim().isNotEmpty)
+          'purposeNotes': purposeNotes.trim(),
+        'houseId': ?houseId,
+      },
+      fromJsonT: (data) => PassModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// The host's own passes, the ones still to use first.
+  Future<ApiResponse<List<PassModel>>> myPasses() async {
+    return _apiClient.get<List<PassModel>>(
+      '${ApiConstants.visits}/passes/mine',
+      fromJsonT: (data) => (data as List)
+          .map((e) => PassModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Future<ApiResponse<PassModel>> cancelPass(String id) async {
+    return _apiClient.post<PassModel>(
+      '${ApiConstants.visits}/passes/$id/cancel',
+      fromJsonT: (data) => PassModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// The gate: the pass a scanned QR or typed code names.
+  Future<ApiResponse<PassModel>> passByCode(String code) async {
+    return _apiClient.get<PassModel>(
+      '${ApiConstants.visits}/passes/code/${Uri.encodeComponent(code)}',
+      fromJsonT: (data) => PassModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// The gate: passes by number plate, phone or ID number — or the code, typed.
+  Future<ApiResponse<List<PassModel>>> findPasses(String query) async {
+    return _apiClient.get<List<PassModel>>(
+      '${ApiConstants.visits}/passes/find',
+      queryParameters: {'q': query.trim()},
+      fromJsonT: (data) => (data as List)
+          .map((e) => PassModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  /// The gate lets the pass holder in. The ID number only where the estate takes one.
+  Future<ApiResponse<CheckInResultModel>> admit(
+    String passId, {
+    String? idNumber,
+    int? visitorCount,
+    String? gateName,
+  }) async {
+    final id = idNumber?.trim() ?? '';
+    return _apiClient.post<CheckInResultModel>(
+      '${ApiConstants.visits}/passes/$passId/admit',
+      data: {
+        if (id.isNotEmpty) 'idType': 'NATIONAL_ID',
+        if (id.isNotEmpty) 'idNumber': id,
+        'visitorCount': ?visitorCount,
+        if (gateName != null && gateName.isNotEmpty) 'gateName': gateName,
+      },
+      fromJsonT: (data) =>
+          CheckInResultModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  static String _day(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   /// They have left. The gate's own action — `ROLE_VISIT_NEW`.
   Future<ApiResponse<VisitModel>> checkOut(String id) async {

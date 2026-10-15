@@ -21,6 +21,12 @@ import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../core/widgets/hodi_webview_page.dart';
 import '../../features/visitors/presentation/visitors_screen.dart';
 import '../../features/visitors/presentation/check_in_screen.dart';
+import '../../features/visitors/domain/pass_model.dart';
+import '../../features/visitors/presentation/passes/gate_pass_screen.dart';
+import '../../features/visitors/presentation/passes/invite_visitor_screen.dart';
+import '../../features/visitors/presentation/passes/my_passes_screen.dart';
+import '../../features/visitors/presentation/passes/pass_screen.dart';
+import '../../features/visitors/presentation/passes/scan_pass_screen.dart';
 import '../../features/expenses/presentation/expenses_screen.dart';
 import '../../features/reports/presentation/reports_screen.dart';
 import '../../features/penalties/presentation/penalties_screen.dart';
@@ -399,6 +405,33 @@ final routerProvider = Provider<GoRouter>((ref) {
                         path: 'check-in',
                         name: RouteNames.checkIn,
                         builder: (context, state) => const CheckInScreen(),
+                      ),
+                      GoRoute(
+                        path: 'invite',
+                        name: RouteNames.inviteVisitor,
+                        builder: (context, state) => const InviteVisitorScreen(),
+                      ),
+                      GoRoute(
+                        path: 'passes',
+                        name: RouteNames.myPasses,
+                        builder: (context, state) => const MyPassesScreen(),
+                      ),
+                      // The pass travels as `extra`: both screens are only reached from one that
+                      // has just read it, and a pass has no screen of its own to deep-link to.
+                      GoRoute(
+                        path: 'pass',
+                        name: RouteNames.visitorPass,
+                        builder: (context, state) => PassScreen(pass: state.extra! as PassModel),
+                      ),
+                      GoRoute(
+                        path: 'scan',
+                        name: RouteNames.scanPass,
+                        builder: (context, state) => const ScanPassScreen(),
+                      ),
+                      GoRoute(
+                        path: 'gate-pass',
+                        name: RouteNames.gatePass,
+                        builder: (context, state) => GatePassScreen(pass: state.extra! as PassModel),
                       ),
                     ],
                   ),

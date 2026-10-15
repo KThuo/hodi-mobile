@@ -31,6 +31,11 @@ abstract class RouteNames {
   static const notifications = 'notifications';
   static const visitors = 'visitors';
   static const checkIn = 'check-in';
+  static const inviteVisitor = 'invite-visitor';
+  static const myPasses = 'my-passes';
+  static const visitorPass = 'visitor-pass';
+  static const scanPass = 'scan-pass';
+  static const gatePass = 'gate-pass';
   static const expenses = 'expenses';
   static const reports = 'reports';
   static const penalties = 'penalties';

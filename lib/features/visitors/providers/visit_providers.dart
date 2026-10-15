@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/auth/providers/auth_provider.dart';
 import '../../../core/permissions/app_permissions.dart';
+import '../../occupations/providers/occupation_providers.dart';
 import '../data/visit_repository.dart';
+import '../domain/pass_model.dart';
 import '../domain/visit_model.dart';
 
 final visitRepositoryProvider = Provider<VisitRepository>((ref) {
@@ -210,3 +212,39 @@ class VisitListNotifier extends Notifier<VisitListState> {
 
 final visitListProvider =
     NotifierProvider<VisitListNotifier, VisitListState>(VisitListNotifier.new);
+
+
+// ── Passes ──────────────────────────────────────────────────────────────────
+
+/// The host's own passes, the ones still to use first. Refetched whenever the screen opens.
+final myPassesProvider = FutureProvider.autoDispose<List<PassModel>>((ref) async {
+  final response = await ref.watch(visitRepositoryProvider).myPasses();
+  if (!response.isSuccess) {
+    throw Exception(response.message.isNotEmpty
+        ? response.message
+        : 'Your passes could not be loaded.');
+  }
+  return response.data ?? const [];
+});
+
+/// The units a tenant can invite a visitor to: their own live tenancies.
+///
+/// Only asked for so the invite form can offer a choice to somebody with more than one; with
+/// one, the server picks it.
+final myUnitsProvider =
+    FutureProvider.autoDispose<List<({String houseId, String label})>>((ref) async {
+  final response = await ref
+      .watch(occupationRepositoryProvider)
+      .getOccupations(mine: true, pageSize: 50);
+  if (!response.isSuccess || response.data == null) return const [];
+  return [
+    for (final o in response.data!.content)
+      (
+        houseId: o.houseId,
+        label: [
+          o.displayName,
+          if (o.propertyName != null && o.propertyName!.isNotEmpty) o.propertyName!,
+        ].join(' · '),
+      ),
+  ];
+});

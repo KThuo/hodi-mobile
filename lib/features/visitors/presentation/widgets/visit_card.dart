@@ -209,6 +209,9 @@ class _ApprovalPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final (bg, fg, label) = switch (visit.approvalStatus) {
       'PENDING' => (HodiColors.warningBg, HodiColors.warningEnd, 'Waiting'),
+      // On the host's own pass nobody was asked — the host had already said yes.
+      'APPROVED' when visit.invited =>
+        (HodiColors.successBg, HodiColors.successEnd, 'Invited'),
       'APPROVED' => (HodiColors.successBg, HodiColors.successEnd, 'Let in'),
       'REJECTED' => (HodiColors.dangerBg, HodiColors.errorStart, 'Refused'),
       _ => (HodiColors.surfaceInset, HodiColors.textMedium, 'No approval needed'),
