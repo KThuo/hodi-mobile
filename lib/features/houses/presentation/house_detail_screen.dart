@@ -126,8 +126,14 @@ class _HouseHeaderCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           HodiStatusBadge(
-            text: detail.occupied ? 'Occupied' : 'Vacant',
-            type: detail.occupied ? BadgeType.success : BadgeType.warning,
+            // Suspended before vacant: a suspended unit is usually empty, and "Vacant"
+            // would say it can be let. Status 1 is active; anything else is suspended.
+            text: detail.status != 1
+                ? 'Suspended'
+                : (detail.occupied ? 'Occupied' : 'Vacant'),
+            type: detail.status != 1
+                ? BadgeType.error
+                : (detail.occupied ? BadgeType.success : BadgeType.warning),
           ),
           const SizedBox(height: 14),
           // An owned unit has no rent. Saying "Monthly Rent KES 0" of it would be a claim, not a

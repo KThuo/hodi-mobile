@@ -7,7 +7,7 @@ void main() {
     final detail = MaintenanceDetailModel.fromJson({
       'request': {
         'id': 'r1', 'requestRef': 'MR-1', 'title': 'Leak', 'description': 'Under the sink',
-        'status': 'SUBMITTED', 'statusLabel': 'Submitted', 'priority': 'NORMAL',
+        'status': 'SUBMITTED', 'statusLabel': 'Submitted', 'priority': 'MEDIUM',
       },
       'timeline': const [],
       'photos': [
@@ -24,7 +24,7 @@ void main() {
     final detail = MaintenanceDetailModel.fromJson({
       'request': {
         'id': 'r1', 'requestRef': 'MR-1', 'title': 'Leak', 'description': 'Under the sink',
-        'status': 'SUBMITTED', 'statusLabel': 'Submitted', 'priority': 'NORMAL',
+        'status': 'SUBMITTED', 'statusLabel': 'Submitted', 'priority': 'MEDIUM',
       },
     });
 

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$MaintenanceRequestModel {
 
  String get id;/// The reference somebody quotes on the phone.
- String get requestRef; String? get propertyName; String? get houseCode; String? get houseNumber; String? get reporterName; String? get categoryName; String get title; String? get description;/// `LOW`, `NORMAL`, `HIGH`, `URGENT`.
+ String get requestRef; String? get propertyName; String? get houseCode; String? get houseNumber; String? get reporterName; String? get categoryName; String get title; String? get description;/// `LOW`, `MEDIUM`, `HIGH`, `EMERGENCY` — the server's four, and the web's.
  String? get priority;/// The code — `SUBMITTED`, `ACKNOWLEDGED`, `ASSIGNED`, `IN_PROGRESS`, `ON_HOLD`, `RESOLVED`,
 /// `CLOSED`, `REJECTED`, `CANCELLED`.
  String get status;/// The same thing in the server's words, which is what gets shown. The app does not keep its
@@ -258,7 +258,7 @@ class _MaintenanceRequestModel extends MaintenanceRequestModel {
 @override final  String? categoryName;
 @override final  String title;
 @override final  String? description;
-/// `LOW`, `NORMAL`, `HIGH`, `URGENT`.
+/// `LOW`, `MEDIUM`, `HIGH`, `EMERGENCY` — the server's four, and the web's.
 @override final  String? priority;
 /// The code — `SUBMITTED`, `ACKNOWLEDGED`, `ASSIGNED`, `IN_PROGRESS`, `ON_HOLD`, `RESOLVED`,
 /// `CLOSED`, `REJECTED`, `CANCELLED`.

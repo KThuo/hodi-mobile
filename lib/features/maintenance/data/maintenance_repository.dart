@@ -81,8 +81,9 @@ class MaintenanceRepository {
   /// `tenantUserId` is not sent. It exists for staff raising a request on somebody's behalf, and
   /// the server ignores it from a tenant anyway — their own request is their own.
   ///
-  /// `reportedChannel` says how it arrived. MOBILE rather than the server's WEB default, because
-  /// "how did this reach us" is the question the field answers and the answer here is the app.
+  /// `reportedChannel` says how it arrived: APP, the server's word for the app, rather than its WEB
+  /// default, because "how did this reach us" is the question the field answers. This sent MOBILE,
+  /// which the server does not know and quietly recorded as WEB.
   Future<ApiResponse<MaintenanceRequestModel>> raise({
     required String categoryId,
     required String title,
@@ -101,7 +102,7 @@ class MaintenanceRepository {
         if (priority != null && priority.isNotEmpty) 'priority': priority,
         if (accessNotes != null && accessNotes.trim().isNotEmpty)
           'accessNotes': accessNotes.trim(),
-        'reportedChannel': 'MOBILE',
+        'reportedChannel': 'APP',
       },
       fromJsonT: (data) =>
           MaintenanceRequestModel.fromJson(data as Map<String, dynamic>),

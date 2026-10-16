@@ -46,8 +46,8 @@ class StatusPill extends StatelessWidget {
 
 /// Priority as a dot rather than a word.
 ///
-/// On a list row the priority is scanned, not read, and "NORMAL" spelled out on every card is
-/// noise against the two that matter. Normal draws nothing at all for the same reason.
+/// On a list row the priority is scanned, not read, and "MEDIUM" spelled out on every card is
+/// noise against the ones that matter. Medium draws nothing at all for the same reason.
 class PriorityDot extends StatelessWidget {
   const PriorityDot({super.key, required this.priority});
 
@@ -57,7 +57,7 @@ class PriorityDot extends StatelessWidget {
   Widget build(BuildContext context) {
     final code = (priority ?? '').toUpperCase();
     final (colour, label) = switch (code) {
-      'URGENT' => (HodiColors.errorStart, 'Urgent'),
+      'EMERGENCY' => (HodiColors.errorStart, 'Emergency'),
       'HIGH' => (HodiColors.warningStart, 'High'),
       'LOW' => (HodiColors.textLight, 'Low'),
       _ => (null, null),

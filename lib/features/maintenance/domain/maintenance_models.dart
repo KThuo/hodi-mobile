@@ -31,7 +31,7 @@ abstract class MaintenanceRequestModel with _$MaintenanceRequestModel {
     required String title,
     String? description,
 
-    /// `LOW`, `NORMAL`, `HIGH`, `URGENT`.
+    /// `LOW`, `MEDIUM`, `HIGH`, `EMERGENCY` — the server's four, and the web's.
     String? priority,
 
     /// The code — `SUBMITTED`, `ACKNOWLEDGED`, `ASSIGNED`, `IN_PROGRESS`, `ON_HOLD`, `RESOLVED`,

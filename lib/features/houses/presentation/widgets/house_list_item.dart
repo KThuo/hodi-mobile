@@ -70,8 +70,14 @@ class HouseListItem extends StatelessWidget {
                       ),
                     const Spacer(),
                     HodiStatusBadge(
-                      text: house.occupied ? 'Occupied' : 'Vacant',
-                      type: house.occupied ? BadgeType.success : BadgeType.warning,
+                      // Suspended before vacant: a suspended unit is usually empty, and "Vacant"
+                      // would say it can be let. Status 1 is active; anything else is suspended.
+                      text: house.status != 1
+                          ? 'Suspended'
+                          : (house.occupied ? 'Occupied' : 'Vacant'),
+                      type: house.status != 1
+                          ? BadgeType.error
+                          : (house.occupied ? BadgeType.success : BadgeType.warning),
                     ),
                   ],
                 ),

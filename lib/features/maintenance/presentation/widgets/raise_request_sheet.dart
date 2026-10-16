@@ -35,7 +35,7 @@ class _RaiseRequestSheetState extends ConsumerState<RaiseRequestSheet> {
   List<XFile> _photos = const [];
 
   MaintenanceCategoryModel? _category;
-  String _priority = 'NORMAL';
+  String _priority = 'MEDIUM';
   String? _houseId;
   bool _busy = false;
   String? _error;
@@ -167,7 +167,7 @@ class _RaiseRequestSheetState extends ConsumerState<RaiseRequestSheet> {
                     _category = c;
                     // The category's own default, which an estate sets per category — a burst
                     // pipe and a squeaking hinge do not start at the same urgency.
-                    _priority = c?.defaultPriority ?? 'NORMAL';
+                    _priority = c?.defaultPriority ?? 'MEDIUM';
                   }),
                 ),
                 const SizedBox(height: 14),
@@ -218,7 +218,7 @@ class _RaiseRequestSheetState extends ConsumerState<RaiseRequestSheet> {
                 Wrap(
                   spacing: 8,
                   children: [
-                    for (final p in const ['LOW', 'NORMAL', 'HIGH', 'URGENT'])
+                    for (final p in const ['LOW', 'MEDIUM', 'HIGH', 'EMERGENCY'])
                       ChoiceChip(
                         label: Text(_priorityLabel(p)),
                         selected: _priority == p,
@@ -273,10 +273,12 @@ class _RaiseRequestSheetState extends ConsumerState<RaiseRequestSheet> {
     );
   }
 
+  /// The server's four, labelled as the web labels them. The app had its own set — NORMAL and
+  /// URGENT — which the server refuses, so a request raised on the phone failed outright.
   static String _priorityLabel(String code) => switch (code) {
         'LOW' => 'Low',
         'HIGH' => 'High',
-        'URGENT' => 'Urgent',
-        _ => 'Normal',
+        'EMERGENCY' => 'Emergency',
+        _ => 'Medium',
       };
 }
