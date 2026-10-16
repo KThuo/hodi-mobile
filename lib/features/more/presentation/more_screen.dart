@@ -10,6 +10,7 @@ import '../../../core/theme/hodi_colors.dart';
 import '../../../core/theme/hodi_gradients.dart';
 import '../../../core/theme/hodi_shadows.dart';
 import '../../../core/theme/hodi_text_styles.dart';
+import '../../chats/providers/chat_providers.dart';
 import '../../notifications/providers/notification_providers.dart';
 
 class _MenuItem {
@@ -76,6 +77,14 @@ const _moduleItems = <_MenuItem>[
   ),
   // Both audiences hold ROLE_MAINT_VIEW, so this row is offered on the authority itself rather
   // than on being staff — which is the point of the module being in the app.
+  // Every conversation — notices, repairs, and the estate office — in one list, with Contact admin
+  // for a tenant. The row carries the unread count, like the bell.
+  _MenuItem(
+    label: 'Chats',
+    icon: Icons.forum_outlined,
+    permissions: [AppPermissions.chatView],
+    route: '/more/chats',
+  ),
   _MenuItem(
     label: 'Repairs',
     icon: Icons.build_outlined,
@@ -138,6 +147,7 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
     final authState = ref.watch(authProvider);
     final user = authState.user;
 
+    final chatUnread = ref.watch(chatUnreadProvider).value ?? 0;
     final visibleModules = _moduleItems.where((item) {
       if (item.permissions == null) return true;
       return user?.hasAnyPermission(item.permissions!) ?? false;
@@ -207,6 +217,7 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                   children: visibleModules
                       .map((item) => _MenuRow(
                             item: item,
+                            badge: item.route == '/more/chats' ? chatUnread : 0,
                             onTap: () => context.go(item.route!),
                           ))
                       .toList(),
@@ -624,7 +635,10 @@ class _MenuRow extends StatelessWidget {
   final _MenuItem item;
   final VoidCallback onTap;
 
-  const _MenuRow({required this.item, required this.onTap});
+  /// Unread messages behind the row; nothing is drawn at zero.
+  final int badge;
+
+  const _MenuRow({required this.item, required this.onTap, this.badge = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -664,6 +678,27 @@ class _MenuRow extends StatelessWidget {
                 ),
               ),
             ),
+            if (badge > 0)
+              Semantics(
+                label: '$badge unread',
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  constraints: const BoxConstraints(minWidth: 22),
+                  decoration: BoxDecoration(
+                    color: HodiColors.errorStart,
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Text(
+                    badge > 99 ? '99+' : '$badge',
+                    textAlign: TextAlign.center,
+                    style: HodiTextStyles.bodySmall.copyWith(
+                      color: HodiColors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

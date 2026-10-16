@@ -34,6 +34,8 @@ import '../../features/leases/presentation/leases_screen.dart';
 import '../../features/leases/presentation/lease_detail_screen.dart';
 import '../../features/maintenance/presentation/maintenance_screen.dart';
 import '../../features/maintenance/presentation/maintenance_detail_screen.dart';
+import '../../features/chats/presentation/chats_screen.dart';
+import '../../features/chats/presentation/office_chat_screen.dart';
 import '../../features/tenants/presentation/tenants_screen.dart';
 import '../../features/tenants/presentation/tenant_detail_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
@@ -444,6 +446,22 @@ final routerProvider = Provider<GoRouter>((ref) {
                         path: ':id',
                         name: RouteNames.maintenanceDetail,
                         builder: (context, state) => MaintenanceDetailScreen(
+                          id: state.pathParameters['id'] ?? '',
+                        ),
+                      ),
+                    ],
+                  ),
+                  // The inbox, and Contact admin's conversation. A notice's and a repair's chats are on
+                  // their own screens; the inbox links to those.
+                  GoRoute(
+                    path: 'chats',
+                    name: RouteNames.chats,
+                    builder: (context, state) => const ChatsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'office/:id',
+                        name: RouteNames.officeChat,
+                        builder: (context, state) => OfficeChatScreen(
                           id: state.pathParameters['id'] ?? '',
                         ),
                       ),

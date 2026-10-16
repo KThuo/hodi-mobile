@@ -16,6 +16,8 @@ import '../../../core/widgets/hodi_error_state.dart';
 import '../../../core/widgets/hodi_gradient_button.dart';
 import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_text_field.dart';
+import '../../chats/presentation/widgets/chat_thread_card.dart';
+import '../../chats/providers/chat_providers.dart';
 import '../domain/maintenance_models.dart';
 import '../providers/maintenance_providers.dart';
 import 'widgets/maintenance_chips.dart';
@@ -24,7 +26,7 @@ import 'widgets/maintenance_chips.dart';
 ///
 /// The actions are the intersection of what the server allows and what this person holds:
 ///
-/// - **Comment** — `ROLE_MAINT_NEW`, which both audiences have.
+/// - **Chat** — `ROLE_MAINT_NEW`, which both audiences have. The repair's comments, as a chat.
 /// - **Resolve** — `ROLE_MAINT_RESOLVE`, the caretaker's.
 /// - **Rate** — `ROLE_MAINT_NEW`, and only once the job is done and unrated.
 ///
@@ -42,11 +44,6 @@ class MaintenanceDetailScreen extends ConsumerStatefulWidget {
 
 class _MaintenanceDetailScreenState
     extends ConsumerState<MaintenanceDetailScreen> {
-  final _commentController = TextEditingController();
-
-  /// Photos sent with the next update — the fix done, the part replaced.
-  List<XFile> _commentPhotos = const [];
-
   Future<void> _addRequestPhotos(List<XFile> photos) async {
     if (photos.isEmpty) return;
     await _run(() async {
@@ -65,12 +62,6 @@ class _MaintenanceDetailScreenState
     });
   }
   bool _busy = false;
-
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
-  }
 
   void _reload() => ref.invalidate(maintenanceDetailProvider(widget.id));
 
@@ -103,33 +94,27 @@ class _MaintenanceDetailScreenState
     return response.isSuccess as bool;
   }
 
-  Future<void> _comment() async {
-    final text = _commentController.text.trim();
-    if (text.isEmpty) return;
-    await _run(() async {
-      final repo = ref.read(maintenanceRepositoryProvider);
-      final response = await repo.comment(id: widget.id, comment: text);
-      final ok = await _report(() async => response);
-      if (ok) {
-        // The note is in; its photos go on that note, so they show beside it in the history.
-        final update = response.data;
-        if (_commentPhotos.isNotEmpty && update != null) {
-          try {
-            await repo.addPhotos(widget.id, _commentPhotos, updateId: update.id);
-          } catch (_) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('The update was posted, but its photos did not upload.'),
-                backgroundColor: HodiColors.warningStart,
-              ));
-            }
-          }
+  /// A message in the repair's chat — its comment — and any photos on it.
+  ///
+  /// The photos go on the comment they came with, as they always have, so they show under that
+  /// message in the chat. A message that went but whose photos did not is still a message: the
+  /// failure is said, not thrown, so the text is not sent twice.
+  Future<void> _send(String text, List<XFile> photos, bool internal) async {
+    final entry = await ref
+        .read(chatRepositoryProvider)
+        .postToRepair(widget.id, text, visibleToTenant: internal ? false : null);
+    if (photos.isNotEmpty) {
+      try {
+        await ref.read(maintenanceRepositoryProvider).addPhotos(widget.id, photos, updateId: entry.id);
+      } catch (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('The message was sent, but its photos did not upload.'),
+            backgroundColor: HodiColors.warningStart,
+          ));
         }
-        _commentController.clear();
-        if (mounted) setState(() => _commentPhotos = const []);
       }
-      return ok;
-    });
+    }
   }
 
   @override
@@ -212,60 +197,33 @@ class _MaintenanceDetailScreenState
                 const SizedBox(height: 16),
               ],
 
-              _Card(
-                title: 'History',
-                child: detail.timeline.isEmpty
-                    ? Text(
-                        'Nothing has happened yet.',
-                        style: HodiTextStyles.bodySmall
-                            .copyWith(color: HodiColors.textLight),
-                      )
-                    : Column(
-                        children: [
-                          for (final u in detail.timeline)
-                            _TimelineRow(
-                              update: u,
-                              photos: [
-                                for (final p in detail.photos.where((p) => p.updateId == u.id))
-                                  PrivatePhoto(
-                                    load: () => ref.read(maintenanceRepositoryProvider).photoBytes(widget.id, p.id),
-                                  ),
-                              ],
-                            ),
-                        ],
-                      ),
+              // The repair's chat: its comments as messages, and everything else that happened
+              // to it — reported, assigned, resolved — as lines between them. The office can keep a
+              // note to itself; the tenant never sees one.
+              ChatThreadCard(
+                intro: 'Between the tenant and the office, kept with the repair.',
+                empty: 'Nothing said yet. Ask about a date, or say what has changed.',
+                closed: 'This repair is closed. The conversation stays on the record.',
+                hint: 'Write a message',
+                onSent: _reload,
+                extraFor: (e) => [
+                  for (final p in detail.photos.where((p) => p.updateId == e.id))
+                    PrivatePhoto(
+                      load: () => ref.read(maintenanceRepositoryProvider).photoBytes(widget.id, p.id),
+                    ),
+                ],
+                source: ChatSource(
+                  load: () async {
+                    final response = await ref.read(chatRepositoryProvider).repair(widget.id);
+                    return response.isSuccess ? response.data : null;
+                  },
+                  send: _send,
+                  photoMax: 5,
+                  allowInternal: true,
+                  canWrite: canComment,
+                ),
               ),
               const SizedBox(height: 16),
-
-              if (canComment && r.open) ...[
-                _Card(
-                  title: 'Add an update',
-                  child: Column(
-                    children: [
-                      HodiTextField(
-                        controller: _commentController,
-                        hintText: 'Anything worth knowing',
-                        maxLines: 3,
-                      ),
-                      const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: PhotoPickerRow(
-                          photos: _commentPhotos,
-                          onChanged: (list) => setState(() => _commentPhotos = list),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      HodiGradientButton(
-                        text: 'Post',
-                        isLoading: _busy,
-                        onPressed: _busy ? null : _comment,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
 
               if (canResolve && r.open)
                 _ResolveCard(
@@ -424,97 +382,6 @@ class _Card extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _TimelineRow extends StatelessWidget {
-  const _TimelineRow({required this.update, this.photos = const []});
-
-  final MaintenanceUpdateModel update;
-
-  /// This update's photos, already wrapped to load through the request.
-  final List<Widget> photos;
-
-  @override
-  Widget build(BuildContext context) {
-    final moved = update.isStatusChange && update.toLabel != null;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            margin: const EdgeInsets.only(top: 6),
-            decoration: BoxDecoration(
-              color: moved ? HodiColors.primaryStart : HodiColors.dividerStrong,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (moved)
-                  Text(
-                    update.fromLabel == null
-                        ? update.toLabel!
-                        : '${update.fromLabel} → ${update.toLabel}',
-                    style: HodiTextStyles.bodyMedium
-                        .copyWith(fontWeight: FontWeight.w600),
-                  ),
-                if (update.comment != null && update.comment!.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(top: moved ? 2 : 0),
-                    child: Text(update.comment!,
-                        style: HodiTextStyles.bodyMedium),
-                  ),
-                if (photos.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Wrap(spacing: 6, runSpacing: 6, children: photos),
-                  ),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    Text(
-                      [
-                        if (update.performedByName != null) update.performedByName!,
-                        _when(update.performedOn),
-                      ].where((s) => s.isNotEmpty).join(' · '),
-                      style: HodiTextStyles.bodySmall
-                          .copyWith(fontSize: 11, color: HodiColors.textLight),
-                    ),
-                    // Labelled rather than hidden: the server already withholds what a tenant may
-                    // not see, so anything here is visible to whoever is reading it — this only
-                    // says which of them were meant for the office.
-                    if (!update.visibleToTenant) ...[
-                      const SizedBox(width: 6),
-                      const Icon(Icons.lock_outline,
-                          size: 11, color: HodiColors.textFaint),
-                      const SizedBox(width: 2),
-                      Text(
-                        'internal',
-                        style: HodiTextStyles.bodySmall
-                            .copyWith(fontSize: 10, color: HodiColors.textFaint),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static String _when(String? raw) {
-    final parsed = DateFormatter.parseApiDate(raw);
-    return parsed == null ? '' : DateFormatter.formatDateTime(parsed);
   }
 }
 

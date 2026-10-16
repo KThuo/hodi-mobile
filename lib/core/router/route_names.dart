@@ -47,6 +47,8 @@ abstract class RouteNames {
   static const metreHistory = 'metre-history';
   static const vacateNotices = 'vacate-notices';
   static const vacateNoticeDetail = 'vacate-notice-detail';
+  static const chats = 'chats';
+  static const officeChat = 'office-chat';
   static const profile = 'profile';
   static const setPin = 'set-pin';
   static const changePassword = 'change-password';

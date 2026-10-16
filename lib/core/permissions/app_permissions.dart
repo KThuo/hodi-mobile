@@ -146,6 +146,12 @@ abstract class AppPermissions {
   static const vacateSettle = 'ROLE_VACATE_SETTLE';
   static const vacatePay = 'ROLE_VACATE_PAY';
 
+  // ── Chats ─────────────────────────────────────────────────────────────────
+  //
+  // The inbox and the office conversation (Contact admin). The move-out notice and the repair keep
+  // their conversations behind their own authorities; this one gates the list of all three.
+  static const chatView = 'ROLE_CHAT_VIEW';
+
   /// Every authority this app names, for the test that checks them against the backend.
   static const all = <String>[
     dashboardView,
@@ -163,5 +169,6 @@ abstract class AppPermissions {
     estateView,
     reportView,
     vacateView, vacateNew, vacateDecide, vacateSettle, vacatePay,
+    chatView,
   ];
 }

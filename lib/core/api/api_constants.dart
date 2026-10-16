@@ -154,6 +154,12 @@ abstract class ApiConstants {
   // ── Vacate notices ────────────────────────────────────────────────────────
   static const String vacateNotices = '$apiPrefix/vacate-notices';
 
+  // ── Chats ─────────────────────────────────────────────────────────────────
+  //
+  // The inbox, its unread total, and the office conversation at `/office/{id}`. A repair's chat is
+  // on the repair: `maintenance/requests/{id}/chat`.
+  static const String chats = '$apiPrefix/chats';
+
   // ── Public: to let, and stays ─────────────────────────────────────────────
   //
   // No session needed for any of these — they are in the backend's public allowlist, because
