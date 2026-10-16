@@ -56,17 +56,36 @@ abstract class NotificationModel with _$NotificationModel {
   /// modules the app does not carry, and guessing at a translation produces a tap that lands on a
   /// "not found" — which reads as the notification being broken rather than the app being smaller.
   String? get mobileRoute {
-    final r = route;
-    if (r == null || r.isEmpty) return null;
+    final raw = route;
+    if (raw == null || raw.isEmpty) return null;
+    // The web's console lives under /app; the newer notices say so and the older ones do not.
+    final r = raw.startsWith('/app/') ? raw.substring(4) : raw;
 
     // /billing/invoices/HPABACMLPVNH  →  /invoices/HPABACMLPVNH
     final invoice = RegExp(r'^/billing/invoices/([^/?]+)').firstMatch(r);
     if (invoice != null) return '/invoices/${invoice.group(1)}';
+    if (RegExp(r'^/(my-)?invoices(\?|$)').hasMatch(r)) return '/invoices';
 
     final payment = RegExp(r'^/payments/receipts?/([^/?]+)').firstMatch(r);
     if (payment != null) return '/payments/${payment.group(1)}';
+    if (RegExp(r'^/payments(\?|$)').hasMatch(r)) return '/payments';
 
-    if (r.startsWith('/maintenance')) return '/more/maintenance';
+    // A unit back on the market, asking the office to confirm.
+    final unit = RegExp(r'^/units/([^/?]+)').firstMatch(r);
+    if (unit != null) return '/houses/${unit.group(1)}';
+
+    // The repair itself, the office's path or the tenant's: one screen here for both.
+    final repair = RegExp(r'^/(my-)?maintenance/([^/?]+)(\?|$)').firstMatch(r);
+    if (repair != null) return '/more/maintenance/${repair.group(2)}';
+    if (r.startsWith('/maintenance') || r.startsWith('/my-maintenance')) return '/more/maintenance';
+
+    final office = RegExp(r'^/chats/office/([^/?]+)').firstMatch(r);
+    if (office != null) return '/more/chats/office/${office.group(1)}';
+    if (r.startsWith('/chats')) return '/more/chats';
+
+    final notice = RegExp(r'^/vacate-notices/([^/?]+)').firstMatch(r);
+    if (notice != null) return '/more/vacate-notices/${notice.group(1)}';
+
     if (r.startsWith('/visitors') || r.startsWith('/visits')) return '/more/visitors';
     if (r.startsWith('/occupancy') || r.startsWith('/my-houses')) return '/my-houses';
 

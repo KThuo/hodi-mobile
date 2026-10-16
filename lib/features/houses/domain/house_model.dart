@@ -53,6 +53,20 @@ abstract class HouseModel with _$HouseModel {
     @Default(false) bool occupied,
     @Default(0) int status,
     String? createdOn,
+
+    /// `AVAILABLE`, or `UNAVAILABLE` — a vacant unit held back from letting, for [availabilityReason].
+    @Default('AVAILABLE') String availability,
+
+    /// `REPAIRS`, `RENOVATION`, `RESERVED` or `OTHER`. Kept while a review is open, to say what the
+    /// unit came back from.
+    String? availabilityReason,
+
+    /// The day it can be let: a notice's vacate date, or a held-back unit's expected-back date.
+    String? availableFrom,
+
+    /// The day it went back on the market by itself, on its expected-back date, while the office
+    /// has not yet confirmed it is ready. Null when nobody is being asked.
+    String? availabilityReviewSince,
   }) = _HouseModel;
 
   factory HouseModel.fromJson(Map<String, dynamic> json) =>

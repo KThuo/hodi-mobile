@@ -13,7 +13,10 @@ import '../../../core/widgets/hodi_loading_shimmer.dart';
 import '../../../core/widgets/hodi_error_state.dart';
 import '../../occupations/domain/occupation_model.dart';
 import '../../occupations/providers/occupation_providers.dart';
+import '../../../core/auth/providers/auth_provider.dart';
+import '../../../core/permissions/app_permissions.dart';
 import '../domain/house_detail_model.dart';
+import '../domain/unit_standing.dart';
 import '../providers/house_providers.dart';
 
 /// One unit.
@@ -47,6 +50,11 @@ class HouseDetailScreen extends ConsumerWidget {
               children: [
                 _HouseHeaderCard(detail: detail),
                 const SizedBox(height: 16),
+                if (detail.availabilityReviewSince != null &&
+                    detail.availability == 'AVAILABLE') ...[
+                  _ReviewCard(detail: detail),
+                  const SizedBox(height: 16),
+                ],
                 _HouseInfoCard(detail: detail),
                 const SizedBox(height: 16),
                 if (detail.features.isNotEmpty) ...[
@@ -78,6 +86,118 @@ class HouseDetailScreen extends ConsumerWidget {
               : 'Failed to load details',
           onRetry: () => ref.invalidate(houseDetailProvider(houseId)),
         ),
+      ),
+    );
+  }
+}
+
+/// The unit's standing, in the order the list uses — see [UnitStanding].
+UnitStanding _standingOf(HouseDetailModel d) => UnitStanding.of(
+      status: d.status,
+      occupied: d.occupied,
+      availability: d.availability,
+      reason: d.availabilityReason,
+      note: d.availabilityNote,
+      availableFrom: d.availableFrom,
+      reviewSince: d.availabilityReviewSince,
+    );
+
+// --- Back on the market ---
+
+/// A held-back unit went back on the market by itself on its expected-back date, and the office is
+/// asked whether it really is ready: confirm, or hold it back again — same reason — to a new date.
+///
+/// Shown to anybody; the two buttons only to someone who can edit units.
+class _ReviewCard extends ConsumerStatefulWidget {
+  final HouseDetailModel detail;
+
+  const _ReviewCard({required this.detail});
+
+  @override
+  ConsumerState<_ReviewCard> createState() => _ReviewCardState();
+}
+
+class _ReviewCardState extends ConsumerState<_ReviewCard> {
+  bool _busy = false;
+
+  Future<void> _answer({DateTime? until}) async {
+    setState(() => _busy = true);
+    final res = await ref.read(houseRepositoryProvider).reviewAvailability(
+          widget.detail.id,
+          postponeTo: until,
+        );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message)));
+    if (res.isSuccess) {
+      ref.invalidate(houseDetailProvider(widget.detail.id));
+      ref.invalidate(houseListProvider);
+    }
+  }
+
+  Future<void> _notYet() async {
+    final now = DateTime.now();
+    final tomorrow = DateTime(now.year, now.month, now.day + 1);
+    final picked = await showDatePicker(
+      context: context,
+      helpText: 'Expected back',
+      initialDate: tomorrow,
+      firstDate: tomorrow,
+      lastDate: tomorrow.add(const Duration(days: 365)),
+    );
+    if (picked != null) await _answer(until: picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final d = widget.detail;
+    final user = ref.watch(authProvider).user;
+    final canAnswer = user?.hasPermission(AppPermissions.houseEdit) ?? false;
+    final why = (UnitStanding.reasons[d.availabilityReason] ?? 'Held back').toLowerCase();
+    final since = DateTime.tryParse(d.availabilityReviewSince ?? '');
+    final note = d.availabilityNote;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: HodiColors.warningStart.withValues(alpha: 0.08),
+        borderRadius: HodiBorderRadius.card,
+        border: Border.all(color: HodiColors.warningStart.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Back on the market — is it ready?',
+              style: HodiTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Text(
+            'Held back for $why${note != null && note.isNotEmpty ? ' — $note' : ''}, it came back'
+            '${since == null ? '' : ' on ${DateFormatter.formatDate(since)}'}. It is listed and can be '
+            'let; confirm it, or hold it back to a new date.',
+            style: HodiTextStyles.bodySmall,
+          ),
+          if (canAnswer) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _busy ? null : _notYet,
+                    child: const Text('Not yet'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _busy ? null : () => _answer(),
+                    child: Text(_busy ? 'Saving…' : 'Confirm ready'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -125,16 +245,17 @@ class _HouseHeaderCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          HodiStatusBadge(
-            // Suspended before vacant: a suspended unit is usually empty, and "Vacant"
-            // would say it can be let. Status 1 is active; anything else is suspended.
-            text: detail.status != 1
-                ? 'Suspended'
-                : (detail.occupied ? 'Occupied' : 'Vacant'),
-            type: detail.status != 1
-                ? BadgeType.error
-                : (detail.occupied ? BadgeType.success : BadgeType.warning),
-          ),
+          HodiStatusBadge(text: _standingOf(detail).label, type: _standingOf(detail).type),
+          if (_standingOf(detail).detail != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              _standingOf(detail).detail!,
+              style: HodiTextStyles.bodySmall.copyWith(
+                color: HodiColors.white.withValues(alpha: 0.85),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
           const SizedBox(height: 14),
           // An owned unit has no rent. Saying "Monthly Rent KES 0" of it would be a claim, not a
           // blank, so the label changes with the tenure rather than the figure changing to zero.

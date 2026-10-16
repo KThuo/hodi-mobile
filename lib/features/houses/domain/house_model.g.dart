@@ -31,6 +31,10 @@ _HouseModel _$HouseModelFromJson(Map<String, dynamic> json) => _HouseModel(
   occupied: json['occupied'] as bool? ?? false,
   status: (json['status'] as num?)?.toInt() ?? 0,
   createdOn: json['createdOn'] as String?,
+  availability: json['availability'] as String? ?? 'AVAILABLE',
+  availabilityReason: json['availabilityReason'] as String?,
+  availableFrom: json['availableFrom'] as String?,
+  availabilityReviewSince: json['availabilityReviewSince'] as String?,
 );
 
 Map<String, dynamic> _$HouseModelToJson(_HouseModel instance) =>
@@ -59,4 +63,8 @@ Map<String, dynamic> _$HouseModelToJson(_HouseModel instance) =>
       'occupied': instance.occupied,
       'status': instance.status,
       'createdOn': instance.createdOn,
+      'availability': instance.availability,
+      'availabilityReason': instance.availabilityReason,
+      'availableFrom': instance.availableFrom,
+      'availabilityReviewSince': instance.availabilityReviewSince,
     };

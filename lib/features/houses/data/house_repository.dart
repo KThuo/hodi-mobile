@@ -2,6 +2,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/api/api_constants.dart';
 import '../../../core/api/api_response.dart';
 import '../../../core/api/paged_response.dart';
+import '../../../core/utils/date_formatter.dart';
 import '../domain/house_model.dart';
 import '../domain/house_detail_model.dart';
 
@@ -53,6 +54,19 @@ class HouseRepository {
     return _apiClient.get<HouseDetailModel>(
       '${ApiConstants.units}/$id',
       fromJsonT: (data) => HouseDetailModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  /// Answer a unit that went back on the market on its expected-back date: confirm it is ready,
+  /// or — with [postponeTo] — hold it back again, for the same reason, until that day. The
+  /// response's message is the server's sentence for the snackbar.
+  Future<ApiResponse<void>> reviewAvailability(String id, {DateTime? postponeTo}) {
+    return _apiClient.post<void>(
+      '${ApiConstants.units}/$id/availability/review',
+      data: {
+        'decision': postponeTo == null ? 'CONFIRM' : 'POSTPONE',
+        if (postponeTo != null) 'availableFrom': DateFormatter.formatForApi(postponeTo),
+      },
     );
   }
 }

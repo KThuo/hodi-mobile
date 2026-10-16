@@ -7,6 +7,7 @@ import '../../../../core/theme/hodi_colors.dart';
 import '../../../../core/theme/hodi_shadows.dart';
 import '../../../../core/theme/hodi_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/date_formatter.dart';
 import '../../domain/vacant_house_model.dart';
 
 /// One home, as a card.
@@ -173,7 +174,7 @@ class VacantHouseListItem extends StatelessWidget {
                   Text(
                     house.availableFrom == null
                         ? 'Available now'
-                        : 'Available from ${house.availableFrom}',
+                        : 'Available from ${_day(house.availableFrom!)}',
                     style: HodiTextStyles.bodySmall.copyWith(
                       fontWeight: FontWeight.w600,
                       color: HodiColors.successEnd,
@@ -268,4 +269,10 @@ class _Badge extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "30 Nov 2026", not the wire's "2026-11-30".
+String _day(String iso) {
+  final d = DateTime.tryParse(iso);
+  return d == null ? iso : DateFormatter.formatDate(d);
 }

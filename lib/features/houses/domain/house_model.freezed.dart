@@ -22,7 +22,13 @@ mixin _$HouseModel {
  String? get usageClassName; String? get tenure;/// Null where the category does not allow bedrooms — an office, a stall. Render nothing
 /// rather than "0 beds", which is wrong rather than empty.
  int? get beds; int? get baths; int? get ensuite; bool get dsq; int? get parking; double? get squareFt;/// Null for an owned unit, which carries a service charge instead.
- double? get rent; bool get occupied; int get status; String? get createdOn;
+ double? get rent; bool get occupied; int get status; String? get createdOn;/// `AVAILABLE`, or `UNAVAILABLE` — a vacant unit held back from letting, for [availabilityReason].
+ String get availability;/// `REPAIRS`, `RENOVATION`, `RESERVED` or `OTHER`. Kept while a review is open, to say what the
+/// unit came back from.
+ String? get availabilityReason;/// The day it can be let: a notice's vacate date, or a held-back unit's expected-back date.
+ String? get availableFrom;/// The day it went back on the market by itself, on its expected-back date, while the office
+/// has not yet confirmed it is ready. Null when nobody is being asked.
+ String? get availabilityReviewSince;
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -35,16 +41,16 @@ $HouseModelCopyWith<HouseModel> get copyWith => _$HouseModelCopyWithImpl<HouseMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.mezzanine, mezzanine) || other.mezzanine == mezzanine)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.label, label) || other.label == label)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.beds, beds) || other.beds == beds)&&(identical(other.baths, baths) || other.baths == baths)&&(identical(other.ensuite, ensuite) || other.ensuite == ensuite)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parking, parking) || other.parking == parking)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.mezzanine, mezzanine) || other.mezzanine == mezzanine)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.label, label) || other.label == label)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.beds, beds) || other.beds == beds)&&(identical(other.baths, baths) || other.baths == baths)&&(identical(other.ensuite, ensuite) || other.ensuite == ensuite)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parking, parking) || other.parking == parking)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn)&&(identical(other.availability, availability) || other.availability == availability)&&(identical(other.availabilityReason, availabilityReason) || other.availabilityReason == availabilityReason)&&(identical(other.availableFrom, availableFrom) || other.availableFrom == availableFrom)&&(identical(other.availabilityReviewSince, availabilityReviewSince) || other.availabilityReviewSince == availabilityReviewSince));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,houseCode,houseNumber,floor,mezzanine,floorLabel,label,propertyId,propertyName,estateId,estateName,categoryName,usageClassName,tenure,beds,baths,ensuite,dsq,parking,squareFt,rent,occupied,status,createdOn]);
+int get hashCode => Object.hashAll([runtimeType,id,houseCode,houseNumber,floor,mezzanine,floorLabel,label,propertyId,propertyName,estateId,estateName,categoryName,usageClassName,tenure,beds,baths,ensuite,dsq,parking,squareFt,rent,occupied,status,createdOn,availability,availabilityReason,availableFrom,availabilityReviewSince]);
 
 @override
 String toString() {
-  return 'HouseModel(id: $id, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, mezzanine: $mezzanine, floorLabel: $floorLabel, label: $label, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, categoryName: $categoryName, usageClassName: $usageClassName, tenure: $tenure, beds: $beds, baths: $baths, ensuite: $ensuite, dsq: $dsq, parking: $parking, squareFt: $squareFt, rent: $rent, occupied: $occupied, status: $status, createdOn: $createdOn)';
+  return 'HouseModel(id: $id, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, mezzanine: $mezzanine, floorLabel: $floorLabel, label: $label, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, categoryName: $categoryName, usageClassName: $usageClassName, tenure: $tenure, beds: $beds, baths: $baths, ensuite: $ensuite, dsq: $dsq, parking: $parking, squareFt: $squareFt, rent: $rent, occupied: $occupied, status: $status, createdOn: $createdOn, availability: $availability, availabilityReason: $availabilityReason, availableFrom: $availableFrom, availabilityReviewSince: $availabilityReviewSince)';
 }
 
 
@@ -55,7 +61,7 @@ abstract mixin class $HouseModelCopyWith<$Res>  {
   factory $HouseModelCopyWith(HouseModel value, $Res Function(HouseModel) _then) = _$HouseModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String houseCode, String? houseNumber, int? floor, bool mezzanine, String? floorLabel, String? label, String? propertyId, String? propertyName, String? estateId, String? estateName, String? categoryName, String? usageClassName, String? tenure, int? beds, int? baths, int? ensuite, bool dsq, int? parking, double? squareFt, double? rent, bool occupied, int status, String? createdOn
+ String id, String houseCode, String? houseNumber, int? floor, bool mezzanine, String? floorLabel, String? label, String? propertyId, String? propertyName, String? estateId, String? estateName, String? categoryName, String? usageClassName, String? tenure, int? beds, int? baths, int? ensuite, bool dsq, int? parking, double? squareFt, double? rent, bool occupied, int status, String? createdOn, String availability, String? availabilityReason, String? availableFrom, String? availabilityReviewSince
 });
 
 
@@ -72,7 +78,7 @@ class _$HouseModelCopyWithImpl<$Res>
 
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? houseCode = null,Object? houseNumber = freezed,Object? floor = freezed,Object? mezzanine = null,Object? floorLabel = freezed,Object? label = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? usageClassName = freezed,Object? tenure = freezed,Object? beds = freezed,Object? baths = freezed,Object? ensuite = freezed,Object? dsq = null,Object? parking = freezed,Object? squareFt = freezed,Object? rent = freezed,Object? occupied = null,Object? status = null,Object? createdOn = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? houseCode = null,Object? houseNumber = freezed,Object? floor = freezed,Object? mezzanine = null,Object? floorLabel = freezed,Object? label = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? usageClassName = freezed,Object? tenure = freezed,Object? beds = freezed,Object? baths = freezed,Object? ensuite = freezed,Object? dsq = null,Object? parking = freezed,Object? squareFt = freezed,Object? rent = freezed,Object? occupied = null,Object? status = null,Object? createdOn = freezed,Object? availability = null,Object? availabilityReason = freezed,Object? availableFrom = freezed,Object? availabilityReviewSince = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
@@ -98,6 +104,10 @@ as double?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to
 as double?,occupied: null == occupied ? _self.occupied : occupied // ignore: cast_nullable_to_non_nullable
 as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as int,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,availability: null == availability ? _self.availability : availability // ignore: cast_nullable_to_non_nullable
+as String,availabilityReason: freezed == availabilityReason ? _self.availabilityReason : availabilityReason // ignore: cast_nullable_to_non_nullable
+as String?,availableFrom: freezed == availableFrom ? _self.availableFrom : availableFrom // ignore: cast_nullable_to_non_nullable
+as String?,availabilityReviewSince: freezed == availabilityReviewSince ? _self.availabilityReviewSince : availabilityReviewSince // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -183,10 +193,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn,  String availability,  String? availabilityReason,  String? availableFrom,  String? availabilityReviewSince)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HouseModel() when $default != null:
-return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn);case _:
+return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn,_that.availability,_that.availabilityReason,_that.availableFrom,_that.availabilityReviewSince);case _:
   return orElse();
 
 }
@@ -204,10 +214,10 @@ return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mez
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn,  String availability,  String? availabilityReason,  String? availableFrom,  String? availabilityReviewSince)  $default,) {final _that = this;
 switch (_that) {
 case _HouseModel():
-return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn);case _:
+return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn,_that.availability,_that.availabilityReason,_that.availableFrom,_that.availabilityReviewSince);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -224,10 +234,10 @@ return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mez
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String houseCode,  String? houseNumber,  int? floor,  bool mezzanine,  String? floorLabel,  String? label,  String? propertyId,  String? propertyName,  String? estateId,  String? estateName,  String? categoryName,  String? usageClassName,  String? tenure,  int? beds,  int? baths,  int? ensuite,  bool dsq,  int? parking,  double? squareFt,  double? rent,  bool occupied,  int status,  String? createdOn,  String availability,  String? availabilityReason,  String? availableFrom,  String? availabilityReviewSince)?  $default,) {final _that = this;
 switch (_that) {
 case _HouseModel() when $default != null:
-return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn);case _:
+return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mezzanine,_that.floorLabel,_that.label,_that.propertyId,_that.propertyName,_that.estateId,_that.estateName,_that.categoryName,_that.usageClassName,_that.tenure,_that.beds,_that.baths,_that.ensuite,_that.dsq,_that.parking,_that.squareFt,_that.rent,_that.occupied,_that.status,_that.createdOn,_that.availability,_that.availabilityReason,_that.availableFrom,_that.availabilityReviewSince);case _:
   return null;
 
 }
@@ -239,7 +249,7 @@ return $default(_that.id,_that.houseCode,_that.houseNumber,_that.floor,_that.mez
 @JsonSerializable()
 
 class _HouseModel extends HouseModel {
-  const _HouseModel({required this.id, required this.houseCode, this.houseNumber, this.floor, this.mezzanine = false, this.floorLabel, this.label, this.propertyId, this.propertyName, this.estateId, this.estateName, this.categoryName, this.usageClassName, this.tenure, this.beds, this.baths, this.ensuite, this.dsq = false, this.parking, this.squareFt, this.rent, this.occupied = false, this.status = 0, this.createdOn}): super._();
+  const _HouseModel({required this.id, required this.houseCode, this.houseNumber, this.floor, this.mezzanine = false, this.floorLabel, this.label, this.propertyId, this.propertyName, this.estateId, this.estateName, this.categoryName, this.usageClassName, this.tenure, this.beds, this.baths, this.ensuite, this.dsq = false, this.parking, this.squareFt, this.rent, this.occupied = false, this.status = 0, this.createdOn, this.availability = 'AVAILABLE', this.availabilityReason, this.availableFrom, this.availabilityReviewSince}): super._();
   factory _HouseModel.fromJson(Map<String, dynamic> json) => _$HouseModelFromJson(json);
 
 @override final  String id;
@@ -273,6 +283,16 @@ class _HouseModel extends HouseModel {
 @override@JsonKey() final  bool occupied;
 @override@JsonKey() final  int status;
 @override final  String? createdOn;
+/// `AVAILABLE`, or `UNAVAILABLE` — a vacant unit held back from letting, for [availabilityReason].
+@override@JsonKey() final  String availability;
+/// `REPAIRS`, `RENOVATION`, `RESERVED` or `OTHER`. Kept while a review is open, to say what the
+/// unit came back from.
+@override final  String? availabilityReason;
+/// The day it can be let: a notice's vacate date, or a held-back unit's expected-back date.
+@override final  String? availableFrom;
+/// The day it went back on the market by itself, on its expected-back date, while the office
+/// has not yet confirmed it is ready. Null when nobody is being asked.
+@override final  String? availabilityReviewSince;
 
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
@@ -287,16 +307,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.mezzanine, mezzanine) || other.mezzanine == mezzanine)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.label, label) || other.label == label)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.beds, beds) || other.beds == beds)&&(identical(other.baths, baths) || other.baths == baths)&&(identical(other.ensuite, ensuite) || other.ensuite == ensuite)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parking, parking) || other.parking == parking)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HouseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.houseCode, houseCode) || other.houseCode == houseCode)&&(identical(other.houseNumber, houseNumber) || other.houseNumber == houseNumber)&&(identical(other.floor, floor) || other.floor == floor)&&(identical(other.mezzanine, mezzanine) || other.mezzanine == mezzanine)&&(identical(other.floorLabel, floorLabel) || other.floorLabel == floorLabel)&&(identical(other.label, label) || other.label == label)&&(identical(other.propertyId, propertyId) || other.propertyId == propertyId)&&(identical(other.propertyName, propertyName) || other.propertyName == propertyName)&&(identical(other.estateId, estateId) || other.estateId == estateId)&&(identical(other.estateName, estateName) || other.estateName == estateName)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.usageClassName, usageClassName) || other.usageClassName == usageClassName)&&(identical(other.tenure, tenure) || other.tenure == tenure)&&(identical(other.beds, beds) || other.beds == beds)&&(identical(other.baths, baths) || other.baths == baths)&&(identical(other.ensuite, ensuite) || other.ensuite == ensuite)&&(identical(other.dsq, dsq) || other.dsq == dsq)&&(identical(other.parking, parking) || other.parking == parking)&&(identical(other.squareFt, squareFt) || other.squareFt == squareFt)&&(identical(other.rent, rent) || other.rent == rent)&&(identical(other.occupied, occupied) || other.occupied == occupied)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdOn, createdOn) || other.createdOn == createdOn)&&(identical(other.availability, availability) || other.availability == availability)&&(identical(other.availabilityReason, availabilityReason) || other.availabilityReason == availabilityReason)&&(identical(other.availableFrom, availableFrom) || other.availableFrom == availableFrom)&&(identical(other.availabilityReviewSince, availabilityReviewSince) || other.availabilityReviewSince == availabilityReviewSince));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,houseCode,houseNumber,floor,mezzanine,floorLabel,label,propertyId,propertyName,estateId,estateName,categoryName,usageClassName,tenure,beds,baths,ensuite,dsq,parking,squareFt,rent,occupied,status,createdOn]);
+int get hashCode => Object.hashAll([runtimeType,id,houseCode,houseNumber,floor,mezzanine,floorLabel,label,propertyId,propertyName,estateId,estateName,categoryName,usageClassName,tenure,beds,baths,ensuite,dsq,parking,squareFt,rent,occupied,status,createdOn,availability,availabilityReason,availableFrom,availabilityReviewSince]);
 
 @override
 String toString() {
-  return 'HouseModel(id: $id, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, mezzanine: $mezzanine, floorLabel: $floorLabel, label: $label, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, categoryName: $categoryName, usageClassName: $usageClassName, tenure: $tenure, beds: $beds, baths: $baths, ensuite: $ensuite, dsq: $dsq, parking: $parking, squareFt: $squareFt, rent: $rent, occupied: $occupied, status: $status, createdOn: $createdOn)';
+  return 'HouseModel(id: $id, houseCode: $houseCode, houseNumber: $houseNumber, floor: $floor, mezzanine: $mezzanine, floorLabel: $floorLabel, label: $label, propertyId: $propertyId, propertyName: $propertyName, estateId: $estateId, estateName: $estateName, categoryName: $categoryName, usageClassName: $usageClassName, tenure: $tenure, beds: $beds, baths: $baths, ensuite: $ensuite, dsq: $dsq, parking: $parking, squareFt: $squareFt, rent: $rent, occupied: $occupied, status: $status, createdOn: $createdOn, availability: $availability, availabilityReason: $availabilityReason, availableFrom: $availableFrom, availabilityReviewSince: $availabilityReviewSince)';
 }
 
 
@@ -307,7 +327,7 @@ abstract mixin class _$HouseModelCopyWith<$Res> implements $HouseModelCopyWith<$
   factory _$HouseModelCopyWith(_HouseModel value, $Res Function(_HouseModel) _then) = __$HouseModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String houseCode, String? houseNumber, int? floor, bool mezzanine, String? floorLabel, String? label, String? propertyId, String? propertyName, String? estateId, String? estateName, String? categoryName, String? usageClassName, String? tenure, int? beds, int? baths, int? ensuite, bool dsq, int? parking, double? squareFt, double? rent, bool occupied, int status, String? createdOn
+ String id, String houseCode, String? houseNumber, int? floor, bool mezzanine, String? floorLabel, String? label, String? propertyId, String? propertyName, String? estateId, String? estateName, String? categoryName, String? usageClassName, String? tenure, int? beds, int? baths, int? ensuite, bool dsq, int? parking, double? squareFt, double? rent, bool occupied, int status, String? createdOn, String availability, String? availabilityReason, String? availableFrom, String? availabilityReviewSince
 });
 
 
@@ -324,7 +344,7 @@ class __$HouseModelCopyWithImpl<$Res>
 
 /// Create a copy of HouseModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? houseCode = null,Object? houseNumber = freezed,Object? floor = freezed,Object? mezzanine = null,Object? floorLabel = freezed,Object? label = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? usageClassName = freezed,Object? tenure = freezed,Object? beds = freezed,Object? baths = freezed,Object? ensuite = freezed,Object? dsq = null,Object? parking = freezed,Object? squareFt = freezed,Object? rent = freezed,Object? occupied = null,Object? status = null,Object? createdOn = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? houseCode = null,Object? houseNumber = freezed,Object? floor = freezed,Object? mezzanine = null,Object? floorLabel = freezed,Object? label = freezed,Object? propertyId = freezed,Object? propertyName = freezed,Object? estateId = freezed,Object? estateName = freezed,Object? categoryName = freezed,Object? usageClassName = freezed,Object? tenure = freezed,Object? beds = freezed,Object? baths = freezed,Object? ensuite = freezed,Object? dsq = null,Object? parking = freezed,Object? squareFt = freezed,Object? rent = freezed,Object? occupied = null,Object? status = null,Object? createdOn = freezed,Object? availability = null,Object? availabilityReason = freezed,Object? availableFrom = freezed,Object? availabilityReviewSince = freezed,}) {
   return _then(_HouseModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,houseCode: null == houseCode ? _self.houseCode : houseCode // ignore: cast_nullable_to_non_nullable
@@ -350,6 +370,10 @@ as double?,rent: freezed == rent ? _self.rent : rent // ignore: cast_nullable_to
 as double?,occupied: null == occupied ? _self.occupied : occupied // ignore: cast_nullable_to_non_nullable
 as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as int,createdOn: freezed == createdOn ? _self.createdOn : createdOn // ignore: cast_nullable_to_non_nullable
+as String?,availability: null == availability ? _self.availability : availability // ignore: cast_nullable_to_non_nullable
+as String,availabilityReason: freezed == availabilityReason ? _self.availabilityReason : availabilityReason // ignore: cast_nullable_to_non_nullable
+as String?,availableFrom: freezed == availableFrom ? _self.availableFrom : availableFrom // ignore: cast_nullable_to_non_nullable
+as String?,availabilityReviewSince: freezed == availabilityReviewSince ? _self.availabilityReviewSince : availabilityReviewSince // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

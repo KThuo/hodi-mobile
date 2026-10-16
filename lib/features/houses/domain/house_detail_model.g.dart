@@ -43,6 +43,11 @@ _HouseDetailModel _$HouseDetailModelFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const <String>[],
+      availability: json['availability'] as String? ?? 'AVAILABLE',
+      availabilityReason: json['availabilityReason'] as String?,
+      availableFrom: json['availableFrom'] as String?,
+      availabilityReviewSince: json['availabilityReviewSince'] as String?,
+      availabilityNote: json['availabilityNote'] as String?,
     );
 
 Map<String, dynamic> _$HouseDetailModelToJson(_HouseDetailModel instance) =>
@@ -74,4 +79,9 @@ Map<String, dynamic> _$HouseDetailModelToJson(_HouseDetailModel instance) =>
       'createdOn': instance.createdOn,
       'features': instance.features,
       'pending': instance.pending,
+      'availability': instance.availability,
+      'availabilityReason': instance.availabilityReason,
+      'availableFrom': instance.availableFrom,
+      'availabilityReviewSince': instance.availabilityReviewSince,
+      'availabilityNote': instance.availabilityNote,
     };

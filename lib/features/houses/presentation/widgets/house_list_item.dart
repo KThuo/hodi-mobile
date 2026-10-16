@@ -5,6 +5,7 @@ import '../../../../core/widgets/hodi_card.dart';
 import '../../../../core/widgets/hodi_amount_text.dart';
 import '../../../../core/widgets/hodi_status_badge.dart';
 import '../../domain/house_model.dart';
+import '../../domain/unit_standing.dart';
 
 class HouseListItem extends StatelessWidget {
   final HouseModel house;
@@ -14,6 +15,14 @@ class HouseListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final standing = UnitStanding.of(
+      status: house.status,
+      occupied: house.occupied,
+      availability: house.availability,
+      reason: house.availabilityReason,
+      availableFrom: house.availableFrom,
+      reviewSince: house.availabilityReviewSince,
+    );
     return HodiCard(
       onTap: onTap,
       child: Row(
@@ -69,18 +78,20 @@ class HouseListItem extends StatelessWidget {
                         style: HodiTextStyles.bodySmall,
                       ),
                     const Spacer(),
-                    HodiStatusBadge(
-                      // Suspended before vacant: a suspended unit is usually empty, and "Vacant"
-                      // would say it can be let. Status 1 is active; anything else is suspended.
-                      text: house.status != 1
-                          ? 'Suspended'
-                          : (house.occupied ? 'Occupied' : 'Vacant'),
-                      type: house.status != 1
-                          ? BadgeType.error
-                          : (house.occupied ? BadgeType.success : BadgeType.warning),
-                    ),
+                    // Suspended, held back, back and awaiting a confirmation, occupied or vacant —
+                    // the order is UnitStanding's, so the list and the detail never disagree.
+                    HodiStatusBadge(text: standing.label, type: standing.type),
                   ],
                 ),
+                if (standing.detail != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    standing.detail!,
+                    style: HodiTextStyles.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),

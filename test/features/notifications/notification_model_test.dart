@@ -88,6 +88,20 @@ void main() {
       expect(n.body, isNotEmpty);
     });
 
+    test('the console\'s /app paths reach the same screens', () {
+      String? to(String route) =>
+          NotificationModel.fromJson({...row, 'route': route}).mobileRoute;
+
+      expect(to('/app/units/Xk9aQ2'), '/houses/Xk9aQ2');
+      expect(to('/app/maintenance/Rb7Lm1'), '/more/maintenance/Rb7Lm1');
+      expect(to('/app/my-maintenance/Rb7Lm1'), '/more/maintenance/Rb7Lm1');
+      expect(to('/app/chats/office/Qw3Er4'), '/more/chats/office/Qw3Er4');
+      expect(to('/app/vacate-notices/Vn5Tz8'), '/more/vacate-notices/Vn5Tz8');
+      expect(to('/app/my-invoices'), '/invoices');
+      expect(to('/app/payments'), '/payments');
+      expect(to('/app/estate-invoices'), isNull);
+    });
+
     test('maintenance and visits reach their lists', () {
       expect(
         NotificationModel.fromJson({...row, 'route': '/maintenance/requests/9'}).mobileRoute,
