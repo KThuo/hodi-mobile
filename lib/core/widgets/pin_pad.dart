@@ -42,6 +42,7 @@ class PinPad extends StatefulWidget {
     this.error,
     this.onForgot,
     this.forgotLabel = 'Use my password instead',
+    this.onGlass = false,
   });
 
   /// Called with the digits once [length] of them have been tapped.
@@ -58,6 +59,11 @@ class PinPad extends StatefulWidget {
 
   final VoidCallback? onForgot;
   final String forgotLabel;
+
+  /// Drawn on a glass card over a photograph, as on the sign-in screen: smaller keys, so the card
+  /// leaves the picture showing, and a translucent fill, so the keys read as part of the glass
+  /// rather than as grey discs stuck on it.
+  final bool onGlass;
 
   @override
   State<PinPad> createState() => _PinPadState();
@@ -128,7 +134,9 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
           builder: (context, child) {
             // Three there-and-back cycles, decaying — a nudge, not a wobble.
             final t = _shake.value;
-            final offset = t == 0 ? 0.0 : (1 - t) * 10 * math.sin(t * 3 * 2 * math.pi);
+            final offset = t == 0
+                ? 0.0
+                : (1 - t) * 10 * math.sin(t * 3 * 2 * math.pi);
             return Transform.translate(offset: Offset(offset, 0), child: child);
           },
           child: Row(
@@ -137,7 +145,9 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
               final filled = i < _entered.length;
               final colour = failed
                   ? HodiColors.errorStart
-                  : (filled ? HodiColors.primaryStart : HodiColors.dividerStrong);
+                  : (filled
+                        ? HodiColors.primaryStart
+                        : HodiColors.dividerStrong);
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 160),
                 curve: Curves.easeOutBack,
@@ -168,7 +178,7 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
         // Reserved whether or not there is a message, so the keypad does not jump up the screen
         // when one appears — the keys must not move under a thumb that is already travelling.
         SizedBox(
-          height: 38,
+          height: widget.onGlass ? 28 : 38,
           child: Center(
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 150),
@@ -207,7 +217,12 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    for (final d in row) _Key(label: d, onTap: () => _tap(d)),
+                    for (final d in row)
+                      _Key(
+                        label: d,
+                        onTap: () => _tap(d),
+                        onGlass: widget.onGlass,
+                      ),
                   ],
                 ),
               Row(
@@ -215,8 +230,12 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
                 children: [
                   // An empty cell rather than a missing one, so 0 sits under 8 as it does on a
                   // telephone.
-                  const _Key.blank(),
-                  _Key(label: '0', onTap: () => _tap('0')),
+                  _Key.blank(onGlass: widget.onGlass),
+                  _Key(
+                    label: '0',
+                    onTap: () => _tap('0'),
+                    onGlass: widget.onGlass,
+                  ),
                   _Key(
                     icon: Icons.backspace_outlined,
                     onTap: _back,
@@ -224,6 +243,7 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
                     // a plain glyph is how every handset's own pad distinguishes it.
                     plain: true,
                     enabled: _entered.isNotEmpty,
+                    onGlass: widget.onGlass,
                   ),
                 ],
               ),
@@ -261,20 +281,22 @@ class _Key extends StatefulWidget {
     this.onTap,
     this.plain = false,
     this.enabled = true,
+    this.onGlass = false,
   });
 
-  const _Key.blank()
-      : label = null,
-        icon = null,
-        onTap = null,
-        plain = true,
-        enabled = false;
+  const _Key.blank({this.onGlass = false})
+    : label = null,
+      icon = null,
+      onTap = null,
+      plain = true,
+      enabled = false;
 
   final String? label;
   final IconData? icon;
   final VoidCallback? onTap;
   final bool plain;
   final bool enabled;
+  final bool onGlass;
 
   @override
   State<_Key> createState() => _KeyState();
@@ -285,13 +307,15 @@ class _KeyState extends State<_Key> {
 
   /// 64 across inside a 78 cell: comfortably past the 48dp target, with the gap between circles
   /// doing the work the old flat keys asked the eye to do.
-  static const _cell = 78.0;
-  static const _circle = 64.0;
+  ///
+  /// On glass, 56 inside 66: still past 48dp, and the pad is some 50 points shorter.
+  double get _cell => widget.onGlass ? 66.0 : 78.0;
+  double get _circle => widget.onGlass ? 56.0 : 64.0;
 
   @override
   Widget build(BuildContext context) {
     if (widget.label == null && widget.icon == null) {
-      return const SizedBox(width: _cell, height: _cell);
+      return SizedBox(width: _cell, height: _cell);
     }
 
     final interactive = widget.enabled && widget.onTap != null;
@@ -315,8 +339,10 @@ class _KeyState extends State<_Key> {
               color: _down
                   ? HodiColors.brandSoft
                   : widget.plain
-                      ? Colors.transparent
-                      : HodiColors.surfaceInset,
+                  ? Colors.transparent
+                  : widget.onGlass
+                  ? HodiColors.white.withValues(alpha: 0.55)
+                  : HodiColors.surfaceInset,
             ),
             child: Center(
               child: widget.icon != null
@@ -324,15 +350,19 @@ class _KeyState extends State<_Key> {
                       widget.icon,
                       size: 24,
                       color: interactive
-                          ? (_down ? HodiColors.primaryStart : HodiColors.textMedium)
+                          ? (_down
+                                ? HodiColors.primaryStart
+                                : HodiColors.textMedium)
                           : HodiColors.textFaint,
                     )
                   : Text(
                       widget.label!,
                       style: HodiTextStyles.heading2.copyWith(
-                        fontSize: 27,
+                        fontSize: widget.onGlass ? 24 : 27,
                         fontWeight: FontWeight.w500,
-                        color: _down ? HodiColors.primaryStart : HodiColors.textDark,
+                        color: _down
+                            ? HodiColors.primaryStart
+                            : HodiColors.textDark,
                       ),
                     ),
             ),

@@ -203,20 +203,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    /*
+                     * The mark, above the card rather than in it, so the card is only the question
+                     * and is that much shorter. On a frosted tile of its own: in its own colours,
+                     * straight on the photograph, the blue would be lost in a dark room.
+                     */
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(22),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            color: HodiColors.white.withValues(alpha: 0.72),
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(
+                              color: HodiColors.white.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          child: SvgPicture.asset(
+                            'assets/images/logo.svg',
+                            height: 40,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
                     // The card: glass over the photograph, as the web's AuthShell is.
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                         child: Container(
-                          padding: const EdgeInsets.all(24),
+                          padding: EdgeInsets.all(_askingForPin ? 20 : 24),
                           decoration: BoxDecoration(
-                            // --glass and --glass-edge. Not flat white: the blur behind it is what
-                            // makes a card on a photograph read as glass rather than as a sticker.
-                            color: HodiColors.white.withValues(alpha: 0.95),
+                            // Translucent enough that the room shows through the blur; any more
+                            // and the grey of the subtitle starts to lose against a dark photograph.
+                            color: HodiColors.white.withValues(alpha: 0.74),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: HodiColors.white.withValues(alpha: 0.4),
+                              color: HodiColors.white.withValues(alpha: 0.55),
                             ),
                             boxShadow: const [
                               BoxShadow(
@@ -236,15 +266,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // The mark lives in the card, in its own colours. Outside it, tinted
-                                // white, it needed a gradient behind it to be visible at all.
-                                Center(
-                                  child: SvgPicture.asset(
-                                    'assets/images/logo.svg',
-                                    height: 52,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
                                 // The heading carries the brand, and it is the only place on this screen
                                 // that does — gradient-clipped text, exactly as `.login__title` is.
                                 ShaderMask(
@@ -271,13 +292,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 // name on it is four dots and no way to tell whose account they open.
                                 Text(
                                   _askingForPin
-                                      ? 'Enter your PIN, ${_remembered ?? ''}'.trimRight()
+                                      ? 'Enter your PIN, ${_remembered ?? ''}'
+                                            .trimRight()
                                       : 'Sign in to your account',
                                   style: HodiTextStyles.bodyMedium.copyWith(
                                     color: HodiColors.textMedium,
                                   ),
                                 ),
-                                const SizedBox(height: 24),
+                                SizedBox(height: _askingForPin ? 16 : 24),
 
                                 // Error message
                                 if (authState.error != null) ...[
@@ -319,76 +341,100 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                                 // ── The PIN, where this handset holds one ──────
                                 if (_askingForPin) ...[
-                                  PinPad(
-                                    busy: authState.isLoading,
-                                    error: _pinError,
-                                    onCompleted: _submitPin,
-                                    onForgot: () =>
-                                        setState(() => _passwordInstead = true),
-                                  ),
-                                  const SizedBox(height: 4),
                                   Center(
-                                    child: TextButton(
-                                      onPressed: _forgetMe,
-                                      child: Text(
-                                        'Not ${_remembered ?? 'you'}?',
-                                        style: HodiTextStyles.bodySmall.copyWith(
-                                          color: HodiColors.textLight,
-                                        ),
-                                      ),
+                                    child: PinPad(
+                                      busy: authState.isLoading,
+                                      error: _pinError,
+                                      onCompleted: _submitPin,
+                                      onGlass: true,
                                     ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  /*
+                                   * The ways out of the keypad, on one line. They used to be three
+                                   * stacked links — the password, "Not you?", and Forgot Password —
+                                   * and the last belongs to the password form, where it now is only.
+                                   */
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _InlineLink(
+                                        label: 'Use password',
+                                        onTap: authState.isLoading
+                                            ? null
+                                            : () => setState(
+                                                () => _passwordInstead = true,
+                                              ),
+                                        strong: true,
+                                      ),
+                                      Text(
+                                        '·',
+                                        style: HodiTextStyles.bodySmall
+                                            .copyWith(
+                                              color: HodiColors.textLight,
+                                            ),
+                                      ),
+                                      _InlineLink(
+                                        label: 'Not ${_remembered ?? 'you'}?',
+                                        onTap: _forgetMe,
+                                      ),
+                                    ],
                                   ),
                                 ],
 
                                 // Username
-                                if (!_askingForPin) HodiTextField(
-                                  controller: _usernameController,
-                                  hintText: 'Username',
-                                  prefixIcon: Icons.person_outline,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  validator: (v) =>
-                                      Validators.required(v, 'Username'),
-                                ),
+                                if (!_askingForPin)
+                                  HodiTextField(
+                                    controller: _usernameController,
+                                    hintText: 'Username',
+                                    prefixIcon: Icons.person_outline,
+                                    keyboardType: TextInputType.text,
+                                    textInputAction: TextInputAction.next,
+                                    validator: (v) =>
+                                        Validators.required(v, 'Username'),
+                                  ),
                                 if (!_askingForPin) const SizedBox(height: 16),
 
                                 // Password
-                                if (!_askingForPin) HodiTextField(
-                                  controller: _passwordController,
-                                  hintText: 'Password',
-                                  prefixIcon: Icons.lock_outline,
-                                  obscureText: _obscurePassword,
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) => _handleLogin(),
-                                  validator: (v) =>
-                                      Validators.required(v, 'Password'),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off_outlined
-                                          : Icons.visibility_outlined,
-                                      color: HodiColors.textLight,
-                                      size: 20,
+                                if (!_askingForPin)
+                                  HodiTextField(
+                                    controller: _passwordController,
+                                    hintText: 'Password',
+                                    prefixIcon: Icons.lock_outline,
+                                    obscureText: _obscurePassword,
+                                    textInputAction: TextInputAction.done,
+                                    onSubmitted: (_) => _handleLogin(),
+                                    validator: (v) =>
+                                        Validators.required(v, 'Password'),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_outlined,
+                                        color: HodiColors.textLight,
+                                        size: 20,
+                                      ),
+                                      onPressed: () {
+                                        setState(
+                                          () => _obscurePassword =
+                                              !_obscurePassword,
+                                        );
+                                      },
                                     ),
-                                    onPressed: () {
-                                      setState(
-                                        () => _obscurePassword =
-                                            !_obscurePassword,
-                                      );
-                                    },
                                   ),
-                                ),
                                 if (!_askingForPin) const SizedBox(height: 24),
 
                                 // Sign In button
-                                if (!_askingForPin) HodiGradientButton(
-                                  text: 'Sign In',
-                                  onPressed: _handleLogin,
-                                  isLoading: authState.isLoading,
-                                ),
+                                if (!_askingForPin)
+                                  HodiGradientButton(
+                                    text: 'Sign In',
+                                    onPressed: _handleLogin,
+                                    isLoading: authState.isLoading,
+                                  ),
 
                                 // Biometric button
-                                if (authState.biometricEnabled && !_askingForPin) ...[
+                                if (authState.biometricEnabled &&
+                                    !_askingForPin) ...[
                                   const SizedBox(height: 16),
                                   SizedBox(
                                     width: double.infinity,
@@ -425,22 +471,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ),
                                   ),
                                 ],
-                                const SizedBox(height: 16),
+                                if (!_askingForPin) const SizedBox(height: 16),
 
                                 // Forgot password
-                                Center(
-                                  child: TextButton(
-                                    onPressed: () =>
-                                        context.pushNamed('forgot-password'),
-                                    child: Text(
-                                      'Forgot Password?',
-                                      style: HodiTextStyles.bodyMedium.copyWith(
-                                        color: HodiColors.primaryStart,
-                                        fontWeight: FontWeight.w500,
+                                if (!_askingForPin)
+                                  Center(
+                                    child: TextButton(
+                                      onPressed: () =>
+                                          context.pushNamed('forgot-password'),
+                                      child: Text(
+                                        'Forgot Password?',
+                                        style: HodiTextStyles.bodyMedium
+                                            .copyWith(
+                                              color: HodiColors.primaryStart,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                       ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
                           ),
@@ -488,6 +536,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
+/// A small link inside the card, sized so two sit on one line.
+class _InlineLink extends StatelessWidget {
+  const _InlineLink({
+    required this.label,
+    required this.onTap,
+    this.strong = false,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+
+  /// The way on (brand, bold) rather than the way back (grey).
+  final bool strong;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onTap,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        minimumSize: const Size(0, 40),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        label,
+        style: HodiTextStyles.bodySmall.copyWith(
+          color: strong ? HodiColors.primaryStart : HodiColors.textMedium,
+          fontWeight: strong ? FontWeight.w600 : FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}
 
 /// One of the two public links under the sign-in card.
 class _PublicLink extends StatelessWidget {
