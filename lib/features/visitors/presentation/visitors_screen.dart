@@ -83,9 +83,19 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
     final user = ref.watch(authProvider).user;
     final canDecide = user?.hasPermission(AppPermissions.visitDecide) ?? false;
     final isGate = user?.hasPermission(AppPermissions.visitNew) ?? false;
-    // A host who can send passes. Somebody working the gate checks people in instead.
+    /*
+     * A host who can send passes.
+     *
+     * Somebody working the gate may live here too — an estate admin renting a flat, say — and is a
+     * host for their own door like anybody else. For them it waits on a unit of their own, so gate
+     * staff who live elsewhere are not offered an invite that can only be refused.
+     */
+    final hasUnits =
+        isGate && (ref.watch(myUnitsProvider).value?.isNotEmpty ?? false);
     final canInvite =
-        !isGate && (user?.hasPermission(AppPermissions.visitInvite) ?? false);
+        (user?.hasPermission(AppPermissions.visitInvite) ?? false) &&
+            (!isGate || hasUnits);
+    final myDoor = ref.watch(myDoorProvider);
 
     return Scaffold(
       backgroundColor: HodiColors.background,
@@ -100,6 +110,13 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
               tooltip: 'Check a pass',
               icon: const Icon(Icons.qr_code_scanner),
               onPressed: () => context.push('/more/visitors/scan'),
+            ),
+          // Gate staff keep Check in as the main button; their own invite sits up here.
+          if (isGate && canInvite)
+            IconButton(
+              tooltip: 'Invite a visitor',
+              icon: const Icon(Icons.person_add_alt),
+              onPressed: () => context.push('/more/visitors/invite'),
             ),
           if (canInvite)
             IconButton(
@@ -176,6 +193,16 @@ class _VisitorsScreenState extends ConsumerState<VisitorsScreen> {
                       .read(visitListProvider.notifier)
                       .setFilter(VisitFilter.all),
                 ),
+                // Gate staff who live here: their own door, alongside whatever filter is on.
+                if (hasUnits) ...[
+                  const SizedBox(width: 8),
+                  _Chip(
+                    label: 'My unit',
+                    selected: myDoor,
+                    onTap: () =>
+                        ref.read(visitListProvider.notifier).setMine(!myDoor),
+                  ),
+                ],
               ],
             ),
           ),

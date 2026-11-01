@@ -107,9 +107,10 @@ class VisitRepository {
     );
   }
 
-  Future<ApiResponse<OnSiteSummaryModel>> onSite() async {
+  Future<ApiResponse<OnSiteSummaryModel>> onSite({bool mine = false}) async {
     return _apiClient.get<OnSiteSummaryModel>(
       '${ApiConstants.visits}/on-site',
+      queryParameters: {if (mine) 'mine': true},
       fromJsonT: (data) =>
           OnSiteSummaryModel.fromJson(data as Map<String, dynamic>),
     );

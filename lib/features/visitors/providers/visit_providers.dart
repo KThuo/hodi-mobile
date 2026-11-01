@@ -19,14 +19,32 @@ final visitRepositoryProvider = Provider<VisitRepository>((ref) {
 final visitsAreMineProvider = Provider<bool>((ref) {
   final user = ref.watch(authProvider).user;
   if (user == null) return true;
-  // Somebody who checks people in is working a gate, not reading their own doorbell.
-  if (user.hasPermission(AppPermissions.visitNew)) return false;
+  // Somebody who checks people in is working a gate, not reading their own doorbell — unless they
+  // have asked for their own door, because the person working it may live here too.
+  if (user.hasPermission(AppPermissions.visitNew)) {
+    return ref.watch(myDoorProvider);
+  }
   return user.hasPermission(AppPermissions.tenantSelf);
 });
 
+/// A gate account's "My unit": its own door's visitors instead of the estate's.
+///
+/// For the admin or superadmin who rents a flat. The server reads "mine" past their estate scope,
+/// so a flat in an estate they do not run is still theirs to see and answer.
+final myDoorProvider = NotifierProvider<MyDoorNotifier, bool>(MyDoorNotifier.new);
+
+class MyDoorNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool mine) => state = mine;
+}
+
 /// How many people are on site, and how many are waiting on an answer.
 final onSiteProvider = FutureProvider.autoDispose<OnSiteSummaryModel?>((ref) async {
-  final response = await ref.watch(visitRepositoryProvider).onSite();
+  final response = await ref
+      .watch(visitRepositoryProvider)
+      .onSite(mine: ref.watch(visitsAreMineProvider));
   return response.isSuccess ? response.data : null;
 });
 
@@ -132,6 +150,13 @@ class VisitListNotifier extends Notifier<VisitListState> {
       searchTerm: term,
       currentPage: 0,
     );
+    await _fetchPage(0);
+  }
+
+  /// A gate account switching between the estate's visitors and its own door's.
+  Future<void> setMine(bool mine) async {
+    ref.read(myDoorProvider.notifier).set(mine);
+    state = state.copyWith(items: const [], isLoading: true, currentPage: 0);
     await _fetchPage(0);
   }
 
